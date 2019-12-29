@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:fluro/fluro.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 
@@ -21,12 +20,10 @@ class StateContainer extends StatefulWidget {
   StateContainer({
     @required this.child,
     @required this.service,
-    @required this.router,
   });
 
   final Widget child;
   final FlutterApplicationService service;
-  final Router router;
 
   static StateContainerState of(BuildContext context) => context
       .dependOnInheritedWidgetOfExactType<_InheritedStateContainer>()
@@ -39,7 +36,6 @@ class StateContainer extends StatefulWidget {
 class StateContainerState extends State<StateContainer> {
   SpongeConnection _connection;
   FlutterApplicationService get service => widget.service;
-  Router get router => widget.router;
   PageStorageBucket _bucket;
   PageStorageBucket get bucket => _bucket;
   PageStorageKey _storageKey;

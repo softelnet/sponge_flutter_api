@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO Move to flutter_client.
+export 'src/app/digits/digits_mvp.dart';
+export 'src/app/digits/digits_widget.dart';
+
 export 'src/application_constants.dart';
 export 'src/common/bloc/action_call_bloc.dart';
 export 'src/common/bloc/action_call_state.dart';
