@@ -10,9 +10,19 @@ dependencies:
   flutter:
     sdk: flutter
 
+  sponge_client_dart: ^1.14.0+1
+  sponge_grpc_client_dart: ^1.14.0
+dependency_overrides:
+  # Use the local library if possible.
+  sponge_client_dart:
+    path: ../sponge_client_dart
+  sponge_grpc_client_dart:
+    path: ../sponge_grpc_client_dart
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
