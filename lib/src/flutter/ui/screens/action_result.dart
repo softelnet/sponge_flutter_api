@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/flutter/mobile_model.dart';
+import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
@@ -91,7 +91,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
 
   static UnitTypeGuiProvider getActionResultProvider(
       BuildContext context, ActionData actionData) {
-    if (actionData is MobileActionData) {
+    if (actionData is FlutterActionData) {
       return actionData.resultProvider;
     }
 

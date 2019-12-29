@@ -26,7 +26,7 @@ import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
-import 'package:sponge_flutter_api/src/flutter/mobile_model.dart';
+import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
@@ -34,8 +34,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_pro
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-class MobileApplicationService extends ApplicationService<MobileSpongeService> {
-  static final Logger _logger = Logger('MobileApplicationService');
+class FlutterApplicationService extends ApplicationService<FlutterSpongeService> {
+  static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
   final typeGuiProvider = DefaultTypeGuiProvider();
   final icons = MdiIcons();
@@ -221,17 +221,17 @@ class MobileApplicationService extends ApplicationService<MobileSpongeService> {
       typeGuiProvider.getProvider(type);
 
   @override
-  Future<MobileSpongeService> createSpongeService(
+  Future<FlutterSpongeService> createSpongeService(
       SpongeConnection connection, TypeConverter typeConverter) async {
     var service =
-        MobileSpongeService(connection, typeConverter, typeGuiProvider)
+        FlutterSpongeService(connection, typeConverter, typeGuiProvider)
           ..actionIntentHandlers = _actionIntentHandlers;
 
     return service;
   }
 
   @override
-  Future<void> startSpongeService(MobileSpongeService spongeService) async {
+  Future<void> startSpongeService(FlutterSpongeService spongeService) async {
     await super.startSpongeService(spongeService);
 
     // Subscribe but don't block the current thread.
@@ -344,16 +344,16 @@ class MobileApplicationService extends ApplicationService<MobileSpongeService> {
   }
 }
 
-class MobileSpongeService extends SpongeService<MobileActionData> {
-  MobileSpongeService(SpongeConnection connection, TypeConverter typeConverter,
+class FlutterSpongeService extends SpongeService<FlutterActionData> {
+  FlutterSpongeService(SpongeConnection connection, TypeConverter typeConverter,
       this.typeGuiProvider)
       : super(connection, typeConverter: typeConverter);
 
   final TypeGuiProvider typeGuiProvider;
 
   @override
-  MobileActionData createActionData(ActionMeta actionMeta) =>
-      MobileActionData(actionMeta, typeGuiProvider);
+  FlutterActionData createActionData(ActionMeta actionMeta) =>
+      FlutterActionData(actionMeta, typeGuiProvider);
 }
 
 class MobileApplicationSettings extends ApplicationSettings {

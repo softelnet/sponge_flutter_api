@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 export 'src/application_constants.dart';
 export 'src/common/bloc/action_call_bloc.dart';
 export 'src/common/bloc/action_call_state.dart';
@@ -32,10 +31,10 @@ export 'src/common/ui/edit_widgets_mvp.dart';
 export 'src/common/ui/events_mvp.dart';
 export 'src/flutter/compatibility/compatibility_mobile.dart';
 export 'src/flutter/configuration/preferences_configuration.dart';
+export 'src/flutter/flutter_model.dart';
 export 'src/flutter/mobile_constants.dart';
-export 'src/flutter/mobile_model.dart';
 export 'src/flutter/routes.dart';
-export 'src/flutter/service/mobile_application_service.dart';
+export 'src/flutter/service/flutter_application_service.dart';
 export 'src/flutter/state_container.dart';
 export 'src/flutter/ui/screens/action_call.dart';
 export 'src/flutter/ui/screens/action_list_item.dart';

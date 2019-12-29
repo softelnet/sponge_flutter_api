@@ -21,7 +21,7 @@ import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
-import 'package:sponge_flutter_api/src/flutter/service/mobile_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
@@ -177,18 +177,18 @@ String getValueDescription(dynamic value) =>
     (value != null && value is AnnotatedValue) ? value.valueDescription : null;
 
 IconData getActionIconDataByActionName(
-    MobileApplicationService service, String actionName) {
+    FlutterApplicationService service, String actionName) {
   var actionMeta = service.spongeService.getCachedAction(actionName).actionMeta;
 
   return getActionIconData(service, actionMeta);
 }
 
 IconData getActionIconData(
-    MobileApplicationService service, ActionMeta actionMeta) {
+    FlutterApplicationService service, ActionMeta actionMeta) {
   return getIconData(service, actionMeta.features[Features.ICON]);
 }
 
-IconData getIconData(MobileApplicationService service, String iconName) {
+IconData getIconData(FlutterApplicationService service, String iconName) {
   if (iconName != null) {
     var iconData = service.icons[ReCase(iconName).camelCase];
     if (iconData?.codePoint != null) {

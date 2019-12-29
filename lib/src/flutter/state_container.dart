@@ -15,7 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
-import 'package:sponge_flutter_api/src/flutter/service/mobile_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 
 class StateContainer extends StatefulWidget {
   StateContainer({
@@ -25,7 +25,7 @@ class StateContainer extends StatefulWidget {
   });
 
   final Widget child;
-  final MobileApplicationService service;
+  final FlutterApplicationService service;
   final Router router;
 
   static StateContainerState of(BuildContext context) => context
@@ -38,7 +38,7 @@ class StateContainer extends StatefulWidget {
 
 class StateContainerState extends State<StateContainer> {
   SpongeConnection _connection;
-  MobileApplicationService get service => widget.service;
+  FlutterApplicationService get service => widget.service;
   Router get router => widget.router;
   PageStorageBucket _bucket;
   PageStorageBucket get bucket => _bucket;

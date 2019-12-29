@@ -17,7 +17,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/action_list_item_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/service/mobile_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
@@ -150,7 +150,7 @@ class _ActionListItemState extends State<ActionListItem>
   }
 
   Widget _getActionIcon(
-      BuildContext context, MobileApplicationService service) {
+      BuildContext context, FlutterApplicationService service) {
     var internalIconSupplier = () => Tooltip(
           message: 'The number of action arguments',
           child: Icon(

@@ -15,8 +15,8 @@
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
-class MobileActionData extends ActionData {
-  MobileActionData(ActionMeta actionMeta, this.typeGuiProvider)
+class FlutterActionData extends ActionData {
+  FlutterActionData(ActionMeta actionMeta, this.typeGuiProvider)
       : super(actionMeta) {
     _initProviders();
   }
@@ -55,8 +55,8 @@ class MobileActionData extends ActionData {
   }
 
   @override
-  MobileActionData copy({ActionData prototype}) =>
-      (super.copy(prototype: MobileActionData(actionMeta, typeGuiProvider))
-          as MobileActionData)
+  FlutterActionData copy({ActionData prototype}) =>
+      (super.copy(prototype: FlutterActionData(actionMeta, typeGuiProvider))
+          as FlutterActionData)
         .._initProviders();
 }
