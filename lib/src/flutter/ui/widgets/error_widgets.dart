@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
@@ -26,6 +24,9 @@ class ErrorPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO Verify error is SocketException.
+    var isSocketException = error?.runtimeType?.toString() ==
+        'SocketException'; //error is SocketException
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -37,8 +38,7 @@ class ErrorPanelWidget extends StatelessWidget {
                 Icons.error,
                 color: Colors.red,
               ),
-              title:
-                  Text(error is SocketException ? 'Connection error' : 'Error'),
+              title: Text(isSocketException ? 'Connection error' : 'Error'),
               subtitle: Text('$error'),
             ),
           ],

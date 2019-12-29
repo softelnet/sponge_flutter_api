@@ -19,7 +19,7 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gu
 class DefaultTypeGuiProvider extends TypeGuiProvider {
   DefaultTypeGuiProvider() {
     // Register default GUI providers.
-    this.registerAll({
+    registerAll({
       DataTypeKind.ANY: (type) => AnyTypeGuiProvider(type),
       DataTypeKind.BINARY: (type) => BinaryTypeGuiProvider(type),
       DataTypeKind.BOOLEAN: (type) => BooleanTypeGuiProvider(type),

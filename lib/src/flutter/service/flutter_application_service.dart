@@ -35,7 +35,7 @@ class FlutterApplicationService
     extends ApplicationService<FlutterSpongeService> {
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
-  final typeGuiProvider = DefaultTypeGuiProvider();
+  DefaultTypeGuiProvider typeGuiProvider = DefaultTypeGuiProvider();
   final icons = MdiIcons();
   MobileApplicationSettings get settings => super.settings;
   BuildContext _mainBuildContext;

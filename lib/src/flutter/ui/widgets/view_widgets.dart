@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +26,7 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 //import 'package:image_picker_saver/image_picker_saver.dart';
 
-typedef Future<File> OnFileSaveCallback();
+typedef OnFileSaveCallback = Future<String> Function();
 
 class ImageViewWidget extends StatelessWidget {
   ImageViewWidget({
@@ -55,12 +54,12 @@ class ImageViewWidget extends StatelessWidget {
                       onSelected: (value) async {
                         switch (value) {
                           case 'save':
-                            File file = await onSave();
+                            var filePath = await onSave();
                             await showModalDialog(
                                 context,
                                 'Information',
                                 Text(
-                                    'The image has been saved to the file ${file.path}'));
+                                    'The image has been saved to the file $filePath'));
                             break;
                         }
                       },

@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:io';
+//import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:logging/logging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 //import 'package:downloads_path_provider/downloads_path_provider.dart';
 //import 'package:simple_permissions/simple_permissions.dart';
-import 'package:http_parser/http_parser.dart';
-import 'package:open_file/open_file.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 
@@ -42,7 +39,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
         return TypeGuiProviderUtils.createWaitingViewer(editorContext);
       }
 
-      return _doCreateEditor(editorContext) ??
+      return doCreateEditor(editorContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeEditor(this,
               labelText: editorContext.safeTypeLabel,
               hintText: editorContext.hintText);
@@ -54,7 +51,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
-  Widget _doCreateEditor(TypeEditorContext editorContext) => null;
+  Widget doCreateEditor(TypeEditorContext editorContext) => null;
 
   @override
   Widget createCompactViewer(TypeViewerContext viewerContext) {
@@ -71,7 +68,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
             this, viewerContext.copy()..value = viewerContext.valueLabel);
       }
 
-      return _doCreateCompactViewer(viewerContext) ??
+      return doCreateCompactViewer(viewerContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeViewer(this,
               labelText: viewerContext.safeTypeLabel);
     } catch (e) {
@@ -80,7 +77,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) => null;
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) => null;
 
   @override
   Widget createViewer(TypeViewerContext viewerContext) {
@@ -91,7 +88,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
 
     try {
-      return _doCreateViewer(viewerContext) ??
+      return doCreateViewer(viewerContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeViewer(this,
               labelText: viewerContext.safeTypeLabel);
     } catch (e) {
@@ -100,7 +97,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
-  Widget _doCreateViewer(TypeViewerContext viewerContext) => null;
+  Widget doCreateViewer(TypeViewerContext viewerContext) => null;
   //   return _createTextBasedViewer(viewerContext);
   // }
 
@@ -109,14 +106,14 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     setupContext(viewerContext);
 
     try {
-      return _doCreateExtendedViewer(viewerContext);
+      return doCreateExtendedViewer(viewerContext);
     } catch (e) {
       _logger.severe('Extended viewer error', e);
       rethrow;
     }
   }
 
-  Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) => null;
+  Widget doCreateExtendedViewer(TypeViewerContext viewerContext) => null;
 
   @override
   dynamic getValueFromString(String s) {
@@ -124,10 +121,10 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     if (s != null && s.isEmpty) {
       s = null;
     }
-    return _doGetValueFromString(s);
+    return doGetValueFromString(s);
   }
 
-  dynamic _doGetValueFromString(String s) =>
+  dynamic doGetValueFromString(String s) =>
       throw Exception('Unsupported conversion from String to ${type.kind}');
 
   @override
@@ -144,13 +141,13 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
 
   Uint8List _compactViewerThumbnailCache;
 
-  String _getMimeType(UiContext uiContext) =>
+  String getMimeType(UiContext uiContext) =>
       DataTypeUtils.getFeatureOrProperty(type, uiContext.value,
           BinaryType.FEATURE_MIME_TYPE, () => type.mimeType);
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
-    switch (_getMimeType(editorContext)) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
+    switch (getMimeType(editorContext)) {
       case 'image/png':
         switch (Features.getCharacteristic(editorContext.features)) {
           case Features.TYPE_CHARACTERISTIC_DRAWING:
@@ -208,14 +205,14 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
         labelText: editorContext.safeTypeLabel,
         hintText: editorContext.hintText,
         message:
-            'Unsupported binary type mime=${_getMimeType(editorContext)}, features=${editorContext.features}');
+            'Unsupported binary type mime=${getMimeType(editorContext)}, features=${editorContext.features}');
   }
 
   Future<Uint8List> _createDrawingThumbnail(DrawingBinaryValue value) async =>
       await convertImageToPng(value, width: 100);
 
   Widget _createCompactViewerDataWidget(TypeViewerContext viewerContext) {
-    var mimeType = _getMimeType(viewerContext) ?? '';
+    var mimeType = getMimeType(viewerContext) ?? '';
 
     if (mimeType.startsWith('image/')) {
       _compactViewerThumbnailCache ??=
@@ -235,7 +232,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) {
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -250,7 +247,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   }
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     // TODO Binary viewer for images should have an option to be inline.
     return GestureDetector(
       onTap: () {
@@ -263,77 +260,13 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
       child: createCompactViewer(viewerContext),
     );
   }
-
-  @override
-  Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
-    if (viewerContext.value == null) {
-      return null;
-    }
-
-    var mimeType = _getMimeType(viewerContext) ?? '';
-
-    if (mimeType.isNotEmpty) {
-      if (StateContainer.of(viewerContext.context)
-              .service
-              .settings
-              .useInternalViewers &&
-          mimeType.startsWith('image/')) {
-        return ImageViewWidget(
-            name: viewerContext.typeLabel,
-            imageData: viewerContext.value,
-            onSave: () async {
-              // if (!(await SimplePermissions.checkPermission(
-              //     Permission.WriteExternalStorage))) {
-              //   var status = await SimplePermissions.requestPermission(
-              //       Permission.WriteExternalStorage);
-              //   if (status != PermissionStatus.authorized) {
-              //     return;
-              //   }
-              // }
-              Directory dir = //Platform.isAndroid
-                  //? await DownloadsPathProvider.downloadsDirectory
-                  await getApplicationDocumentsDirectory();
-              return await _saveFile(viewerContext, mimeType, dir);
-            });
-      } else {
-        // Async.
-        _launchExternalViewer(viewerContext, mimeType)
-            .catchError((e) => handleError(viewerContext.context, e));
-      }
-    }
-
-    return null;
-  }
-
-  Future<File> _saveFile(
-      TypeViewerContext viewerContext, String mimeType, Directory dir) async {
-    String filename = viewerContext.features[Features.TYPE_FILENAME];
-
-    if (filename == null) {
-      var mimeSubtype = MediaType.parse(mimeType).subtype;
-      filename = '${DateTime.now().microsecondsSinceEpoch}.$mimeSubtype';
-    }
-
-    var file = File('${dir.path}/$filename')
-      ..writeAsBytesSync(viewerContext.value, flush: true);
-
-    return file;
-  }
-
-  Future<void> _launchExternalViewer(
-      TypeViewerContext viewerContext, String mimeType) async {
-    var file =
-        await _saveFile(viewerContext, mimeType, await getTemporaryDirectory());
-
-    await OpenFile.open(file.path);
-  }
 }
 
 class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
   BooleanTypeGuiProvider(DataType type) : super(type);
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     String widgetType = Features.getOptional(
         editorContext.features, Features.WIDGET, () => null);
     String icon = editorContext.features[Features.ICON];
@@ -390,11 +323,11 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(this, viewerContext);
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     bool boolValue = viewerContext.value as bool;
 
     var label = viewerContext.getDecorationLabel();
@@ -419,7 +352,7 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
   DateTimeTypeGuiProvider(DataType type) : super(type);
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     if (editorContext.readOnly) {
       return createCompactViewer(editorContext.copyAsViewer());
     } else {
@@ -443,12 +376,12 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(
           this, viewerContext.copy()..value = _valueToString(viewerContext));
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedViewer(
           this, viewerContext.copy()..value = _valueToString(viewerContext));
 }
@@ -457,7 +390,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
   DynamicTypeGuiProvider(DataType type) : super(type);
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     var dynamicValue = editorContext.value as DynamicValue;
 
     if (dynamicValue == null) {
@@ -471,7 +404,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
         _createTargetQualifiedDataType(editorContext);
 
     if (editorContext.readOnly) {
-      return _doCreateViewer(editorContext.copyAsViewer());
+      return doCreateViewer(editorContext.copyAsViewer());
     } else {
       return typeProviderRegistry
           .getProvider(dynamicValue.type)
@@ -486,7 +419,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
           uiContext.qualifiedType.path, (uiContext.value as DynamicValue)?.type,
           isRoot: uiContext.qualifiedType.isRoot);
 
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) {
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     if (viewerContext.value == null) {
       return TypeGuiProviderUtils.createTextBasedCompactViewer(
           this, viewerContext);
@@ -503,7 +436,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
   }
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     if (viewerContext.value == null) {
       return TypeGuiProviderUtils.createTextBasedViewer(this, viewerContext);
     }
@@ -519,7 +452,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
   }
 
   @override
-  Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
+  Widget doCreateExtendedViewer(TypeViewerContext viewerContext) {
     if (viewerContext.value == null) {
       return null;
     }
@@ -539,10 +472,10 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
   IntegerTypeGuiProvider(DataType type) : super(type);
 
   @override
-  dynamic _doGetValueFromString(String s) => s != null ? int.parse(s) : null;
+  dynamic doGetValueFromString(String s) => s != null ? int.parse(s) : null;
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     int minValue = DataTypeUtils.getFeatureOrProperty(type, editorContext.value,
         IntegerType.FEATURE_MIN_VALUE, () => type.minValue);
     int maxValue = DataTypeUtils.getFeatureOrProperty(type, editorContext.value,
@@ -626,11 +559,11 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(this, viewerContext);
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedViewer(this, viewerContext);
 }
 
@@ -647,7 +580,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
 
   // TODO copy context
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     var hasElementValueSet = type.provided?.elementValueSet ?? false;
     if (hasElementValueSet) {
       return type.unique
@@ -671,11 +604,11 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
     }
   }
 
-  String _createListString(TypeViewerContext viewerContext) =>
-      viewerContext.value?.toString();
+  // String _createListString(TypeViewerContext viewerContext) =>
+  //     viewerContext.value?.toString();
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) {
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     return ListTypeWidget(
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
       uiContext: viewerContext,
@@ -687,7 +620,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   }
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     return ListTypeWidget(
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
       uiContext: viewerContext,
@@ -713,10 +646,10 @@ class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {
   NumberTypeGuiProvider(DataType type) : super(type);
 
   @override
-  dynamic _doGetValueFromString(String s) => s != null ? num.parse(s) : null;
+  dynamic doGetValueFromString(String s) => s != null ? num.parse(s) : null;
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     num minValue = DataTypeUtils.getFeatureOrProperty(type, editorContext.value,
         NumberType.FEATURE_MIN_VALUE, () => type.minValue);
     num maxValue = DataTypeUtils.getFeatureOrProperty(type, editorContext.value,
@@ -765,11 +698,11 @@ class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(this, viewerContext);
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedViewer(this, viewerContext);
 }
 
@@ -780,7 +713,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
       uiContext.qualifiedType.type as ObjectType;
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     var objectType = _getObjectType(editorContext);
 
     if (objectType.companionType == null) {
@@ -791,7 +724,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
         _createTargetQualifiedDataType(editorContext);
 
     if (editorContext.readOnly) {
-      return _doCreateViewer(editorContext.copyAsViewer());
+      return doCreateViewer(editorContext.copyAsViewer());
     } else {
       return typeProviderRegistry
           .getProvider(objectType.companionType)
@@ -804,7 +737,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
           (uiContext.qualifiedType.type as ObjectType).companionType,
           isRoot: uiContext.qualifiedType.isRoot);
 
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) {
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     var objectType = _getObjectType(viewerContext);
 
     if (objectType.companionType == null) {
@@ -818,7 +751,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
   }
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     var objectType = _getObjectType(viewerContext);
 
     if (objectType.companionType == null) {
@@ -832,7 +765,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
   }
 
   @override
-  Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
+  Widget doCreateExtendedViewer(TypeViewerContext viewerContext) {
     if (viewerContext.value == null) {
       return null;
     }
@@ -863,7 +796,7 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   // }
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     return RecordTypeWidget(
       key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
       uiContext: editorContext,
@@ -881,13 +814,13 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   //     : null;
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) {
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     // Show a normal viewer.
-    return _doCreateViewer(viewerContext);
+    return doCreateViewer(viewerContext);
   }
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) {
+  Widget doCreateViewer(TypeViewerContext viewerContext) {
     return RecordTypeWidget(
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
       uiContext: viewerContext.copyAsEditor()..readOnly = true,
@@ -917,10 +850,10 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
   StringTypeGuiProvider(DataType type) : super(type);
 
   @override
-  dynamic _doGetValueFromString(String s) => s;
+  dynamic doGetValueFromString(String s) => s;
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     int minLength = DataTypeUtils.getFeatureOrProperty(
         type,
         editorContext.value,
@@ -1002,15 +935,15 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
   }
 
   @override
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(this, viewerContext);
 
   @override
-  Widget _doCreateViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedViewer(this, viewerContext);
 
   @override
-  Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
+  Widget doCreateExtendedViewer(TypeViewerContext viewerContext) {
     return TypeGuiProviderUtils.createTextBasedExtendedViewer(
         this, viewerContext);
   }
@@ -1024,7 +957,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
   VoidTypeGuiProvider(DataType type) : super(type);
 
   @override
-  Widget _doCreateEditor(TypeEditorContext editorContext) {
+  Widget doCreateEditor(TypeEditorContext editorContext) {
     String icon = editorContext.features[Features.ICON];
 
     var onTap = editorContext.enabled &&
@@ -1050,7 +983,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
     );
   }
 
-  Widget _doCreateCompactViewer(TypeViewerContext viewerContext) =>
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(
           this, viewerContext.copy()..value = 'Success');
 }
