@@ -1,4 +1,4 @@
-// Copyright 2019 The Sponge authors.
+// Copyright 2018 The Sponge authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:flutter_test/flutter_test.dart';
-
-void main() {
-  test('adds one to input values', () {
-    // final calculator = Calculator();
-    // expect(calculator.addOne(2), 3);
-    // expect(calculator.addOne(-7), -6);
-    // expect(calculator.addOne(0), 1);
-    // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
-  });
+class MobileConstants {
+  static const TEXT_VIEWER_WIDTH_SCALE = 1000;
 }

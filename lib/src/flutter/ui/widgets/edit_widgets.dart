@@ -1,0 +1,1355 @@
+// Copyright 2018 The Sponge authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:intl/intl.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/flutter/service/mobile_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
+
+class OptionalScrollContainer extends InheritedWidget {
+  OptionalScrollContainer({
+    Key key,
+    @required this.scrollable,
+    @required Widget child,
+  }) : super(key: key, child: child);
+
+  final bool scrollable;
+
+  @override
+  bool updateShouldNotify(OptionalScrollContainer old) => true;
+
+  static OptionalScrollContainer of(BuildContext context) =>
+      context.inheritFromWidgetOfExactType(OptionalScrollContainer)
+          as OptionalScrollContainer;
+}
+
+class OptionalExpanded extends StatelessWidget {
+  OptionalExpanded({
+    Key key,
+    @required this.child,
+  }) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return (OptionalScrollContainer.of(context)?.scrollable ?? true)
+        ? child
+        : Expanded(
+            child: child,
+          );
+  }
+}
+
+class RecordTypeWidget extends StatefulWidget {
+  RecordTypeWidget({
+    Key key,
+    @required this.uiContext,
+  }) : super(key: key) {
+    Validate.isTrue(
+        uiContext.qualifiedType.type is RecordType, 'Record type expected');
+  }
+
+  final UiContext uiContext;
+
+  @override
+  _RecordTypeWidgetState createState() => _RecordTypeWidgetState();
+}
+
+class _RecordTypeWidgetState extends State<RecordTypeWidget> {
+  Map<String, UnitTypeGuiProvider> _typeGuiProviders;
+  SubActionsController _contextActionsController;
+  bool _isExpanded;
+
+  bool get isRecordReadOnly =>
+      (widget.uiContext is TypeEditorContext &&
+          (widget.uiContext as TypeEditorContext).readOnly) ||
+      (widget.uiContext.qualifiedType.type.provided?.readOnly ?? false);
+
+  bool get isRecordEnabled =>
+      widget.uiContext is TypeEditorContext &&
+          (widget.uiContext as TypeEditorContext).enabled ||
+      !(widget.uiContext is TypeEditorContext);
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return _build(context);
+    } catch (e) {
+      return Center(child: ErrorPanelWidget(error: e));
+    }
+  }
+
+  Widget _build(BuildContext context) {
+    if (_isExpanded == null) {
+      _isExpanded = !widget.uiContext.qualifiedType.type.nullable &&
+              widget.uiContext.value != null ||
+          widget.uiContext.value != null;
+    } else if (_isExpanded && widget.uiContext.value == null) {
+      _isExpanded = false;
+    }
+
+    var label = widget.uiContext.getDecorationLabel();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            if (widget.uiContext.qualifiedType.type.nullable ||
+                DataTypeUtils.isValueNotSet(widget.uiContext.value))
+              IconButton(
+                key: Key('record-expand'),
+                icon: Icon(_isExpanded
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank),
+                tooltip: 'Set nullable value',
+                onPressed: isRecordEnabled && !isRecordReadOnly
+                    ? () {
+                        setState(() {
+                          _toggleExpand();
+                        });
+                      }
+                    : null,
+              ),
+            if (label != null)
+              Text(
+                label,
+                style: getArgLabelTextStyle(context),
+              ),
+          ],
+          //alignment: Alignment.centerLeft,
+        ),
+        if (_isExpanded)
+          Container(
+            height: 5,
+          ),
+        if (_isExpanded)
+          OptionalExpanded(
+            child: Card(
+              margin: EdgeInsets.only(bottom: 5),
+              elevation: 1,
+              shape: BeveledRectangleBorder(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildFieldsWidgets(context),
+              ),
+              color: Theme.of(widget.uiContext.context).scaffoldBackgroundColor,
+              //shape: StadiumBorder(side: BorderSide(width: 2.0)),
+              //margin: EdgeInsets.all(5),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _toggleExpand() {
+    _isExpanded = !_isExpanded;
+
+    if (_isExpanded) {
+      if (widget.uiContext.value == null) {
+        Map<String, dynamic> newValue = {};
+        var defaultValue = DataTypeUtils.unwrapAnnotatedValue(
+            widget.uiContext.qualifiedType.type.defaultValue);
+
+        if (defaultValue != null) {
+          Validate.isTrue(defaultValue is Map<String, dynamic>,
+              'A default value for a record should be a map');
+          newValue = defaultValue;
+        }
+
+        widget.uiContext.value = newValue;
+      }
+    } else {
+      widget.uiContext.value = null;
+    }
+
+    _onSave(widget.uiContext.qualifiedType, widget.uiContext.value);
+  }
+
+  List<Widget> _buildFieldsWidgets(BuildContext context) {
+    RecordType recordType = widget.uiContext.qualifiedType.type as RecordType;
+
+    var service = StateContainer.of(context).service;
+    _typeGuiProviders ??= Map.fromIterable(recordType.fields,
+        key: (field) => field.name,
+        value: (field) => service.getTypeGuiProvider(field));
+
+    List<Widget> widgets = [];
+
+    _contextActionsController = SubActionsController(
+      spongeService: service.spongeService,
+      parentFeatures: widget.uiContext.features,
+      elementType: recordType,
+      onBeforeInstantCall: () async {
+        await widget.uiContext.callbacks.onBeforeSubActionCall();
+      },
+      onAfterCall: (subActionSpec, state, index) async {
+        // Handle sub-action result substitution.
+        if (subActionSpec.resultSubstitution != null &&
+            state is ActionCallStateEnded &&
+            state.resultInfo != null &&
+            state.resultInfo.isSuccess) {
+          var parentType = subActionSpec.resultSubstitution ==
+                  DataTypeUtils.THIS
+              ? widget.uiContext.qualifiedType
+              : widget.uiContext.qualifiedType.createChild(
+                  recordType.getFieldType(subActionSpec.resultSubstitution));
+
+          var value = state.resultInfo.result;
+          if (subActionSpec.resultSubstitution != DataTypeUtils.THIS ||
+              !DataTypeUtils.isNull(value)) {
+            _onSave(parentType, value);
+          }
+        }
+
+        await widget.uiContext.callbacks.onAfterSubActionCall(state);
+      },
+    );
+
+    if (isRecordEnabled &&
+        _contextActionsController.hasSubActions(widget.uiContext.value)) {
+      widgets.add(Align(
+        child: Container(
+          child: SubActionsWidget(
+            controller: _contextActionsController,
+            value: widget.uiContext.value,
+            beforeSelectedSubAction: _beforeContextAction,
+          ),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).dividerColor,
+          ),
+          margin: EdgeInsets.only(right: 5),
+        ),
+        alignment: Alignment.centerRight,
+      ));
+    }
+
+    var groups = _createFieldGroups(recordType);
+    groups.asMap().forEach((i, group) {
+      widgets.add(_buildFieldGroupWidget(context, group));
+
+      if (i < groups.length - 1) {
+        widgets.add(Divider());
+      }
+    });
+
+    return widgets;
+  }
+
+  Future<bool> _beforeContextAction(ActionData subActionData,
+      SubActionType subActionType, dynamic contextValue) async {
+    if (subActionData.needsRunConfirmation) {
+      if (!(await showConfirmationDialog(context,
+          'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  List<List<DataType>> _createFieldGroups(RecordType recordType) {
+    List<List<DataType>> groups = [];
+    String lastGroupName;
+    int lastGroupIndex = -1;
+
+    // TODO Util method - merge with annotated features.
+    recordType.fields
+        .where((fieldType) => fieldType.features[Features.VISIBLE] ?? true)
+        .toList()
+        .asMap()
+        .forEach((i, fieldType) {
+      String fieldGroup = fieldType.features[Features.GROUP];
+      if (lastGroupName != null && lastGroupName == fieldGroup) {
+        groups[lastGroupIndex].add(fieldType);
+      } else {
+        groups.add([fieldType]);
+        lastGroupIndex++;
+      }
+
+      lastGroupName = fieldGroup;
+    });
+
+    return groups;
+  }
+
+  Widget _buildFieldGroupWidget(
+      BuildContext context, List<DataType> fieldGroup) {
+    Widget groupWidget;
+
+    List<Widget> rawFieldWidgets = fieldGroup
+        .map((fieldType) => _buildFieldWidget(
+              context,
+              widget.uiContext.qualifiedType,
+              widget.uiContext.qualifiedType.createChild(fieldType),
+              widget.uiContext.value as Map,
+            ))
+        .toList();
+
+    if (rawFieldWidgets.length > 1) {
+      groupWidget = Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: rawFieldWidgets,
+      );
+    } else if (rawFieldWidgets.length == 1) {
+      groupWidget = rawFieldWidgets.first;
+    }
+
+    groupWidget = Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
+      child: Align(
+        child: groupWidget,
+        alignment: Alignment.centerLeft,
+      ),
+    );
+
+    return
+        // Expanded only if any in a group field shoud have a scroll.
+        fieldGroup.any((fieldType) => hasListTypeScroll(fieldType))
+            ? OptionalExpanded(child: groupWidget)
+            : groupWidget;
+  }
+
+  void _onSave(QualifiedDataType qType, dynamic value) {
+    widget.uiContext.callbacks.onSave(qType, value);
+  }
+
+  void _onUpdate(QualifiedDataType qType, dynamic value) {
+    widget.uiContext.callbacks.onUpdate(qType, value);
+  }
+
+  Widget _buildFieldWidget(BuildContext context, QualifiedDataType recordType,
+      QualifiedDataType qFieldType, Map record) {
+    try {
+      Validate.notNull(
+          record, 'The record ${recordType.type.name} must not be null');
+      var fieldValue = record[qFieldType.type.name];
+      var onSave = (value) => setState(() {
+            _onSave(qFieldType, value);
+          });
+      var onUpdate = (value) => setState(() {
+            _onUpdate(qFieldType, value);
+          });
+
+      var editorContext = TypeEditorContext(
+        widget.uiContext.name,
+        context,
+        widget.uiContext.callbacks,
+        qFieldType,
+        fieldValue,
+        hintText: qFieldType.type.description,
+        onSave: onSave,
+        onUpdate: onUpdate,
+        readOnly: //widget.editorContext.readOnly || // TODO Rename to enabled
+            !widget.uiContext.callbacks.shouldBeEnabled(qFieldType) ||
+                widget.uiContext is TypeEditorContext &&
+                    !(widget.uiContext as TypeEditorContext).enabled,
+        enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
+            isRecordEnabled, // && ifFieldEnabled,
+      );
+
+      if (qFieldType.type.provided?.hasValueSet ?? false) {
+        return AbsorbPointer(
+          child: ProvidedValueSetEditorWidget(
+            editorContext.getDecorationLabel(),
+            qFieldType,
+            qFieldType.type.provided.valueSet,
+            fieldValue,
+            widget.uiContext.callbacks.onGetProvidedArg,
+            onSave,
+          ),
+          absorbing: qFieldType.type.provided.readOnly || !isRecordEnabled,
+        );
+      }
+
+      var isFieldReadOnly = qFieldType.type.provided?.readOnly ?? false;
+      //var isFieldEnabled = qFieldType.type.provided?.readOnly ?? false;
+
+      // Switch to a viewer for a record field if necessary.
+      if (isRecordReadOnly || isFieldReadOnly || !isRecordEnabled) {
+        return Padding(
+          padding: EdgeInsets.only(left: 0, right: 0, top: 5, bottom: 5),
+          child: _typeGuiProviders[qFieldType.type.name]
+              .createViewer(editorContext.copyAsViewer()),
+        );
+      }
+
+      return _typeGuiProviders[qFieldType.type.name]
+          .createEditor(editorContext);
+    } catch (e) {
+      return ErrorPanelWidget(error: e);
+    }
+  }
+}
+
+typedef ProvidedValue GetProvidedArgCallback(QualifiedDataType qType);
+
+// TODO Handle readOnly providedValueSet
+// TODO Handle value set in GuiProviders - typed
+class ProvidedValueSetEditorWidget extends StatefulWidget {
+  ProvidedValueSetEditorWidget(
+    this.label,
+    this.qType,
+    this.valueSetMeta,
+    this.value,
+    this.onGetProvidedArg,
+    this.onSaved,
+  );
+  final String label;
+  final QualifiedDataType qType;
+  final ValueSetMeta valueSetMeta;
+  final dynamic value;
+  final GetProvidedArgCallback onGetProvidedArg;
+  final ValueChanged onSaved;
+
+  @override
+  _ProvidedValueSetEditorWidgetState createState() =>
+      _ProvidedValueSetEditorWidgetState();
+}
+
+class _ProvidedValueSetEditorWidgetState
+    extends State<ProvidedValueSetEditorWidget> {
+  TextEditingController _controller;
+
+  /// Creates a new controller initially and every time an argument value has changed.
+  TextEditingController getOrCreateController() {
+    if (_controller == null || widget.value != _controller.text) {
+      // TODO Dispose controller when creating a new.
+      _controller = TextEditingController(text: widget.value?.toString() ?? '')
+        ..addListener(() {
+          widget.onSaved(_controller.text);
+        });
+    }
+
+    return _controller;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _controller?.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.valueSetMeta.limited) {
+      var items = _getLimitedMenuItems();
+      var hasItems = items.isNotEmpty;
+
+      Widget dropdown = DropdownButtonHideUnderline(
+        child: DropdownButton(
+          key: Key(createDataTypeKeyValue(widget.qType)),
+          // TODO Is this condition required?
+          value: hasItems
+              ? widget.value /*widget.presenter.getArg(widget.index)*/ : null,
+          items: hasItems ? items : null,
+          onChanged: (value) {
+            setState(() {});
+            widget.onSaved(value);
+          },
+          disabledHint: Container(),
+          isExpanded: true,
+          //isDense: true,
+        ),
+      );
+
+      return widget.label != null
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  widget.label,
+                  style: Theme.of(context).inputDecorationTheme.labelStyle,
+                  // TODO Style same as in text field.
+                  //DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.1),
+                ),
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: dropdown,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : dropdown;
+    } else {
+      // TODO Only String non-limited values are supported.
+
+      var items = _getNotLimitedMenuItems();
+      return Row(
+        children: <Widget>[
+          Flexible(
+            child: TextField(
+              key: Key(createDataTypeKeyValue(widget.qType)),
+              decoration: widget.label != null
+                  ? InputDecoration(
+                      border: InputBorder.none, labelText: widget.label)
+                  : null,
+              controller: getOrCreateController(),
+            ),
+          ),
+          Visibility(
+            child: PopupMenuButton(
+              key: Key('popup-${createDataTypeKeyValue(widget.qType)}'),
+              itemBuilder: (BuildContext context) => items,
+              onSelected: (value) {
+                _controller.text = value?.toString();
+              },
+            ),
+            visible: !(items?.isEmpty ?? true),
+          ),
+        ],
+      );
+    }
+  }
+
+  List<AnnotatedValue> _getValueSetValues() {
+    ProvidedValue argValue = widget.onGetProvidedArg(widget.qType);
+    return argValue?.annotatedValueSet
+            ?.where((annotatedValue) => annotatedValue != null)
+            ?.toList() ??
+        [];
+  }
+
+  List<DropdownMenuItem<dynamic>> _getLimitedMenuItems() {
+    List<AnnotatedValue> valueSetValues = _getValueSetValues();
+
+    // If the type is nullable and has value set that contains no null values, insert a first element that has a null value.
+    if (widget.qType.type.nullable &&
+        valueSetValues.every((valueSetValue) => valueSetValue?.value != null)) {
+      valueSetValues = []
+        ..add(AnnotatedValue(null))
+        ..addAll(valueSetValues);
+    }
+
+    return valueSetValues
+        .map((annotatedValue) => DropdownMenuItem(
+              value: annotatedValue.value,
+              child: Text(annotatedValue.valueLabel ??
+                  annotatedValue.value?.toString() ??
+                  ''),
+            ))
+        .toList();
+  }
+
+  List<PopupMenuItem> _getNotLimitedMenuItems() {
+    return _getValueSetValues()
+        .map((annotatedValue) => PopupMenuItem(
+              value: annotatedValue.value,
+              child: Text(annotatedValue.valueLabel ??
+                  annotatedValue.value?.toString() ??
+                  ''),
+            ))
+        .toList();
+  }
+}
+
+class ColorEditWidget extends StatefulWidget {
+  ColorEditWidget({
+    Key key,
+    @required this.name,
+    @required this.initialColor,
+    @required this.onColorChanged,
+    @required this.defaultColor,
+    this.enabled = true,
+  }) : super(key: key);
+
+  final String name;
+  final Color initialColor;
+  final Color defaultColor;
+  final ValueChanged<Color> onColorChanged;
+  final bool enabled;
+
+  @override
+  _ColorEditWidgetState createState() => _ColorEditWidgetState();
+}
+
+class _ColorEditWidgetState extends State<ColorEditWidget> {
+  Color _currentPickerColor;
+
+  @override
+  Widget build(BuildContext context) {
+    var suggestedColor = widget.initialColor ?? widget.defaultColor;
+    return FlatButton(
+      child: Text(
+        '${widget.name ?? 'Color'}${widget.initialColor != null ? " (" + color2string(widget.initialColor) + ")" : ""}',
+        style: TextStyle(color: getContrastColor(suggestedColor)),
+      ),
+      color: suggestedColor,
+      onPressed: widget.enabled
+          ? () => showColorPicker(context, suggestedColor)
+          : null,
+    );
+  }
+
+  Future<void> showColorPicker(
+      BuildContext context, Color suggestedColor) async {
+    Color choosenColor = await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('Pick a color'),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: suggestedColor,
+            onColorChanged: (color) => _currentPickerColor = color,
+            enableLabel: true,
+            pickerAreaHeightPercent: 0.8,
+            enableAlpha: false,
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop(_currentPickerColor);
+            },
+          ),
+          FlatButton(
+            child: Text('CANCEL'),
+            onPressed: () {
+              Navigator.of(context).pop(null);
+            },
+          ),
+        ],
+      ),
+    );
+
+    if (choosenColor != null) {
+      widget.onColorChanged(choosenColor);
+    }
+  }
+}
+
+class DateTimeEditWidget extends StatefulWidget {
+  DateTimeEditWidget({
+    Key key,
+    @required this.name,
+    @required this.initialValue,
+    @required this.onValueChanged,
+    this.enabled = true,
+  }) : super(key: key);
+
+  final String name;
+  final DateTime initialValue;
+  final ValueChanged<DateTime> onValueChanged;
+  final bool enabled;
+
+  @override
+  _DateTimeEditWidgetState createState() => _DateTimeEditWidgetState();
+}
+
+// TODO DateTime editor support for different dateTimeKind.
+class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            if (widget.name != null) Text(widget.name),
+            FlatButton(
+              child: Text(widget.initialValue != null
+                  ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
+                  : 'DATE'),
+              onPressed: () =>
+                  _showDatePicker().catchError((e) => handleError(context, e)),
+            ),
+            FlatButton(
+              child: Text(widget.initialValue != null
+                  ? DateFormat('HH:mm').format(widget.initialValue)
+                  : 'TIME'),
+              onPressed: () =>
+                  _showTimePicker().catchError((e) => handleError(context, e)),
+            ),
+          ],
+        ),
+        onTap: () async {});
+  }
+
+  Future<void> _showDatePicker() async {
+    DateTime initialDate = widget.initialValue ?? DateTime.now();
+    DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      // TODO Date picker firstDate and lastDate.
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      widget.onValueChanged(picked);
+    }
+  }
+
+  Future<void> _showTimePicker() async {
+    TimeOfDay initialTime = widget.initialValue != null
+        ? TimeOfDay.fromDateTime(widget.initialValue)
+        : TimeOfDay.now();
+    TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+    );
+    if (picked != null) {
+      var newValue = widget.initialValue;
+      if (newValue == null) {
+        newValue = DateTime.now();
+      }
+      newValue = DateTime(
+          newValue.year,
+          newValue.month,
+          newValue.day,
+          picked.hour,
+          picked.minute,
+          newValue.second,
+          newValue.millisecond,
+          newValue.microsecond);
+
+      widget.onValueChanged(newValue);
+    }
+  }
+}
+
+class ListTypeWidget extends StatefulWidget {
+  ListTypeWidget({
+    Key key,
+    @required this.uiContext,
+    @required this.guiProvider,
+  }) : super(key: key);
+
+  final UiContext uiContext;
+  final ListTypeGuiProvider guiProvider;
+
+  @override
+  _ListTypeWidgetState createState() => _ListTypeWidgetState();
+}
+
+class _ListTypeWidgetState extends State<ListTypeWidget> {
+  // TODO Is PAGEABLE_SCROLL_EXTENT_TOLERANCE necessary?
+  static const double PAGEABLE_SCROLL_EXTENT_TOLERANCE = 20;
+
+  SubActionsController _subActionsController;
+  ScrollController _scrollController;
+  bool _busy = false;
+
+  MobileApplicationService get service => StateContainer.of(context).service;
+
+  bool get isPageable =>
+      widget.uiContext.features[Features.PROVIDE_VALUE_PAGEABLE] ?? false;
+
+  int get pageableOffset =>
+      widget.uiContext.features[Features.PROVIDE_VALUE_OFFSET];
+
+  int get pageableLimit =>
+      widget.uiContext.features[Features.PROVIDE_VALUE_LIMIT];
+
+  int get pageableCount =>
+      widget.uiContext.features[Features.PROVIDE_VALUE_COUNT];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (isPageable) {
+      _scrollController = ScrollController();
+      _scrollController.addListener(() {
+        // print(
+        //     '${_scrollController.position.pixels} / ${_scrollController.position.maxScrollExtent}');
+        if (_scrollController.position.pixels ==
+                _scrollController.position.maxScrollExtent //-
+            /*PAGEABLE_SCROLL_EXTENT_TOLERANCE*/) {
+          _getMoreData();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List data = isPageable
+        ? widget.uiContext.callbacks
+            .getPageableList(widget.uiContext.qualifiedType)
+        : (widget.uiContext.value as List ?? []);
+
+    var elementType = widget.guiProvider.type.elementType;
+
+    _subActionsController = SubActionsController(
+        spongeService: service.spongeService,
+        parentFeatures: widget.uiContext.features,
+        elementType: elementType,
+        onBeforeInstantCall: () async {
+          await widget.uiContext.callbacks.onBeforeSubActionCall();
+        },
+        onAfterCall: (subActionSpec, state, index) async {
+          if (subActionSpec.resultSubstitution != null &&
+              state is ActionCallStateEnded &&
+              state.resultInfo != null &&
+              state.resultInfo.isSuccess) {
+            Validate.isTrue(
+                subActionSpec.resultSubstitution == DataTypeUtils.THIS,
+                'Only result substitution to \'this\' is supported for a list element');
+            Validate.notNull(index, 'The list element index cannot be null');
+
+            var value = state.resultInfo.result;
+            if (!DataTypeUtils.isNull(value)) {
+              // TODO This logic shouldn't be in a view.
+              (widget.uiContext.value as List)[index] = value;
+              // Save all list.
+              widget.uiContext.callbacks.onSave(
+                  widget.uiContext.qualifiedType, widget.uiContext.value);
+            }
+          }
+
+          await widget.uiContext.callbacks.onAfterSubActionCall(state);
+        });
+
+    List<Widget> buttons = [];
+
+    if (_subActionsController.isCreateEnabled()) {
+      buttons.add(FlatButton(
+        key: Key('list-create'),
+        child: Icon(
+          getActionIconDataByActionName(
+                  service, _subActionsController.getCreateActionName()) ??
+              Icons.add,
+          color: getIconColor(context),
+        ),
+        padding: EdgeInsets.zero,
+        onPressed: () => _subActionsController
+            .onCreateElement(context)
+            .catchError((e) => handleError(context, e)),
+      ));
+    }
+
+    if (_isRefreshEnabled) {
+      buttons.add(FlatButton(
+        key: Key('list-refresh'),
+        child: Icon(
+          Icons.refresh,
+          color: getIconColor(context),
+        ),
+        padding: EdgeInsets.zero,
+        onPressed: () => _refresh().catchError((e) => handleError(context, e)),
+      ));
+    }
+
+    // TODO What if element type has no name?
+    // TODO What if element type is annotated?
+    var qElementType = widget.uiContext.qualifiedType.createChild(elementType);
+
+    var label = widget.uiContext.getDecorationLabel();
+
+    return ModalProgressHUD(
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                label ?? '',
+                style: getArgLabelTextStyle(context),
+              ),
+              Expanded(
+                child: Container(
+                  padding: buttons.isNotEmpty
+                      ? EdgeInsets.zero
+                      : EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: buttons,
+                  ),
+                ),
+              )
+            ],
+          ),
+          hasListTypeScroll(widget.uiContext.qualifiedType.type)
+              ? Expanded(
+                  child: PageStorageConsumer(
+                    child: ListView.builder(
+                      key: PageStorageKey(
+                          '${widget.uiContext.name}-${widget.uiContext.qualifiedType.path}'),
+                      controller: isPageable ? _scrollController : null,
+                      shrinkWrap: true,
+                      itemCount: data.length, // + (isPageable ? 1 : 0),
+                      itemBuilder: (BuildContext context, int index) {
+                        // if (isPageable && index == data.length) {
+                        //   return _buildProgressIndicator();
+                        // } else {
+                        return _createElementWidget(
+                            index, qElementType, data[index]);
+                        // }
+                      },
+                    ),
+                  ),
+                )
+              : ListBody(
+                  children: data
+                      .asMap()
+                      .map((index, element) => MapEntry(index,
+                          _createElementWidget(index, qElementType, element)))
+                      .values
+                      .toList(),
+                ),
+        ],
+      ),
+      inAsyncCall: _busy,
+    );
+  }
+
+  // Widget _buildProgressIndicator() {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(5.0),
+  //     child: Center(
+  //       child: Visibility(
+  //         //opacity: _busy ? 1.0 : 00,
+  //         visible: _busy,
+  //         child: CircularProgressIndicator(),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Future<void> _getMoreData() async {
+    var pageableList = widget.uiContext.callbacks
+        .getPageableList(widget.uiContext.qualifiedType);
+
+    if (pageableList.hasMorePages) {
+      if (!_busy) {
+        setState(() {
+          _busy = true;
+        });
+
+        await widget.uiContext.callbacks
+            .fetchPageableListPage(widget.uiContext.qualifiedType);
+
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
+  }
+
+  Widget _createElementWidget(
+      int index, QualifiedDataType qElementType, dynamic element) {
+    TypeViewerContext subUiContext = TypeViewerContext(
+      widget.uiContext.name,
+      context,
+      widget.uiContext.callbacks,
+      qElementType,
+      element,
+      showLabel: false,
+    );
+
+    var elementTypeProvider = widget.guiProvider.elementTypeProvider
+      ..setupContext(subUiContext);
+
+    var elementIcon = subUiContext.features[Features.ICON];
+
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 1,
+      shape: BeveledRectangleBorder(),
+      child: ListTile(
+        key: Key('list-element-$index'),
+        leading: elementIcon != null
+            ? Icon(getIconData(service, elementIcon))
+            : null,
+        title: elementTypeProvider.createCompactViewer(subUiContext),
+        subtitle: subUiContext.valueDescription != null
+            ? Text(subUiContext.valueDescription)
+            : null,
+        trailing: _subActionsController.hasSubActions(element) &&
+                widget.uiContext.enabled
+            ? SubActionsWidget(
+                key: Key('sub-actions'),
+                controller: _subActionsController,
+                value: element,
+                index: index,
+                beforeSelectedSubAction: _beforeSelectedSubAction,
+              )
+            : null,
+
+        //Icon(Icons.more_vert),
+        dense: true,
+        //contentPadding: EdgeInsets.all(0),
+        onTap: widget.uiContext.enabled && _isOnElementTap(element)
+            ? () => _onElementTap(subUiContext, element, index)
+                .catchError((e) => handleError(context, e))
+            : null,
+        contentPadding: EdgeInsets.all(5),
+      ),
+    );
+  }
+
+  Future<bool> _beforeSelectedSubAction(ActionData subActionData,
+      SubActionType subActionType, dynamic contextValue) async {
+    if (subActionData.needsRunConfirmation) {
+      String contextValueLabel =
+          contextValue is AnnotatedValue ? contextValue.valueLabel : null;
+      var confirmationQuestion;
+      if (subActionType == SubActionType.delete) {
+        confirmationQuestion =
+            'Do you want to remove ${contextValueLabel ?? " the element"}?';
+      } else {
+        confirmationQuestion =
+            'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?';
+      }
+      if (!(await showConfirmationDialog(context, confirmationQuestion))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool _isOnActivateSubmit(dynamic rawElement) =>
+      _subActionsController
+          .getFeatures(rawElement)[Features.SUB_ACTION_ACTIVATE_ACTION] ==
+      Features.TYPE_LIST_ACTIVATE_ACTION_VALUE_SUBMIT;
+
+  bool _isOnElementTap(dynamic rawElement) =>
+      _isOnActivateSubmit(rawElement) ||
+      _subActionsController.isActivateEnabled(rawElement) ||
+      service.settings.argumentListElementTapBehavior == 'update' &&
+          _subActionsController.isUpdateEnabled(rawElement) ||
+      _subActionsController.isReadEnabled(rawElement);
+
+  Future<void> _onElementTap(
+      TypeViewerContext subUiContext, dynamic rawElement, int index) async {
+    if (_isOnActivateSubmit(rawElement)) {
+      subUiContext.callbacks.onActivate(subUiContext.qualifiedType, rawElement);
+    } else if (_subActionsController.isActivateEnabled(rawElement)) {
+      await _subActionsController.onActivateElement(context, rawElement,
+          index: index);
+    } else if (service.settings.argumentListElementTapBehavior == 'update' &&
+        _subActionsController.isUpdateEnabled(rawElement)) {
+      await _subActionsController.onUpdateElement(context, rawElement,
+          index: index);
+    } else if (_subActionsController.isReadEnabled(rawElement)) {
+      await _subActionsController.onReadElement(context, rawElement,
+          index: index);
+    }
+  }
+
+  bool get _isRefreshEnabled =>
+      widget.uiContext?.qualifiedType?.type?.provided != null &&
+      (widget.uiContext?.features[Features.REFRESHABLE] ?? false);
+
+  Future<void> _refresh() async {
+    await widget.uiContext?.callbacks?.onRefreshArgs();
+  }
+}
+
+class MultiChoiceListEditWidget extends StatefulWidget {
+  MultiChoiceListEditWidget({
+    Key key,
+    @required this.qType,
+    @required this.labelText,
+    @required this.value,
+    @required this.onGetProvidedArg,
+    @required this.onSave,
+    @required this.enabled,
+  }) : super(key: key);
+
+  final QualifiedDataType qType;
+  final String labelText;
+  final List value;
+  final GetProvidedArgCallback onGetProvidedArg;
+  final ValueChanged onSave;
+  final bool enabled;
+
+  @override
+  _MultiChoiceListEditWidgetState createState() =>
+      _MultiChoiceListEditWidgetState();
+}
+
+class _MultiChoiceListEditWidgetState extends State<MultiChoiceListEditWidget> {
+  @override
+  Widget build(BuildContext context) {
+    List<AnnotatedValue> elementValueSet = _getElementValueSetValues();
+    var elementValueSetAsValues =
+        elementValueSet.map((annotatedValue) => annotatedValue.value).toList();
+
+    Set currentValueAsSet = widget.value?.toSet() ?? Set();
+
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                widget.labelText != null ? widget.labelText : '',
+                style: getArgLabelTextStyle(context),
+              ),
+            ],
+          ),
+          ListBody(
+            children: elementValueSet.map((elementValueSetAnnotatedValue) {
+              var label = elementValueSetAnnotatedValue.valueLabel ??
+                  elementValueSetAnnotatedValue.value;
+              return Row(
+                children: <Widget>[
+                  Checkbox(
+                    key: Key('checkbox-$label'),
+                    value: currentValueAsSet
+                        .contains(elementValueSetAnnotatedValue.value),
+                    onChanged: widget.enabled
+                        ? (bool selected) {
+                            setState(() {
+                              if (selected) {
+                                if (!widget.value.contains(
+                                    elementValueSetAnnotatedValue.value)) {
+                                  widget.value
+                                      .add(elementValueSetAnnotatedValue.value);
+                                }
+                              } else {
+                                widget.value.remove(
+                                    elementValueSetAnnotatedValue.value);
+                              }
+                            });
+
+                            // Set the list order according to the elementValueSet order.
+                            widget.value.sort((v1, v2) =>
+                                elementValueSetAsValues.indexOf(v1) -
+                                elementValueSetAsValues.indexOf(v2));
+
+                            widget.onSave(widget.value);
+                          }
+                        : null,
+                  ),
+                  Text(label),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<AnnotatedValue> _getElementValueSetValues() {
+    ProvidedValue argValue = widget.onGetProvidedArg(widget.qType);
+    return argValue?.annotatedElementValueSet
+            ?.where((annotatedValue) => annotatedValue != null)
+            ?.toList() ??
+        [];
+  }
+}
+
+class SliderWidget extends StatefulWidget {
+  SliderWidget({
+    Key key,
+    @required this.name,
+    @required this.initialValue,
+    @required this.minValue,
+    @required this.maxValue,
+    @required this.onValueChanged,
+    this.responsive = false,
+    this.enabled = true,
+  }) : super(key: key);
+
+  final String name;
+  final int initialValue;
+  final int minValue;
+  final int maxValue;
+  final ValueChanged<int> onValueChanged;
+  final bool responsive;
+  final bool enabled;
+
+  @override
+  _SliderWidgetState createState() => _SliderWidgetState();
+}
+
+class _SliderWidgetState extends State<SliderWidget> {
+  int _value;
+  bool _changingByUi = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_value == null || !_changingByUi || widget.responsive) {
+      _value = widget.initialValue;
+    }
+
+    return Slider(
+      activeColor: Theme.of(context).accentColor,
+      label: widget.name,
+      min: widget.minValue.roundToDouble(),
+      max: widget.maxValue.roundToDouble(),
+      value: _value?.roundToDouble() ?? widget.minValue.roundToDouble(),
+      onChanged: widget.enabled
+          ? (value) async {
+              if (!widget.responsive) {
+                _changingByUi = true;
+                setState(() {
+                  _value = value.toInt();
+                });
+              } else {
+                widget.onValueChanged(value?.toInt());
+              }
+            }
+          : null,
+      onChangeEnd: (value) async {
+        if (!widget.responsive) {
+          _changingByUi = false;
+          widget.onValueChanged(value?.toInt());
+        }
+      },
+    );
+  }
+}
+
+class TextEditWidget extends StatefulWidget {
+  TextEditWidget({
+    Key key,
+    @required this.provider,
+    @required this.editorContext,
+    @required this.inputType,
+    this.validator,
+    this.maxLines,
+  }) : super(key: key);
+
+  final UnitTypeGuiProvider provider;
+  final TypeEditorContext editorContext;
+  final TextInputType inputType;
+  final TypeEditorValidatorCallback validator;
+  final int maxLines;
+
+  @override
+  _TextEditWidgetState createState() => _TextEditWidgetState();
+}
+
+class _TextEditWidgetState extends State<TextEditWidget> {
+  TextEditingController _controller;
+
+  String get _sourceValue => widget.editorContext.value?.toString() ?? '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = TextEditingController(text: _sourceValue)
+      ..addListener(() {
+        widget.editorContext
+            .onUpdate(widget.provider.getValueFromString(_controller.text));
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _controller?.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _controller.value =
+        TextEditingController.fromValue(TextEditingValue(text: _sourceValue))
+            .value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _createTextEditWidget(
+      widget.provider,
+      widget.editorContext,
+      inputType: widget.inputType,
+    );
+  }
+
+  Widget _createTextEditWidget<T extends DataType>(
+    UnitTypeGuiProvider<T> provider,
+    TypeEditorContext editorContext, {
+    @required TextInputType inputType,
+    TypeEditorValidatorCallback validator,
+    int maxLines,
+  }) {
+    var decoration = InputDecoration(
+        border: InputBorder.none,
+        labelText: editorContext.getDecorationLabel(),
+        labelStyle: getArgLabelTextStyle(editorContext.context),
+        hintText: editorContext.hintText,
+        suffixIcon: editorContext.enabled && !editorContext.readOnly
+            ? GestureDetector(
+                key: Key('text-clear'),
+                child: Icon(
+                  MdiIcons.close,
+                  //Icons.cancel,
+                  color: Colors.grey,
+                  size: getArgLabelTextStyle(editorContext.context).fontSize *
+                      1.5,
+                ),
+                onTap: () => WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _controller.clear()))
+            : null);
+    bool obscure = Features.getOptional(
+        editorContext.features, Features.STRING_OBSCURE, () => false);
+
+    return TextFormField(
+      key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+      controller: _controller,
+      keyboardType: inputType,
+      decoration: decoration,
+      onFieldSubmitted: (String value) {
+        editorContext.onSave(provider.getValueFromString(value));
+      },
+      // TODO Are both onFieldSubmitted and onSaved necessary?
+      onSaved: (String value) {
+        editorContext.onSave(provider.getValueFromString(value));
+      },
+      validator: (value) {
+        if (!provider.type.nullable && value.isEmpty) {
+          return '${editorContext.qualifiedType.type.label ?? "Value"} is required';
+        }
+
+        return validator != null
+            ? validator(provider.getValueFromString(value))
+            : null;
+      },
+      maxLines: obscure ? 1 : maxLines,
+      enabled: editorContext.enabled && !editorContext.readOnly,
+      obscureText: obscure,
+    );
+  }
+}

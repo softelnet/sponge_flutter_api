@@ -1,4 +1,4 @@
-// Copyright 2019 The Sponge authors.
+// Copyright 2018 The Sponge authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:sponge_client_dart/sponge_client_dart.dart';
 
-void main() {
-  test('adds one to input values', () {
-    // final calculator = Calculator();
-    // expect(calculator.addOne(2), 3);
-    // expect(calculator.addOne(-7), -6);
-    // expect(calculator.addOne(0), 1);
-    // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
-  });
+class ApplicationConstants {
+  static const String URL_TEMPLATE =
+      'http://:/${SpongeClientConstants.DEFAULT_PATH}';
+
+  static const DEMO_SERVICE_ADDRESS = 'https://spongedemoapi.openksavi.org';
+  static const DEMO_SERVICE_NAME = 'Demo service';
 }

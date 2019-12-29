@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
 
-void main() {
-  test('adds one to input values', () {
-    // final calculator = Calculator();
-    // expect(calculator.addOne(2), 3);
-    // expect(calculator.addOne(-7), -6);
-    // expect(calculator.addOne(0), 1);
-    // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
-  });
+class ForwardingBloc<T> extends Bloc<T, T> {
+  ForwardingBloc({@required this.initialValue});
+
+  T initialValue;
+
+  @override
+  T get initialState => initialValue;
+
+  @override
+  Stream<T> mapEventToState(T event) async* {
+    yield event;
+  }
 }

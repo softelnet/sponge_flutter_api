@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:sponge_client_dart/sponge_client_dart.dart';
 
-void main() {
-  test('adds one to input values', () {
-    // final calculator = Calculator();
-    // expect(calculator.addOne(2), 3);
-    // expect(calculator.addOne(-7), -6);
-    // expect(calculator.addOne(0), 1);
-    // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
-  });
+class EventReceivedBloc {
+  EventReceivedBloc() {
+    onEvent = BehaviorSubject<EventData>();
+    event = onEvent.asBroadcastStream();
+  }
+
+  BehaviorSubject<EventData> onEvent;
+  Observable<EventData> event;
+
+  void dispose() => onEvent.close();
+  void clear() => onEvent.add(null);
 }
