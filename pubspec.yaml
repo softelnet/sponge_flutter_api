@@ -36,7 +36,6 @@ dependencies:
   #{ TODO mobile only!
   path_provider: ^1.5.1
   downloads_path_provider: ^0.1.0
-  flutter_local_notifications: ^0.8.4+3
   #}
 
   sponge_client_dart: ^1.14.0+1

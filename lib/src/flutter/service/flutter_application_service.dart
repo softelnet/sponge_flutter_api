@@ -19,7 +19,6 @@ import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
@@ -27,14 +26,13 @@ import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
-import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-class FlutterApplicationService extends ApplicationService<FlutterSpongeService> {
+class FlutterApplicationService
+    extends ApplicationService<FlutterSpongeService> {
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
   final typeGuiProvider = DefaultTypeGuiProvider();
@@ -42,8 +40,7 @@ class FlutterApplicationService extends ApplicationService<FlutterSpongeService>
   MobileApplicationSettings get settings => super.settings;
   BuildContext _mainBuildContext;
   final Map<String, ActionIntentHandler> _actionIntentHandlers = {};
-  FlutterLocalNotificationsPlugin _localNotificationsPlugin;
-  final int _eventNotificationId = 0;
+
   Timer _subscriptionWatchdog;
 
   Future<void> init() async {
@@ -55,8 +52,6 @@ class FlutterApplicationService extends ApplicationService<FlutterSpongeService>
         createTypeConverter(this));
 
     _initActionIntentHandlers();
-
-    await _initLocalNotifications();
   }
 
   void _initActionIntentHandlers() {
@@ -180,30 +175,6 @@ class FlutterApplicationService extends ApplicationService<FlutterSpongeService>
     return actionMeta.getArgIndex(subscribeType.name);
   }
 
-  Future<void> _initLocalNotifications() async {
-    _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    await _localNotificationsPlugin.initialize(
-      InitializationSettings(
-          AndroidInitializationSettings('@mipmap/ic_launcher'),
-          IOSInitializationSettings()),
-      onSelectNotification: _onSelectNotification,
-    );
-  }
-
-  Future _onSelectNotification(String payload) async {
-    try {
-      _logger.info('Notification tapped: $payload');
-
-      // Show the event handler action.
-      await showEventHandlerActionById(mainBuildContext, payload);
-
-      // The show the event list.
-      await showDistinctScreen(mainBuildContext, Routes.EVENTS);
-    } catch (e) {
-      _logger.severe('Notification plugin error', e);
-    }
-  }
-
   // TODO BuildContext to service.
   void bindMainBuildContext(BuildContext mainBuildContext) {
     _mainBuildContext = mainBuildContext;
@@ -236,12 +207,6 @@ class FlutterApplicationService extends ApplicationService<FlutterSpongeService>
 
     // Subscribe but don't block the current thread.
     unawaited(subscribe(spongeService));
-  }
-
-  @override
-  Future<void> closeSpongeService() async {
-    await super.closeSpongeService();
-    await _localNotificationsPlugin?.cancelAll();
   }
 
   @override
@@ -312,36 +277,7 @@ class FlutterApplicationService extends ApplicationService<FlutterSpongeService>
     }
   }
 
-  Future<void> showEventNotification(EventData eventData) async {
-    // Get details on if the app was launched via a notification
-    // var notificationAppLaunchDetails =
-    // await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    var label = eventData.event.label ?? eventData.type.label;
-    var message = eventData.event.description ??
-        eventData.type.description ??
-        label ??
-        eventData.event.name;
-    await _localNotificationsPlugin.show(
-      _eventNotificationId,
-      label ?? 'Sponge',
-      message,
-      NotificationDetails(
-          AndroidNotificationDetails(
-            'sponge',
-            'Sponge',
-            'Sponge channel',
-            ticker: message,
-            enableVibration: false,
-          ),
-          IOSNotificationDetails()),
-      payload: eventData.event.id,
-    );
-  }
-
-  @override
-  Future<void> clearEventNotifications() async {
-    await _localNotificationsPlugin.cancel(_eventNotificationId);
-  }
+  Future<void> showEventNotification(EventData eventData) async {}
 }
 
 class FlutterSpongeService extends SpongeService<FlutterActionData> {
