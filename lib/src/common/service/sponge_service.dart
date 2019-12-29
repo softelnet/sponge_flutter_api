@@ -28,6 +28,7 @@ class SpongeService<AD extends ActionData> {
   SpongeService(
     this._connection, {
     this.typeConverter,
+    this.actionIntentHandlers = const {},
   });
 
   static final Logger _logger = Logger('SpongeService');
@@ -42,7 +43,7 @@ class SpongeService<AD extends ActionData> {
   final Lock _lock = Lock(reentrant: true);
   List<AD> _actions;
   Map<String, ActionCallBloc> _actionCallBloc = {};
-  Map<String, ActionIntentHandler> actionIntentHandlers = {};
+  Map<String, ActionIntentHandler> actionIntentHandlers;
 
   ClientSubscription _subscription;
   ClientSubscription get subscription => _subscription;
@@ -75,7 +76,7 @@ class SpongeService<AD extends ActionData> {
     Map<String, dynamic> features = await _client.getFeatures();
     if (features[SpongeClientConstants.REMOTE_API_FEATURE_GRPC_ENABLED] ??
         false) {
-      _grpcClient = _createSpongeGrpcClient();
+      _grpcClient = createSpongeGrpcClient(_client, _connection);
     }
 
     eventReceivedBloc?.dispose();
@@ -401,11 +402,12 @@ class SpongeService<AD extends ActionData> {
     );
   }
 
-  SpongeGrpcClient _createSpongeGrpcClient() {
+  SpongeGrpcClient createSpongeGrpcClient(
+      SpongeRestClient client, SpongeConnection connection) {
     return DefaultSpongeGrpcClient(
-      _client,
+      client,
       channelOptions: ChannelOptions(
-        credentials: _connection.isSecure()
+        credentials: connection.isSecure()
             ? ChannelCredentials.secure()
             : ChannelCredentials.insecure(),
       ),

@@ -31,8 +31,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-class FlutterApplicationService
-    extends ApplicationService<FlutterSpongeService> {
+class FlutterApplicationService<S extends FlutterSpongeService>
+    extends ApplicationService<S> {
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
   DefaultTypeGuiProvider typeGuiProvider = DefaultTypeGuiProvider();
@@ -192,13 +192,19 @@ class FlutterApplicationService
       typeGuiProvider.getProvider(type);
 
   @override
-  Future<FlutterSpongeService> createSpongeService(
+  Future<S> createSpongeService(
       SpongeConnection connection, TypeConverter typeConverter) async {
     var service =
-        FlutterSpongeService(connection, typeConverter, typeGuiProvider)
-          ..actionIntentHandlers = _actionIntentHandlers;
+        FlutterSpongeService(connection, typeConverter, typeGuiProvider);
 
     return service;
+  }
+
+  Future<void> configureSpongeService(
+      FlutterSpongeService spongeService) async {
+    spongeService.maxEventCount = settings.maxEventCount;
+    spongeService.autoUseAuthToken = settings.autoUseAuthToken;
+    spongeService.actionIntentHandlers = _actionIntentHandlers;
   }
 
   @override
@@ -281,9 +287,14 @@ class FlutterApplicationService
 }
 
 class FlutterSpongeService extends SpongeService<FlutterActionData> {
-  FlutterSpongeService(SpongeConnection connection, TypeConverter typeConverter,
-      this.typeGuiProvider)
-      : super(connection, typeConverter: typeConverter);
+  FlutterSpongeService(
+    SpongeConnection connection,
+    TypeConverter typeConverter,
+    this.typeGuiProvider, {
+    Map<String, ActionIntentHandler> actionIntentHandlers,
+  }) : super(connection,
+            typeConverter: typeConverter,
+            actionIntentHandlers: actionIntentHandlers);
 
   final TypeGuiProvider typeGuiProvider;
 
