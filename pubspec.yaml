@@ -27,6 +27,7 @@ dependencies:
   recase: ^2.0.1
   #collection: ^1.14.11
   #tuple: ^1.0.2
+  flutter_widgets: ^0.1.8
 
   sponge_client_dart: ^1.14.0+1
   sponge_grpc_client_dart: ^1.14.0

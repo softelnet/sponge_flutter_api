@@ -48,10 +48,11 @@ class FlutterApplicationService<S extends FlutterSpongeService>
 
     settings = MobileApplicationSettings(_prefs);
 
-    await configure(SharedPreferencesConnectionsConfiguration(_prefs),
-        createTypeConverter(this));
-
     _initActionIntentHandlers();
+
+    await configure(SharedPreferencesConnectionsConfiguration(_prefs),
+        createTypeConverter(this),
+        connectSynchronously: false);
   }
 
   void _initActionIntentHandlers() {

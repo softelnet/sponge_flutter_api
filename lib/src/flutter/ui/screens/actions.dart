@@ -17,6 +17,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/actions_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
@@ -79,81 +80,144 @@ class _ActionsWidgetState extends State<ActionsWidget>
     this._presenter.setService(service);
 
     return WillPopScope(
-      child: FutureBuilder<List<_ActionGroup>>(
-        future: _busyNoConnection ? Future(() => []) : _getActionGroups(),
-        builder: (context, snapshot) {
-          _useTabs = service.settings.tabsInActionList &&
-              _isDone(snapshot) &&
-              snapshot.data.length > 1;
-
-          _lastConnectionName ??= _presenter.connectionName;
-          if (_useTabs) {
-            if (_lastConnectionName != _presenter.connectionName) {
-              _initialTabIndex = 0;
-            } else {
-              _initialTabIndex =
-                  _useTabs && _initialTabIndex < snapshot.data.length
-                      ? _initialTabIndex
-                      : 0;
-            }
-          }
-
-          _lastConnectionName = _presenter.connectionName;
-
-          var tabBar = _useTabs
-              ? ColoredTabBar(
-                  child: TabBar(
-                    // TODO Parametrize tabbar scroll in settings.
-                    isScrollable: snapshot.data.length > 3,
-                    tabs: snapshot.data
-                        .map((group) => Tab(
-                              key: Key('group-${group.name}'),
-                              child: Tooltip(
-                                child: Text(group.name.toUpperCase()),
-                                message: group.name,
-                              ),
-                            ))
-                        .toList(),
-                    onTap: (index) => _initialTabIndex = index,
-                    //labelColor: getSecondaryColor(context),
-                    //unselectedLabelColor: getTextColor(context),
-                    indicatorColor: getSecondaryColor(context),
+      child: StreamBuilder(
+          stream: service.connectionBloc,
+          initialData: service.connectionBloc.state,
+          builder: (BuildContext context,
+              AsyncSnapshot<SpongeConnectionState> snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data is SpongeConnectionStateNotConnected) {
+                return _buildScaffold(
+                  context,
+                  child: ConnectionNotInitializedWidget(
+                      hasConnections: _presenter.hasConnections),
+                );
+              } else if (snapshot.data is SpongeConnectionStateConnecting) {
+                return _buildScaffold(
+                  context,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              } else if (snapshot.data is SpongeConnectionStateError) {
+                return _buildScaffold(
+                  context,
+                  child: Center(
+                    child: ErrorPanelWidget(
+                      error:
+                          (snapshot.data as SpongeConnectionStateError).error,
+                    ),
                   ),
-                  color: getThemedBackgroundColor(context),
-                )
-              : null;
+                );
+              } else {
+                return FutureBuilder<List<_ActionGroup>>(
+                  future:
+                      _busyNoConnection ? Future(() => []) : _getActionGroups(),
+                  builder: (context, snapshot) {
+                    _useTabs = service.settings.tabsInActionList &&
+                        _isDone(snapshot) &&
+                        snapshot.data.length > 1;
 
-          Widget scaffold = Scaffold(
-            appBar: AppBar(
-              title: _buildTitle(context),
-              actions: _buildConnectionsWidget(context),
-              bottom: tabBar,
-            ),
-            drawer: HomeDrawer(),
-            body: SafeArea(
-              child: ModalProgressHUD(
-                  child: _presenter.connected
-                      ? (_busyNoConnection
-                          ? Center(child: CircularProgressIndicator())
-                          : _buildActionGroupWidget(context, snapshot))
-                      : ConnectionNotInitializedWidget(
-                          hasConnections: _presenter.hasConnections),
-                  inAsyncCall: _presenter.busy),
-            ),
-            floatingActionButton: _buildFloatingActionButton(
-                context), // This trailing comma makes auto-formatting nicer for build methods.
-          );
+                    _lastConnectionName ??= _presenter.connectionName;
+                    if (_useTabs) {
+                      if (_lastConnectionName != _presenter.connectionName) {
+                        _initialTabIndex = 0;
+                      } else {
+                        _initialTabIndex =
+                            _useTabs && _initialTabIndex < snapshot.data.length
+                                ? _initialTabIndex
+                                : 0;
+                      }
+                    }
 
-          return _useTabs
-              ? DefaultTabController(
-                  length: snapshot.data.length,
-                  child: scaffold,
-                  initialIndex: _initialTabIndex,
-                )
-              : scaffold;
-        },
-      ),
+                    _lastConnectionName = _presenter.connectionName;
+
+                    var tabBar = _useTabs
+                        ? ColoredTabBar(
+                            child: TabBar(
+                              // TODO Parametrize tabbar scroll in settings.
+                              isScrollable: snapshot.data.length > 3,
+                              tabs: snapshot.data
+                                  .map((group) => Tab(
+                                        key: Key('group-${group.name}'),
+                                        child: Tooltip(
+                                          child: Text(group.name.toUpperCase()),
+                                          message: group.name,
+                                        ),
+                                      ))
+                                  .toList(),
+                              onTap: (index) => _initialTabIndex = index,
+                              //labelColor: getSecondaryColor(context),
+                              //unselectedLabelColor: getTextColor(context),
+                              indicatorColor: getSecondaryColor(context),
+                            ),
+                            color: getThemedBackgroundColor(context),
+                          )
+                        : null;
+
+                    var scaffold = _buildScaffold(
+                      context,
+                      child: _presenter.connected
+                          ? (_busyNoConnection
+                              ? Center(child: CircularProgressIndicator())
+                              : _buildActionGroupWidget(context, snapshot))
+                          : ConnectionNotInitializedWidget(
+                              hasConnections: _presenter.hasConnections),
+                      tabBar: tabBar,
+                      actionGroupsSnapshot: snapshot,
+                    );
+
+                    return _useTabs
+                        ? DefaultTabController(
+                            length: snapshot.data.length,
+                            child: scaffold,
+                            initialIndex: _initialTabIndex,
+                          )
+                        : scaffold;
+                  },
+                );
+              }
+            } else if (snapshot.hasError) {
+              return _buildScaffold(
+                context,
+                child: Center(
+                  child: ErrorPanelWidget(
+                    error: snapshot.error,
+                  ),
+                ),
+              );
+            } else {
+              return _buildScaffold(
+                context,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+          }),
       onWillPop: () async => await showAppExitConfirmationDialog(context),
+    );
+  }
+
+  Scaffold _buildScaffold(
+    BuildContext context, {
+    @required Widget child,
+    PreferredSizeWidget tabBar,
+    AsyncSnapshot<List<_ActionGroup>> actionGroupsSnapshot =
+        const AsyncSnapshot.withData(ConnectionState.done, []),
+  }) {
+    return Scaffold(
+      appBar: AppBar(
+        title: _buildTitle(context),
+        actions: _buildConnectionsWidget(context),
+        bottom: tabBar,
+      ),
+      drawer: HomeDrawer(),
+      body: SafeArea(
+        child: ModalProgressHUD(
+          child: child,
+          inAsyncCall: _presenter.busy,
+        ),
+      ),
+      floatingActionButton: _buildFloatingActionButton(
+        context,
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -200,22 +264,25 @@ class _ActionsWidgetState extends State<ActionsWidget>
         _presenter.busy = _busyNoConnection = true;
       });
 
-      bool isNewConnectionDifferent = true;
+      //bool isNewConnectionDifferent = true;
 
       try {
         await _presenter.onConnectionChange(name);
 
-        isNewConnectionDifferent = StateContainer.of(context)
-            .updateConnection(_presenter.connection, refresh: false);
+        // isNewConnectionDifferent = StateContainer.of(context)
+        //     .updateConnection(_presenter.connection, refresh: false);
       } finally {
-        setState(() {
-          _presenter.busy = _busyNoConnection = false;
-          if (isNewConnectionDifferent) {
+        if (mounted) {
+          setState(() {
+            _presenter.busy = _busyNoConnection = false;
+            //if (isNewConnectionDifferent) {
             _initialTabIndex = 0;
-          }
-        });
+            //}
+          });
+        }
       }
     } catch (e) {
+      // TODO May throw an exception if the operations takes too long and meanwhile a connection has been changed.
       await handleError(context, e);
     }
   }

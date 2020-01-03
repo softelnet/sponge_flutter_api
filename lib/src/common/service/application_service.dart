@@ -15,8 +15,11 @@
 import 'dart:async';
 
 import 'package:logging/logging.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/application_constants.dart';
+import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
+import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
 import 'package:sponge_flutter_api/src/common/configuration/connections_configuration.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
@@ -41,6 +44,9 @@ abstract class ApplicationService<S extends SpongeService> {
   TypeConverter _typeConverter;
   ApplicationSettings settings;
 
+  final connectionBloc = ForwardingBloc<SpongeConnectionState>(
+      initialValue: SpongeConnectionStateNotConnected());
+
   ConnectionsConfiguration get connectionsConfiguration =>
       _connectionsConfiguration;
   S get spongeService => _spongeService;
@@ -51,7 +57,8 @@ abstract class ApplicationService<S extends SpongeService> {
       connected && _spongeService.client.configuration.username != null;
 
   Future<void> configure(ConnectionsConfiguration connectionsConfiguration,
-      TypeConverter typeConverter) async {
+      TypeConverter typeConverter,
+      {bool connectSynchronously = true}) async {
     _connectionsConfiguration = connectionsConfiguration;
     _typeConverter = typeConverter;
 
@@ -59,8 +66,12 @@ abstract class ApplicationService<S extends SpongeService> {
     await _rebuildConnectionsConfiguration();
 
     try {
-      await _setupActiveConnection(
-          _connectionsConfiguration.getActiveConnectionName());
+      var activeConnectionName =
+          _connectionsConfiguration.getActiveConnectionName();
+      if (activeConnectionName != null) {
+        await _setupActiveConnection(activeConnectionName,
+            connectSynchronously: connectSynchronously);
+      }
     } catch (e) {
       // Only log the error thrown while setting the active connection.
       _logger.severe('Setup active connection error', e, StackTrace.current);
@@ -80,20 +91,43 @@ abstract class ApplicationService<S extends SpongeService> {
     }
   }
 
-  Future<void> _setupActiveConnection(String connectionName) async {
+  Future<void> _connect(SpongeConnection connection) async {
+    connectionBloc.add(SpongeConnectionStateConnecting());
+
+    try {
+      await closeSpongeService();
+      _spongeService = await createSpongeService(connection, _typeConverter);
+      await configureSpongeService(_spongeService);
+      await _spongeService.open();
+      await startSpongeService(_spongeService);
+
+      if (isCurrentConnection(connection)) {
+        connectionBloc.add(SpongeConnectionStateConnected());
+      }
+    } catch (e) {
+      if (isCurrentConnection(connection)) {
+        connectionBloc.add(SpongeConnectionStateError(e));
+      }
+      rethrow;
+    }
+  }
+
+  bool isCurrentConnection(SpongeConnection connection) =>
+      connection?.isSame(_spongeService?.connection) ?? false;
+
+  Future<void> _setupActiveConnection(String connectionName,
+      {bool connectSynchronously = true}) async {
     if (connectionName != null) {
-      SpongeConnection connection =
-          _connectionsConfiguration.getConnection(connectionName);
+      var connection = _connectionsConfiguration.getConnection(connectionName);
 
       SpongeConnection prevConnection = _spongeService?.connection;
       if (connection != null &&
           (prevConnection == null || !connection.isSame(prevConnection))) {
-        await closeSpongeService();
-        _spongeService = await createSpongeService(connection, _typeConverter);
-        await configureSpongeService(_spongeService);
-        await _spongeService.open();
-        await _connectionsConfiguration.setActiveConnection(connectionName);
-        await startSpongeService(_spongeService);
+        if (connectSynchronously) {
+          await _connect(connection);
+        } else {
+          unawaited(_connect(connection));
+        }
       }
     } else {
       await closeSpongeService();

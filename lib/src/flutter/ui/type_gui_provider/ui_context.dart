@@ -32,6 +32,7 @@ abstract class UiContextCallbacks {
   bool shouldBeEnabled(QualifiedDataType qType);
   PageableList getPageableList(QualifiedDataType qType);
   Future<void> fetchPageableListPage(QualifiedDataType qType);
+  String getKey(String code);
 }
 
 class NoOpUiContextCallbacks implements UiContextCallbacks {
@@ -70,6 +71,9 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
 
   @override
   Future<void> fetchPageableListPage(QualifiedDataType qType) => null;
+
+  @override
+  String getKey(String code) => null;
 }
 
 typedef String TypeEditorValidatorCallback(String value);

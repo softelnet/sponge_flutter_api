@@ -285,8 +285,8 @@ class ActionCallPresenter
       var dynamicTypes = actionData.getDynamicTypeNestedTypes(
           List.of(namesToProvide)..addAll(currentNames));
 
-      _logger.fine(
-          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
+      // _logger.fine(
+      //     'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
 
       Map<String, ProvidedValue> newProvidedArgs = await service
           .spongeService.client
@@ -297,7 +297,7 @@ class ActionCallPresenter
               dynamicTypes: dynamicTypes,
               features: features);
 
-      _logger.fine('\t-> provided: ${newProvidedArgs.keys}');
+      // _logger.fine('\t-> provided: ${newProvidedArgs.keys}');
 
       var previousViewModelProvidedArgs = Map.from(viewModel.providedArgs);
       viewModel.providedArgs.addAll(newProvidedArgs);
@@ -616,6 +616,22 @@ class ActionCallPresenter
               service.settings.defaultPageableListPageSize)
         }
       }).drain();
+    }
+  }
+
+  @override
+  String getKey(String code) {
+    if (code == null) {
+      return null;
+    }
+
+    try {
+      return actionData.getArgValueByName(code,
+          unwrapAnnotatedTarget: true, unwrapDynamicTarget: true);
+    } catch (e) {
+      // TODO Handle the exception properly.
+      _logger.severe('getKey error for \'$code\'', e);
+      return null;
     }
   }
 }

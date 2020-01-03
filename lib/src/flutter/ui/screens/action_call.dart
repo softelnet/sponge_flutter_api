@@ -267,9 +267,11 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
         try {
           await _refreshArgs();
         } finally {
-          setState(() {
-            _presenter.busy = false;
-          });
+          if (mounted) {
+            setState(() {
+              _presenter.busy = false;
+            });
+          }
         }
       },
       showDialogOnError: _presenter.error == null,
