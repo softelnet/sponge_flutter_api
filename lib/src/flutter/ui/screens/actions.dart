@@ -264,15 +264,11 @@ class _ActionsWidgetState extends State<ActionsWidget>
         _presenter.busy = _busyNoConnection = true;
       });
 
-      //bool isNewConnectionDifferent = true;
-
       try {
         await _presenter.onConnectionChange(name);
-
-        // isNewConnectionDifferent = StateContainer.of(context)
-        //     .updateConnection(_presenter.connection, refresh: false);
       } finally {
-        if (mounted) {
+        // Concurrent connection change is allowed. Prevents a stale connection to be shown in the GUI.
+        if (mounted && _busyNoConnection && name == _presenter.connectionName) {
           setState(() {
             _presenter.busy = _busyNoConnection = false;
             //if (isNewConnectionDifferent) {
@@ -282,8 +278,10 @@ class _ActionsWidgetState extends State<ActionsWidget>
         }
       }
     } catch (e) {
-      // TODO May throw an exception if the operations takes too long and meanwhile a connection has been changed.
-      await handleError(context, e);
+      // Concurrent connection change is allowed. Prevents a stale connection to be shown in the GUI.
+      if (mounted && _busyNoConnection && name == _presenter.connectionName) {
+        await handleError(context, e);
+      }
     }
   }
 

@@ -94,25 +94,27 @@ abstract class ApplicationService<S extends SpongeService> {
   Future<void> _connect(SpongeConnection connection) async {
     connectionBloc.add(SpongeConnectionStateConnecting());
 
+    // Connect may be called concurrently.
+    var newSpongeService =
+        await createSpongeService(connection, _typeConverter);
+    var prevSpongeService = _spongeService;
+    _spongeService = newSpongeService;
+
     try {
-      unawaited(_spongeService?.close());
+      unawaited(prevSpongeService?.close());
 
-      // Connect may be called concurrently.
-      var spongeService = await createSpongeService(connection, _typeConverter);
-      _spongeService = spongeService;
+      await configureSpongeService(newSpongeService);
+      await newSpongeService.open();
+      await startSpongeService(newSpongeService);
 
-      await configureSpongeService(spongeService);
-      await spongeService.open();
-      await startSpongeService(spongeService);
-
-      if (identical(_spongeService, spongeService)) {
+      if (identical(_spongeService, newSpongeService)) {
         connectionBloc.add(SpongeConnectionStateConnected());
       }
     } catch (e) {
-      if (identical(_spongeService, spongeService)) {
+      if (identical(_spongeService, newSpongeService)) {
         connectionBloc.add(SpongeConnectionStateError(e));
+        rethrow;
       }
-      rethrow;
     }
   }
 
