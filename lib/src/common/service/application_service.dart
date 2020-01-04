@@ -95,34 +95,37 @@ abstract class ApplicationService<S extends SpongeService> {
     connectionBloc.add(SpongeConnectionStateConnecting());
 
     try {
-      await closeSpongeService();
-      _spongeService = await createSpongeService(connection, _typeConverter);
-      await configureSpongeService(_spongeService);
-      await _spongeService.open();
-      await startSpongeService(_spongeService);
+      unawaited(_spongeService?.close());
 
-      if (isCurrentConnection(connection)) {
+      // Connect may be called concurrently.
+      var spongeService = await createSpongeService(connection, _typeConverter);
+      _spongeService = spongeService;
+
+      await configureSpongeService(spongeService);
+      await spongeService.open();
+      await startSpongeService(spongeService);
+
+      if (identical(_spongeService, spongeService)) {
         connectionBloc.add(SpongeConnectionStateConnected());
       }
     } catch (e) {
-      if (isCurrentConnection(connection)) {
+      if (identical(_spongeService, spongeService)) {
         connectionBloc.add(SpongeConnectionStateError(e));
       }
       rethrow;
     }
   }
 
-  bool isCurrentConnection(SpongeConnection connection) =>
-      connection?.isSame(_spongeService?.connection) ?? false;
-
   Future<void> _setupActiveConnection(String connectionName,
-      {bool connectSynchronously = true}) async {
+      {bool connectSynchronously = true, bool forceRefresh = false}) async {
     if (connectionName != null) {
       var connection = _connectionsConfiguration.getConnection(connectionName);
 
       SpongeConnection prevConnection = _spongeService?.connection;
       if (connection != null &&
-          (prevConnection == null || !connection.isSame(prevConnection))) {
+          (prevConnection == null ||
+              !connection.isSame(prevConnection) ||
+              forceRefresh)) {
         if (connectSynchronously) {
           await _connect(connection);
         } else {
@@ -165,9 +168,10 @@ abstract class ApplicationService<S extends SpongeService> {
 
   bool get hasConnections => _connectionsConfiguration.hasConnections;
 
-  Future<void> setActiveConnection(String connectionName) async {
+  Future<void> setActiveConnection(String connectionName,
+      {bool forceRefresh = false}) async {
     await _connectionsConfiguration.setActiveConnection(connectionName);
-    await _setupActiveConnection(connectionName);
+    await _setupActiveConnection(connectionName, forceRefresh: forceRefresh);
   }
 
   Future<void> clearConfiguration() async {

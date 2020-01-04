@@ -45,8 +45,7 @@ class OptionalScrollContainer extends InheritedWidget {
   bool updateShouldNotify(OptionalScrollContainer old) => true;
 
   static OptionalScrollContainer of(BuildContext context) =>
-      context.inheritFromWidgetOfExactType(OptionalScrollContainer)
-          as OptionalScrollContainer;
+      context.dependOnInheritedWidgetOfExactType<OptionalScrollContainer>();
 }
 
 class OptionalExpanded extends StatelessWidget {
@@ -61,9 +60,7 @@ class OptionalExpanded extends StatelessWidget {
   Widget build(BuildContext context) {
     return (OptionalScrollContainer.of(context)?.scrollable ?? true)
         ? child
-        : Expanded(
-            child: child,
-          );
+        : Expanded(child: child);
   }
 }
 
@@ -466,7 +463,7 @@ class _ProvidedValueSetEditorWidgetState
       var items = _getLimitedMenuItems();
       var hasItems = items.isNotEmpty;
 
-      Widget dropdown = DropdownButtonHideUnderline(
+      var dropdown = DropdownButtonHideUnderline(
         child: DropdownButton(
           key: Key(createDataTypeKeyValue(widget.qType)),
           // TODO Is this condition required?
@@ -485,26 +482,16 @@ class _ProvidedValueSetEditorWidgetState
 
       return widget.label != null
           ? Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
                   widget.label,
-                  style: Theme.of(context).inputDecorationTheme.labelStyle,
-                  // TODO Style same as in text field.
-                  //DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.1),
+                  style: getArgLabelTextStyle(context),
                 ),
                 Container(
                   padding: EdgeInsets.all(16.0),
                 ),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: dropdown,
-                      ),
-                    ],
-                  ),
+                  child: dropdown,
                 ),
               ],
             )
@@ -933,20 +920,20 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text(
-                label ?? '',
-                style: getArgLabelTextStyle(context),
+              Padding(
+                child: Text(
+                  label ?? '',
+                  style: getArgLabelTextStyle(context),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10),
               ),
               Expanded(
-                child: Container(
-                  padding:
-                      buttons.isNotEmpty ? EdgeInsets.zero : EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: buttons,
-                  ),
+                child: ButtonBar(
+                  children: buttons,
+                  buttonPadding: EdgeInsets.zero,
+                  alignment: MainAxisAlignment.end,
                 ),
-              )
+              ),
             ],
           ),
           isListScroll

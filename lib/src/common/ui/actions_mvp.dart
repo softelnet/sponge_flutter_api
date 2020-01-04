@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
@@ -74,11 +75,16 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
     return actionDataList;
   }
 
-  Future<void> refreshActions() async =>
+  Future<void> refreshActions() async {
+    if (service.connectionBloc.state is SpongeConnectionStateConnected) {
       await service.spongeService.clearActions();
+    } else if (connectionName != null) {
+      await service.setActiveConnection(connectionName, forceRefresh: true);
+    }
+  }
 
   Future<void> onConnectionChange(String connectionName) async {
-      await service.setActiveConnection(connectionName);
+    await service.setActiveConnection(connectionName);
   }
 
   Future<void> onActionCall(ActionData actionData) async {
