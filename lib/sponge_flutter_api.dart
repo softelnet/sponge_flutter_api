@@ -36,7 +36,6 @@ export 'src/common/ui/events_mvp.dart';
 export 'src/flutter/compatibility/compatibility_mobile.dart';
 export 'src/flutter/configuration/preferences_configuration.dart';
 export 'src/flutter/flutter_model.dart';
-export 'src/flutter/mobile_constants.dart';
 export 'src/flutter/routes.dart';
 export 'src/flutter/service/flutter_application_service.dart';
 export 'src/flutter/state_container.dart';

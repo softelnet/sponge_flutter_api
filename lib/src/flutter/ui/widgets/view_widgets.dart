@@ -19,7 +19,7 @@ import 'package:flutter/rendering.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/flutter/mobile_constants.dart';
+import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';

@@ -14,7 +14,7 @@
 
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:sponge_flutter_api/src/flutter/mobile_constants.dart';
+import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
