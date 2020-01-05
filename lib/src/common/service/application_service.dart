@@ -51,7 +51,10 @@ abstract class ApplicationService<S extends SpongeService> {
       _connectionsConfiguration;
   S get spongeService => _spongeService;
 
-  bool get connected => _spongeService != null && _spongeService.connected;
+  bool get connected =>
+      _spongeService != null &&
+      _spongeService.connected &&
+      connectionBloc.state is SpongeConnectionStateConnected;
 
   bool get logged =>
       connected && _spongeService.client.configuration.username != null;
