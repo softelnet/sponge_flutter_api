@@ -181,7 +181,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         ListTile(
                           title: Text('Text viewer width in pixels ' +
                               (_textViewerWidthSliderValue > 0
-                                  ? '(${_textViewerWidthSliderValue * MobileConstants.TEXT_VIEWER_WIDTH_SCALE})'
+                                  ? '(${_textViewerWidthSliderValue * GuiConstants.TEXT_VIEWER_WIDTH_SCALE})'
                                   : '(default)')),
                           subtitle: Slider(
                             activeColor: Theme.of(context).accentColor,

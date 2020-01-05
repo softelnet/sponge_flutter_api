@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class MobileConstants {
+class GuiConstants {
   static const TEXT_VIEWER_WIDTH_SCALE = 1000;
 }

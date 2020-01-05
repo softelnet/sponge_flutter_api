@@ -213,7 +213,7 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
   Widget _buldScrollContainer(Widget child) {
     var textViewerWidth =
         (StateContainer.of(context).service.settings.textViewerWidth ?? 0) *
-            MobileConstants.TEXT_VIEWER_WIDTH_SCALE;
+            GuiConstants.TEXT_VIEWER_WIDTH_SCALE;
 
     return SingleChildScrollView(
       child: (textViewerWidth ?? 0) > 0
