@@ -35,7 +35,7 @@ Future showAboutAppDialog(BuildContext context) async {
         fit: BoxFit.scaleDown,
         width: 100.0,
       ),
-      applicationLegalese: '© 2019 The Sponge Authors',
+      applicationLegalese: '© 2020 The Sponge Authors',
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(top: 24.0),
@@ -75,8 +75,8 @@ Future showAboutAppDialog(BuildContext context) async {
                 ),
                 LinkTextSpan(
                   style: linkStyle,
-                  url: 'https://github.com/softelnet/sponge_mobile_client',
-                  text: 'Sponge mobile client github repo',
+                  url: 'https://github.com/softelnet/sponge_flutter_client',
+                  text: 'Sponge flutter client github repo',
                 ),
                 TextSpan(
                   style: aboutTextStyle,
