@@ -755,6 +755,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   ItemScrollController _itemScrollController;
   ItemPositionsListener _itemPositionsListener;
   bool _busy = false;
+  bool _fetchingData = false;
   final _itemMargin = 1.0;
   String _lastFeatureKey;
 
@@ -950,11 +951,12 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                         itemPositionsListener:
                             isPageable ? _itemPositionsListener : null,
                         //shrinkWrap: true,
-                        itemCount: data.length, // + (isPageable ? 1 : 0),
+                        itemCount: data.length + (_fetchingData ? 1 : 0),
                         itemBuilder: (BuildContext context, int index) {
-                          // if (isPageable && index == data.length) {
-                          //   return _buildProgressIndicator();
-                          // } else {
+                          if (index == data.length) {
+                            return _buildloadDataProgressIndicator(context);
+                          }
+
                           // TODO Why is this required when switched to ScrollablePositionedList from ListView?
                           return index < data.length
                               ? _createElementWidget(
@@ -988,37 +990,43 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     );
   }
 
-  // Widget _buildProgressIndicator() {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(5.0),
-  //     child: Center(
-  //       child: Visibility(
-  //         //opacity: _busy ? 1.0 : 00,
-  //         visible: _busy,
-  //         child: CircularProgressIndicator(),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildloadDataProgressIndicator(BuildContext context) {
+    return _createElementCard(Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Center(child: CircularProgressIndicator()),
+    ));
+  }
 
   Future<void> _getMoreData() async {
     var pageableList = widget.uiContext.callbacks
         .getPageableList(widget.uiContext.qualifiedType);
 
     if (pageableList.hasMorePages) {
-      if (!_busy) {
+      if (!_fetchingData) {
         setState(() {
-          _busy = true;
+          _fetchingData = true;
         });
 
-        await widget.uiContext.callbacks
-            .fetchPageableListPage(widget.uiContext.qualifiedType);
-
-        setState(() {
-          _busy = false;
-        });
+        try {
+          await widget.uiContext.callbacks
+              .fetchPageableListPage(widget.uiContext.qualifiedType);
+        } finally {
+          setState(() {
+            _fetchingData = false;
+          });
+        }
       }
     }
+  }
+
+  Widget _createElementCard(Widget child, {double verticalMargin}) {
+    return Card(
+      margin: verticalMargin != null
+          ? EdgeInsets.only(bottom: verticalMargin)
+          : EdgeInsets.zero,
+      shape: BeveledRectangleBorder(),
+      child: child,
+    );
   }
 
   Widget _createElementWidget(
@@ -1038,12 +1046,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     var elementIcon = subUiContext.features[Features.ICON];
 
-    return Card(
-      margin: verticalMargin != null
-          ? EdgeInsets.only(bottom: verticalMargin)
-          : EdgeInsets.zero,
-      shape: BeveledRectangleBorder(),
-      child: ListTile(
+    return _createElementCard(
+      ListTile(
         key: Key('list-element-$index'),
         leading: elementIcon != null
             ? Icon(getIconData(service, elementIcon))
@@ -1072,6 +1076,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
             : null,
         contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       ),
+      verticalMargin: verticalMargin,
     );
   }
 
