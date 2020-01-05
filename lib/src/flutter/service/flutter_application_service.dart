@@ -147,12 +147,22 @@ class FlutterApplicationService<S extends FlutterSpongeService>
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_RELOAD] =
         ActionIntentHandler(
       onAfterCall: (ActionMeta actionMeta, List args,
-          ActionCallResultInfo resultInfo) async {
-        await spongeService.clearActions();
-        StateContainer.of(mainBuildContext)
-            .updateConnection(spongeService.connection, force: true);
-      },
+              ActionCallResultInfo resultInfo) async =>
+          await _reset(),
     );
+
+    _actionIntentHandlers[Features.ACTION_INTENT_VALUE_RESET] =
+        ActionIntentHandler(
+      onAfterCall: (ActionMeta actionMeta, List args,
+              ActionCallResultInfo resultInfo) async =>
+          await _reset(),
+    );
+  }
+
+  Future<void> _reset() async {
+    await spongeService.clearActions();
+    StateContainer.of(mainBuildContext)
+        .updateConnection(spongeService.connection, force: true);
   }
 
   int _getSubscribeEventNamesActionArgIndex(ActionMeta actionMeta) {
