@@ -39,7 +39,9 @@ class _DrawWidgetState extends State<DrawWidget> {
   PainterController _controller;
 
   Widget build(BuildContext context) {
-    _controller ??= PainterController()..isAntiAlias = StateContainer.of(context).service.settings.drawAntiAliasing;
+    _controller ??= PainterController()
+      ..isAntiAlias =
+          StateContainer.of(context).service.settings.drawAntiAliasing;
 
     return WillPopScope(
       child: Scaffold(
@@ -71,12 +73,7 @@ class _DrawWidgetState extends State<DrawWidget> {
       ),
       onWillPop: () async {
         try {
-          // TODO Changing the main reference and then returning it.
-          widget.drawingBinary
-            ..displaySize = convertToSize(_controller.size)
-            ..strokes = convertToStrokes(_controller.strokes);
-
-          Navigator.pop(context, widget.drawingBinary);
+          _close();
         } catch (e) {
           await handleError(context, e);
         }
@@ -84,5 +81,14 @@ class _DrawWidgetState extends State<DrawWidget> {
         return false;
       },
     );
+  }
+
+  void _close() {
+    // TODO Changing the main reference and then returning it.
+    widget.drawingBinary
+      ..displaySize = convertToSize(_controller.size)
+      ..strokes = convertToStrokes(_controller.strokes);
+
+    Navigator.pop(context, widget.drawingBinary);
   }
 }

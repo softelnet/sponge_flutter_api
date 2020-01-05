@@ -242,6 +242,54 @@ class ColoredTabBar extends StatelessWidget implements PreferredSizeWidget {
       );
 }
 
+typedef OnSwipePopCallback = void Function();
+
+class SwipePopDetector extends StatefulWidget {
+  SwipePopDetector({
+    Key key,
+    @required this.child,
+    this.onSwipe,
+    this.ratio = 0.2,
+  })  : assert(child != null),
+        assert(ratio != null),
+        super(key: key);
+
+  final Widget child;
+  final OnSwipePopCallback onSwipe;
+  final double ratio;
+
+  @override
+  _SwipePopDetectorState createState() => _SwipePopDetectorState();
+}
+
+class _SwipePopDetectorState extends State<SwipePopDetector> {
+  double dx = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: widget.child,
+      onPanStart: (details) => dx = 0,
+      onPanUpdate: (details) {
+        if (details.delta.dx > 0) {
+          dx += details.delta.dx;
+
+          var minDx = MediaQuery.of(context).size.width * widget.ratio;
+
+          if (dx >= minDx && widget.onSwipe != null) {
+            widget.onSwipe();
+          }
+        } else if (details.delta.dx < 0) {
+          dx = 0;
+        }
+      },
+      onPanEnd: (details) {
+        dx = 0;
+      },
+    );
+  }
+}
+
 Future<void> showEventHandlerActionById(
     BuildContext context, String eventId) async {
   var service = StateContainer.of(context).service;

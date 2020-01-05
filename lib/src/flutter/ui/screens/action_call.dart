@@ -85,28 +85,31 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     //     (index) => service.getTypeGuiProvider(_presenter.argTypes[index].type));
 
     return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(title: Text('${_presenter.actionLabel}')),
-        body: SafeArea(
-          child: ModalProgressHUD(
-            child: _presenter.hasProvidedArgs
-                ? StreamBuilder<bool>(
-                    stream: _presenter.provideArgs(),
-                    builder: (context, snapshot) {
-                      _presenter.error = null;
-                      if (snapshot.hasData) {
-                        return _buildWidget(context);
-                      } else if (snapshot.hasError) {
-                        _presenter.error = snapshot.error;
-                        return Center(
-                            child: ErrorPanelWidget(error: snapshot.error));
-                      }
-                      return Center(child: CircularProgressIndicator());
-                    },
-                  )
-                : Builder(
-                    builder: (BuildContext context) => _buildWidget(context)),
-            inAsyncCall: _presenter.busy,
+      child: SwipePopDetector(
+        onSwipe: () => _onCancel(context),
+        child: Scaffold(
+          appBar: AppBar(title: Text('${_presenter.actionLabel}')),
+          body: SafeArea(
+            child: ModalProgressHUD(
+              child: _presenter.hasProvidedArgs
+                  ? StreamBuilder<bool>(
+                      stream: _presenter.provideArgs(),
+                      builder: (context, snapshot) {
+                        _presenter.error = null;
+                        if (snapshot.hasData) {
+                          return _buildWidget(context);
+                        } else if (snapshot.hasError) {
+                          _presenter.error = snapshot.error;
+                          return Center(
+                              child: ErrorPanelWidget(error: snapshot.error));
+                        }
+                        return Center(child: CircularProgressIndicator());
+                      },
+                    )
+                  : Builder(
+                      builder: (BuildContext context) => _buildWidget(context)),
+              inAsyncCall: _presenter.busy,
+            ),
           ),
         ),
       ),
@@ -158,10 +161,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
             ),
           if (_presenter.showCancel && _presenter.cancelLabel != null)
             FlatButton(
-              onPressed: () {
-                _onClose();
-                Navigator.pop(context);
-              },
+              onPressed: () => _onCancel(context),
               child:
                   Text(_presenter.cancelLabel.toUpperCase(), style: textStyle),
             ),
@@ -219,6 +219,11 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     );
 
     return _presenter.isScrollable() ? argWidget : Expanded(child: argWidget);
+  }
+
+  void _onCancel(BuildContext context) {
+    _onClose();
+    Navigator.pop(context);
   }
 
   Future<void> _submit(BuildContext context) async {
