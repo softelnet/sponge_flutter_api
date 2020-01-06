@@ -267,6 +267,11 @@ class _SwipePopDetectorState extends State<SwipePopDetector> {
 
   @override
   Widget build(BuildContext context) {
+    // Swipe disabled.
+    if (widget.ratio == 0 || widget.onSwipe == null) {
+      return widget.child;
+    }
+
     return GestureDetector(
       child: widget.child,
       onPanStart: (details) => dx = 0,
@@ -276,7 +281,7 @@ class _SwipePopDetectorState extends State<SwipePopDetector> {
 
           var minDx = MediaQuery.of(context).size.width * widget.ratio;
 
-          if (dx >= minDx && widget.onSwipe != null) {
+          if (dx >= minDx) {
             widget.onSwipe();
           }
         } else if (details.delta.dx < 0) {
