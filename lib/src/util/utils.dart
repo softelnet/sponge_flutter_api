@@ -45,7 +45,9 @@ DataType getActionArgByIntent(ActionMeta actionMeta, String intentValue) =>
 bool hasListTypeScroll(DataType type, {bool recursively = false}) {
   var check = (DataType t) =>
       t is ListType &&
-      Features.getOptional(t.features, Features.SCROLL, () => false);
+      (Features.getOptional(t.features, Features.SCROLL, () => false) ||
+          Features.getOptional(
+              t.features, Features.PROVIDE_VALUE_PAGEABLE, () => false));
 
   if (recursively) {
     bool hasScroll = false;

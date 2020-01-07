@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -787,8 +789,12 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         var data = _getData();
         var positions = List.of(_itemPositionsListener.itemPositions.value);
 
-        if (positions.isNotEmpty && positions.last.index == data.length - 1) {
-          _getMoreData();
+        if (positions.isNotEmpty) {
+          var lastPosition =
+              positions.map((position) => position.index).reduce(max);
+          if (lastPosition == data.length) {
+            _getMoreData();
+          }
         }
       });
 
@@ -951,10 +957,10 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                         itemPositionsListener:
                             isPageable ? _itemPositionsListener : null,
                         //shrinkWrap: true,
-                        itemCount: data.length + (_fetchingData ? 1 : 0),
+                        itemCount: data.length + 1,
                         itemBuilder: (BuildContext context, int index) {
                           if (index == data.length) {
-                            return _buildloadDataProgressIndicator(context);
+                            return _buildProgressIndicator();
                           }
 
                           // TODO Why is this required when switched to ScrollablePositionedList from ListView?
@@ -990,11 +996,16 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     );
   }
 
-  Widget _buildloadDataProgressIndicator(BuildContext context) {
-    return _createElementCard(Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Center(child: CircularProgressIndicator()),
-    ));
+  Widget _buildProgressIndicator() {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Center(
+        child: Opacity(
+          opacity: _fetchingData ? 1 : 0,
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
   }
 
   Future<void> _getMoreData() async {
