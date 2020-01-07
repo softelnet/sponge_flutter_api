@@ -342,6 +342,8 @@ class MobileApplicationSettings extends ApplicationSettings {
   static const String PREF_SUBSCRIPTION_WATCHDOG_INTERVAL =
       'subscriptionWatchdogInterval';
 
+  static const int MAX_SUBSCRIPTION_WATCHDOG_INTERVAL = 360;
+
   final SharedPreferences _prefs;
 
   Brightness get defaultThemeBrightness => Brightness.dark;
@@ -430,8 +432,12 @@ class MobileApplicationSettings extends ApplicationSettings {
   int get subscriptionWatchdogInterval =>
       _prefs.getInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL) ?? 15;
 
-  Future<bool> setSubscriptionWatchdogInterval(int value) async =>
-      await _prefs.setInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL, value);
+  Future<bool> setSubscriptionWatchdogInterval(int value) async {
+    Validate.isTrue(value >= 0 && value <= MAX_SUBSCRIPTION_WATCHDOG_INTERVAL,
+        'The subscription watchdog interval must be a value between 0 and $MAX_SUBSCRIPTION_WATCHDOG_INTERVAL');
+
+    return await _prefs.setInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL, value);
+  }
 }
 
 class EventNotificationState with ChangeNotifier {

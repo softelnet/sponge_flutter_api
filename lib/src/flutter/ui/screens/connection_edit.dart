@@ -90,6 +90,7 @@ class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
                       },
                       initialValue: _presenter.name,
                       validator: _presenter.validateName,
+                      autofocus: true,
                     ),
                     _buildConnectionFieldWidget(
                       key: Key('address'),
@@ -202,6 +203,7 @@ class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
     Widget icon,
     bool obscureText = false,
     bool enabled = true,
+    bool autofocus = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(left: PADDING, right: PADDING, top: 2.0),
@@ -220,6 +222,7 @@ class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
         validator: validator,
         obscureText: obscureText,
         enabled: enabled,
+        autofocus: autofocus,
       ),
     );
   }

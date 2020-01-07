@@ -140,6 +140,8 @@ Color getContrastColor(Color color) {
   return y >= 128 ? Colors.black : Colors.white;
 }
 
+Color getPrimaryColor(BuildContext context) => Theme.of(context).accentColor;
+
 Color getIconColor(BuildContext context) =>
     Theme.of(context).accentColor.withAlpha(200);
 

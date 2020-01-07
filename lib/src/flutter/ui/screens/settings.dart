@@ -62,6 +62,11 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Settings'),
+          actions: [
+            Builder(
+              builder: (BuildContext context) => _buildMenu(context),
+            )
+          ],
         ),
         body: SafeArea(
           child: Builder(
@@ -69,215 +74,209 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               margin: const EdgeInsets.only(top: 20.0, bottom: 20.0),
               child: ListView(
                 children: <Widget>[
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Dark theme'),
-                          trailing: Switch(
-                            value:
-                                Theme.of(context).brightness == Brightness.dark,
-                            onChanged: (value) => _toggleTheme(context),
-                          ),
-                          onTap: () => _toggleTheme(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text(
-                              'Show tabs for action categories and knowledge bases'),
-                          trailing: Switch(
-                              value: settings.tabsInActionList,
-                              onChanged: (value) => _toggleTabsInActionList()),
-                          onTap: () => _toggleTabsInActionList(),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text(
-                              'Action call simplified by a tap on an item'),
-                          trailing: Switch(
-                              value: settings.actionCallOnTap,
-                              onChanged: (value) => _toggleActionCallOnTap()),
-                          onTap: () => _toggleActionCallOnTap(),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title:
-                              Text('Action argument list element tap behavior'),
-                          trailing: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              value: settings.argumentListElementTapBehavior,
-                              items: settings
-                                  .argumentListElementTapBehaviorValueSet
-                                  .map((annotatedValue) => DropdownMenuItem(
-                                        value: annotatedValue.value,
-                                        child: Text(annotatedValue.valueLabel),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) async {
-                                setState(() {});
-                                await settings
-                                    .setArgumentListElementTapBehavior(value);
-                              },
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text('Action icons view'),
-                          trailing: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              value: settings.actionIconsView,
-                              items: settings.actionIconsViewValueSet
-                                  .map((annotatedValue) => DropdownMenuItem(
-                                        value: annotatedValue.value,
-                                        child: Text(annotatedValue.valueLabel),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) async {
-                                setState(() {});
-                                await settings.setActionIconsView(value);
-                              },
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text('Actions order'),
-                          trailing: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              value: settings.actionsOrder,
-                              items: settings.actionsOrderValueSet
-                                  .map((annotatedValue) => DropdownMenuItem(
-                                        value: annotatedValue.value,
-                                        child: Text(annotatedValue.valueLabel),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) async {
-                                setState(() {});
-                                await settings.setActionsOrder(value);
-                              },
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text('Use internal viewers if possible'),
-                          trailing: Switch(
-                              value: settings.useInternalViewers,
-                              onChanged: (value) =>
-                                  _toggleUseInternalViewers()),
-                          onTap: () => _toggleUseInternalViewers(),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text('Text viewer width in pixels ' +
-                              (_textViewerWidthSliderValue > 0
-                                  ? '(${_textViewerWidthSliderValue * GuiConstants.TEXT_VIEWER_WIDTH_SCALE})'
-                                  : '(default)')),
-                          subtitle: Slider(
-                            activeColor: Theme.of(context).accentColor,
-                            label: 'a$_textViewerWidthSliderValue',
-                            min: 0,
-                            max: MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE
-                                .roundToDouble(),
-                            value:
-                                _textViewerWidthSliderValue?.roundToDouble() ??
-                                    0,
+                  _buildGroup(name: 'theme', title: 'Theme', children: [
+                    ListTile(
+                      title: Text('Dark theme'),
+                      trailing: Switch(
+                        value: Theme.of(context).brightness == Brightness.dark,
+                        onChanged: (value) => _toggleTheme(context),
+                      ),
+                      onTap: () => _toggleTheme(context),
+                    )
+                  ]),
+                  _buildGroup(
+                    name: 'actions',
+                    title: 'Actions',
+                    children: [
+                      ListTile(
+                        title: Text(
+                            'Show tabs for action categories and knowledge bases'),
+                        trailing: Switch(
+                            value: settings.tabsInActionList,
+                            onChanged: (value) => _toggleTabsInActionList()),
+                        onTap: () => _toggleTabsInActionList(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title:
+                            Text('Action call simplified by a tap on an item'),
+                        trailing: Switch(
+                            value: settings.actionCallOnTap,
+                            onChanged: (value) => _toggleActionCallOnTap()),
+                        onTap: () => _toggleActionCallOnTap(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title:
+                            Text('Action argument list element tap behavior'),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: settings.argumentListElementTapBehavior,
+                            items: settings
+                                .argumentListElementTapBehaviorValueSet
+                                .map((annotatedValue) => DropdownMenuItem(
+                                      value: annotatedValue.value,
+                                      child: Text(annotatedValue.valueLabel),
+                                    ))
+                                .toList(),
                             onChanged: (value) async {
-                              setState(() =>
-                                  _textViewerWidthSliderValue = value.toInt());
-                              await settings.setTextViewerWidth(value.toInt());
+                              setState(() {});
+                              await settings
+                                  .setArgumentListElementTapBehavior(value);
                             },
+                            isDense: true,
                           ),
                         ),
-                        // TODO Remove drawAntiAliasing.
-                        // Divider(),
-                        // ListTile(
-                        //   title: Text(
-                        //       'Anti-aliasing in drawings (may cause issues on Android)'),
-                        //   trailing: Switch(
-                        //       value: settings.drawAntiAliasing,
-                        //       onChanged: (value) =>
-                        //           _toggleDrawAntiAliasing()),
-                        //   onTap: () => _toggleDrawAntiAliasing(),
-                        // ),
-                      ],
-                    ),
-                  ),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Number of stored events ' +
-                              (_maxEventCountSliderValue > 0
-                                  ? '(${_maxEventCountSliderValue * MAX_EVENT_COUNT_RATIO})'
-                                  : '(infinite)')),
-                          subtitle: Slider(
-                            activeColor: Theme.of(context).accentColor,
-                            label: '$_maxEventCountSliderValue',
-                            min: 0,
-                            max: MAX_MAX_EVENT_COUNT_SLIDER_VALUE
-                                .roundToDouble(),
-                            value:
-                                _maxEventCountSliderValue?.roundToDouble() ?? 0,
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Action icons view'),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: settings.actionIconsView,
+                            items: settings.actionIconsViewValueSet
+                                .map((annotatedValue) => DropdownMenuItem(
+                                      value: annotatedValue.value,
+                                      child: Text(annotatedValue.valueLabel),
+                                    ))
+                                .toList(),
                             onChanged: (value) async {
-                              setState(() =>
-                                  _maxEventCountSliderValue = value.toInt());
-                              await settings.setMaxEventCount(
-                                  value.toInt() * MAX_EVENT_COUNT_RATIO);
+                              setState(() {});
+                              await settings.setActionIconsView(value);
                             },
+                            isDense: true,
                           ),
                         ),
-                        Divider(),
-                        ListTile(
-                          title: Text(
-                              'Subscription watchdog interval (in seconds)'),
-                          subtitle: TextField(
-                            keyboardType: TextInputType.number,
-                            controller: _subscriptionWatchdogIntervalController,
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Actions order'),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: settings.actionsOrder,
+                            items: settings.actionsOrderValueSet
+                                .map((annotatedValue) => DropdownMenuItem(
+                                      value: annotatedValue.value,
+                                      child: Text(annotatedValue.valueLabel),
+                                    ))
+                                .toList(),
                             onChanged: (value) async {
+                              setState(() {});
+                              await settings.setActionsOrder(value);
+                            },
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  _buildGroup(
+                    name: 'events',
+                    title: 'Events',
+                    children: [
+                      ListTile(
+                        title: Text('Number of stored events ' +
+                            (_maxEventCountSliderValue > 0
+                                ? '(${_maxEventCountSliderValue * MAX_EVENT_COUNT_RATIO})'
+                                : '(infinite)')),
+                        subtitle: Slider(
+                          activeColor: Theme.of(context).accentColor,
+                          label: '$_maxEventCountSliderValue',
+                          min: 0,
+                          max: MAX_MAX_EVENT_COUNT_SLIDER_VALUE.roundToDouble(),
+                          value:
+                              _maxEventCountSliderValue?.roundToDouble() ?? 0,
+                          onChanged: (value) async {
+                            setState(() =>
+                                _maxEventCountSliderValue = value.toInt());
+                            await settings.setMaxEventCount(
+                                value.toInt() * MAX_EVENT_COUNT_RATIO);
+                          },
+                        ),
+                      ),
+                      Divider(),
+                      ListTile(
+                        title:
+                            Text('Subscription watchdog interval (in seconds)'),
+                        subtitle: TextField(
+                          // The key is required here, see https://github.com/flutter/flutter/issues/36539.
+                          key: PageStorageKey(
+                              'setting-setSubscriptionWatchdogInterval'),
+                          keyboardType: TextInputType.number,
+                          controller: _subscriptionWatchdogIntervalController,
+                          onSubmitted: (value) async {
+                            try {
                               await settings.setSubscriptionWatchdogInterval(
                                   int.parse(value));
-                            },
-                          ),
+                            } catch (e) {
+                              await handleError(context, e);
+                              _subscriptionWatchdogIntervalController.text =
+                                  '${settings.subscriptionWatchdogInterval}';
+                            }
+                          },
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder()),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Automatically use authentication token'),
-                          trailing: Switch(
-                              value: settings.autoUseAuthToken,
-                              onChanged: (value) => _toggleAutoUseAuthToken()),
-                          onTap: () => _toggleAutoUseAuthToken(),
+                  _buildGroup(
+                    name: 'viewer',
+                    title: 'Viewer',
+                    children: [
+                      ListTile(
+                        title: Text('Use internal viewers if possible'),
+                        trailing: Switch(
+                            value: settings.useInternalViewers,
+                            onChanged: (value) => _toggleUseInternalViewers()),
+                        onTap: () => _toggleUseInternalViewers(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Text viewer width in pixels ' +
+                            (_textViewerWidthSliderValue > 0
+                                ? '(${_textViewerWidthSliderValue * GuiConstants.TEXT_VIEWER_WIDTH_SCALE})'
+                                : '(default)')),
+                        subtitle: Slider(
+                          activeColor: Theme.of(context).accentColor,
+                          label: 'a$_textViewerWidthSliderValue',
+                          min: 0,
+                          max: MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE
+                              .roundToDouble(),
+                          value:
+                              _textViewerWidthSliderValue?.roundToDouble() ?? 0,
+                          onChanged: (value) async {
+                            setState(() =>
+                                _textViewerWidthSliderValue = value.toInt());
+                            await settings.setTextViewerWidth(value.toInt());
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                      // TODO Remove drawAntiAliasing.
+                      // _buildDivider(),
+                      // ListTile(
+                      //   title: Text(
+                      //       'Anti-aliasing in drawings (may cause issues on Android)'),
+                      //   trailing: Switch(
+                      //       value: settings.drawAntiAliasing,
+                      //       onChanged: (value) =>
+                      //           _toggleDrawAntiAliasing()),
+                      //   onTap: () => _toggleDrawAntiAliasing(),
+                      // ),
+                    ],
                   ),
-                  Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Reset to defaults'),
-                          onTap: () => _resetToDefaults(context),
-                          trailing: IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () => _resetToDefaults(context)),
-                        ),
-                      ],
-                    ),
+                  _buildGroup(
+                    name: 'security',
+                    title: 'Security',
+                    children: [
+                      ListTile(
+                        title: Text('Use authentication token'),
+                        trailing: Switch(
+                            value: settings.autoUseAuthToken,
+                            onChanged: (value) => _toggleAutoUseAuthToken()),
+                        onTap: () => _toggleAutoUseAuthToken(),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -288,6 +287,43 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       onWillPop: _submit,
     );
   }
+
+  Widget _buildGroup({
+    @required String name,
+    @required String title,
+    @required List<Widget> children,
+  }) {
+    return ExpansionTile(
+      key: PageStorageKey('setting-group-$name'),
+      title: Text(title),
+      initiallyExpanded: true,
+      children: children,
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      indent: 10,
+      endIndent: 10,
+    );
+  }
+
+  Widget _buildMenu(BuildContext context) => PopupMenuButton<String>(
+        key: Key('settings-menu'),
+        onSelected: (value) {
+          if (value == 'reset') {
+            _resetToDefaults(context);
+          }
+        },
+        itemBuilder: (BuildContext context) => [
+          PopupMenuItem<String>(
+            key: Key('settings-menu-reset'),
+            value: 'reset',
+            child: Text('Reset settings'),
+          ),
+        ],
+        padding: EdgeInsets.zero,
+      );
 
   Future<void> _toggleTabsInActionList() async {
     await settings.setTabsInActionList(!settings.tabsInActionList);
@@ -324,11 +360,13 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     try {
       bool cleared = await _clearConfiguration(context);
       if (cleared) {
+        var backgroudColor = getPrimaryColor(context);
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text(
             'Settings have been reset to the default values',
+            style: TextStyle(color: getContrastColor(backgroudColor)),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: backgroudColor,
         ));
       }
     } catch (e) {
