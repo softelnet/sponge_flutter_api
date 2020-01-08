@@ -85,10 +85,10 @@ class SpongeService<AD extends ActionData> {
     subscriptionBloc = ForwardingBloc<bool>(initialValue: false);
   }
 
-  bool isActionActiveByIntent(ActionMeta actionMeta) {
+  bool isActionAllowedByIntent(ActionMeta actionMeta) {
     var intent = actionMeta.features[Features.INTENT];
     return intent != null
-        ? (actionIntentHandlers[intent]?.onIsActive(actionMeta) ?? true)
+        ? (actionIntentHandlers[intent]?.onIsAllowed(actionMeta) ?? true)
         : true;
   }
 
@@ -428,7 +428,7 @@ typedef void OnActionIntentPrepareCallback(ActionMeta actionMeta, List args);
 typedef Future<void> OnActionIntentCallback(ActionMeta actionMeta, List args);
 typedef Future<void> OnActionIntentAfterCallback(
     ActionMeta actionMeta, List args, ActionCallResultInfo resultInfo);
-typedef bool OnActionIntentIsActiveCallback(ActionMeta actionMeta);
+typedef bool OnActionIntentIsAllowedCallback(ActionMeta actionMeta);
 
 class ActionIntentHandler {
   ActionIntentHandler({
@@ -436,7 +436,7 @@ class ActionIntentHandler {
     OnActionIntentCallback onBeforeCall,
     OnActionIntentAfterCallback onAfterCall,
     OnActionIntentCallback onCallError,
-    OnActionIntentIsActiveCallback onIsActive,
+    OnActionIntentIsAllowedCallback onIsAllowed,
   }) {
     this.onPrepare = onPrepare ?? ((ActionMeta actionMeta, List args) {});
     this.onBeforeCall =
@@ -446,12 +446,12 @@ class ActionIntentHandler {
             ActionCallResultInfo resultInfo) async {});
     this.onCallError =
         onCallError ?? ((ActionMeta actionMeta, List args) async {});
-    this.onIsActive = onIsActive ?? ((ActionMeta actionMeta) => true);
+    this.onIsAllowed = onIsAllowed ?? ((ActionMeta actionMeta) => true);
   }
 
   OnActionIntentPrepareCallback onPrepare;
   OnActionIntentCallback onBeforeCall;
   OnActionIntentAfterCallback onAfterCall;
   OnActionIntentCallback onCallError;
-  OnActionIntentIsActiveCallback onIsActive;
+  OnActionIntentIsAllowedCallback onIsAllowed;
 }

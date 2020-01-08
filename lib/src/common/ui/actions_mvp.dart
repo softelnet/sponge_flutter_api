@@ -58,7 +58,7 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
         // Filter out actions with handled intents.
         .where((actionData) =>
             service.spongeService
-                ?.isActionActiveByIntent(actionData.actionMeta) ??
+                ?.isActionAllowedByIntent(actionData.actionMeta) ??
             true)
         // Filter out unsupported actions.
         .where((actionData) =>

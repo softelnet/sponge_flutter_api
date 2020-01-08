@@ -84,7 +84,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
         // In case of error, set the connection to anonymous.
         await changeActiveConnectionCredentials(null, null);
       },
-      onIsActive: (ActionMeta actionMeta) => !logged,
+      onIsAllowed: (ActionMeta actionMeta) => !logged,
     );
 
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_LOGOUT] =
@@ -105,12 +105,12 @@ class FlutterApplicationService<S extends FlutterSpongeService>
         StateContainer.of(mainBuildContext)
             .updateConnection(spongeService.connection);
       },
-      onIsActive: (ActionMeta actionMeta) => logged,
+      onIsAllowed: (ActionMeta actionMeta) => logged,
     );
 
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_SIGN_UP] =
         ActionIntentHandler(
-      onIsActive: (ActionMeta actionMeta) => !logged,
+      onIsAllowed: (ActionMeta actionMeta) => !logged,
     );
 
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_SUBSCRIPTION] =
