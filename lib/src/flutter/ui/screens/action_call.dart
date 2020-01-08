@@ -438,9 +438,11 @@ Future<ActionData> showActionCall(
   BuildContext context,
   ActionData actionData, {
   @required WidgetBuilder builder,
+  bool verifyIsActive = true,
 }) async {
   var service = StateContainer.of(context).service;
-  if (await service.spongeService.isActionActive(actionData.actionMeta.name)) {
+  if (!verifyIsActive ||
+      await service.spongeService.isActionActive(actionData.actionMeta.name)) {
     return await Navigator.push(
         context, MaterialPageRoute<ActionData>(builder: builder));
   } else {

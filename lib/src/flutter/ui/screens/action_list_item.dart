@@ -72,6 +72,7 @@ class _ActionListItemState extends State<ActionListItem>
               ? _buildResultWidget()
               : _buildAdvancedSubtitle(context, snapshot);
 
+          // TODO Wrap in a widget to disable when the action is called/checked if it is active.
           return Card(
             child: Tooltip(
               message: _presenter.tooltip,
