@@ -751,9 +751,6 @@ class ListTypeWidget extends StatefulWidget {
 }
 
 class _ListTypeWidgetState extends State<ListTypeWidget> {
-  // TODO Is PAGEABLE_SCROLL_EXTENT_TOLERANCE necessary?
-  //static const double PAGEABLE_SCROLL_EXTENT_TOLERANCE = 20;
-
   SubActionsController _subActionsController;
 
   ScrollController _scrollController;
@@ -807,9 +804,10 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       if (_scrollController == null || isFeatureKeyChanged) {
         _scrollController = ScrollController();
         _scrollController.addListener(() {
+          // print(
+          //     'position.pixels= ${_scrollController.position.pixels}, maxScrollExtent=${_scrollController.position.maxScrollExtent}');
           if (_scrollController.position.pixels ==
-                  _scrollController.position.maxScrollExtent //-
-              /*PAGEABLE_SCROLL_EXTENT_TOLERANCE*/) {
+              _scrollController.position.maxScrollExtent) {
             _getMoreData();
           }
         });
