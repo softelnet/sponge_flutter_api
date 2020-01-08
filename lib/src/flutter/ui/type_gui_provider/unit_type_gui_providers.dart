@@ -141,9 +141,8 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
 
   Uint8List _compactViewerThumbnailCache;
 
-  String getMimeType(UiContext uiContext) =>
-      DataTypeUtils.getFeatureOrProperty(type, uiContext.value,
-          BinaryType.FEATURE_MIME_TYPE, () => type.mimeType);
+  String getMimeType(UiContext uiContext) => DataTypeUtils.getFeatureOrProperty(
+      type, uiContext.value, BinaryType.FEATURE_MIME_TYPE, () => type.mimeType);
 
   @override
   Widget doCreateEditor(TypeEditorContext editorContext) {
@@ -578,6 +577,12 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
     //return _elementTypeProvider;
   }
 
+  bool _useScrollableIndexedList(UiContext uiContext) =>
+      StateContainer.of(uiContext.context)
+          .service
+          .settings
+          .useScrollableIndexedList;
+
   // TODO copy context
   @override
   Widget doCreateEditor(TypeEditorContext editorContext) {
@@ -600,6 +605,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
         uiContext: editorContext,
         guiProvider: this,
+        useScrollableIndexedList: _useScrollableIndexedList(editorContext),
       );
     }
   }
@@ -613,6 +619,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
       uiContext: viewerContext,
       guiProvider: this,
+      useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
     );
 
     // return TypeGuiProviderUtils.createTextBasedCompactViewer(
@@ -625,6 +632,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
       uiContext: viewerContext,
       guiProvider: this,
+      useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
     );
     // return TypeGuiProviderUtils.createTextBasedViewer(
     //     this, viewerContext.copy()..value ??= _createListString(viewerContext));

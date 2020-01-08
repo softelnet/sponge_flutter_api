@@ -74,16 +74,21 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               margin: const EdgeInsets.only(top: 20.0, bottom: 20.0),
               child: ListView(
                 children: <Widget>[
-                  _buildGroup(name: 'theme', title: 'Theme', children: [
-                    ListTile(
-                      title: Text('Dark theme'),
-                      trailing: Switch(
-                        value: Theme.of(context).brightness == Brightness.dark,
-                        onChanged: (value) => _toggleTheme(context),
-                      ),
-                      onTap: () => _toggleTheme(context),
-                    )
-                  ]),
+                  _buildGroup(
+                    name: 'theme',
+                    title: 'Theme',
+                    children: [
+                      ListTile(
+                        title: Text('Dark theme'),
+                        trailing: Switch(
+                          value:
+                              Theme.of(context).brightness == Brightness.dark,
+                          onChanged: (value) => _toggleTheme(context),
+                        ),
+                        onTap: () => _toggleTheme(context),
+                      )
+                    ],
+                  ),
                   _buildGroup(
                     name: 'actions',
                     title: 'Actions',
@@ -168,6 +173,15 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                           ),
                         ),
                       ),
+                      _buildDivider(),
+                      ListTile(
+                        title:
+                            Text('Swipe to close action (from left to right)'),
+                        trailing: Switch(
+                            value: settings.actionSwipeToClose,
+                            onChanged: (value) => _toggleActionSwipeToClose()),
+                        onTap: () => _toggleActionSwipeToClose(),
+                      ),
                     ],
                   ),
                   _buildGroup(
@@ -221,8 +235,8 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                     ],
                   ),
                   _buildGroup(
-                    name: 'viewer',
-                    title: 'Viewer',
+                    name: 'dataTypes',
+                    title: 'Data types',
                     children: [
                       ListTile(
                         title: Text('Use internal viewers if possible'),
@@ -251,6 +265,16 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                             await settings.setTextViewerWidth(value.toInt());
                           },
                         ),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title:
+                            Text('Use scrollable indexed list (experimental)'),
+                        trailing: Switch(
+                            value: settings.useScrollableIndexedList,
+                            onChanged: (value) =>
+                                _toggleUseScrollableIndexedList()),
+                        onTap: () => _toggleUseScrollableIndexedList(),
                       ),
                       // TODO Remove drawAntiAliasing.
                       // _buildDivider(),
@@ -335,8 +359,19 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     setState(() {});
   }
 
+  Future<void> _toggleActionSwipeToClose() async {
+    await settings.setActionSwipeToClose(!settings.actionSwipeToClose);
+    setState(() {});
+  }
+
   Future<void> _toggleUseInternalViewers() async {
     await settings.setUseInternalViewers(!settings.useInternalViewers);
+    setState(() {});
+  }
+
+  Future<void> _toggleUseScrollableIndexedList() async {
+    await settings
+        .setUseScrollableIndexedList(!settings.useScrollableIndexedList);
     setState(() {});
   }
 

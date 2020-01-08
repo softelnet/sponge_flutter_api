@@ -246,8 +246,8 @@ class ColoredTabBar extends StatelessWidget implements PreferredSizeWidget {
 
 typedef OnSwipePopCallback = void Function();
 
-class SwipePopDetector extends StatefulWidget {
-  SwipePopDetector({
+class SwipeDetector extends StatefulWidget {
+  SwipeDetector({
     Key key,
     @required this.child,
     this.onSwipe,
@@ -261,10 +261,10 @@ class SwipePopDetector extends StatefulWidget {
   final double ratio;
 
   @override
-  _SwipePopDetectorState createState() => _SwipePopDetectorState();
+  _SwipeDetectorState createState() => _SwipeDetectorState();
 }
 
-class _SwipePopDetectorState extends State<SwipePopDetector> {
+class _SwipeDetectorState extends State<SwipeDetector> {
   double dx = 0;
 
   @override

@@ -321,6 +321,8 @@ class MobileApplicationSettings extends ApplicationSettings {
 
   static const String PREF_ACTION_CALL_ON_TAP = 'actionCallOnTap';
 
+  static const String PREF_ACTION_SWIPE_TO_CLOSE = 'actionSwipeToClose';
+
   static const String PREF_USE_INTERNAL_VIEWERS = 'useInternalViewers';
 
   static const String PREF_TEXT_VIEWER_WIDTH = 'textViewerWidth';
@@ -342,6 +344,9 @@ class MobileApplicationSettings extends ApplicationSettings {
   static const String PREF_SUBSCRIPTION_WATCHDOG_INTERVAL =
       'subscriptionWatchdogInterval';
 
+  static const String PREF_USE_SCROLLABLE_INDEXED_LIST =
+      'useScrollableIndexedList';
+
   static const int MAX_SUBSCRIPTION_WATCHDOG_INTERVAL = 360;
 
   final SharedPreferences _prefs;
@@ -357,6 +362,12 @@ class MobileApplicationSettings extends ApplicationSettings {
 
   Future<bool> setActionCallOnTap(bool value) async =>
       await _prefs.setBool(PREF_ACTION_CALL_ON_TAP, value);
+
+  bool get actionSwipeToClose =>
+      _prefs.getBool(PREF_ACTION_SWIPE_TO_CLOSE) ?? true;
+
+  Future<bool> setActionSwipeToClose(bool value) async =>
+      await _prefs.setBool(PREF_ACTION_SWIPE_TO_CLOSE, value);
 
   bool get useInternalViewers =>
       _prefs.getBool(PREF_USE_INTERNAL_VIEWERS) ?? false;
@@ -438,6 +449,12 @@ class MobileApplicationSettings extends ApplicationSettings {
 
     return await _prefs.setInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL, value);
   }
+
+  bool get useScrollableIndexedList =>
+      _prefs.getBool(PREF_USE_SCROLLABLE_INDEXED_LIST) ?? false;
+
+  Future<bool> setUseScrollableIndexedList(bool value) async =>
+      await _prefs.setBool(PREF_USE_SCROLLABLE_INDEXED_LIST, value);
 }
 
 class EventNotificationState with ChangeNotifier {

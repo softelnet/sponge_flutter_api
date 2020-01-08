@@ -739,10 +739,12 @@ class ListTypeWidget extends StatefulWidget {
     Key key,
     @required this.uiContext,
     @required this.guiProvider,
+    this.useScrollableIndexedList = false,
   }) : super(key: key);
 
   final UiContext uiContext;
   final ListTypeGuiProvider guiProvider;
+  final bool useScrollableIndexedList;
 
   @override
   _ListTypeWidgetState createState() => _ListTypeWidgetState();
@@ -754,7 +756,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
   SubActionsController _subActionsController;
 
-  final _useStandardList = false;
   ScrollController _scrollController;
   ItemScrollController _itemScrollController;
   ItemPositionsListener _itemPositionsListener;
@@ -784,20 +785,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         _lastFeatureKey != null &&
         _lastFeatureKey != featureKey;
 
-    if (_useStandardList) {
-      if (_scrollController == null || isFeatureKeyChanged) {
-        _scrollController = ScrollController();
-        _scrollController.addListener(() {
-          // print(
-          //     '${_scrollController.position.pixels} / ${_scrollController.position.maxScrollExtent}');
-          if (_scrollController.position.pixels ==
-                  _scrollController.position.maxScrollExtent //-
-              /*PAGEABLE_SCROLL_EXTENT_TOLERANCE*/) {
-            _getMoreData();
-          }
-        });
-      }
-    } else {
+    if (widget.useScrollableIndexedList) {
       if (_itemScrollController == null || isFeatureKeyChanged) {
         _itemScrollController = ItemScrollController();
         _itemPositionsListener = ItemPositionsListener.create();
@@ -815,9 +803,20 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
           }
         });
       }
-
-      _lastFeatureKey = featureKey;
+    } else {
+      if (_scrollController == null || isFeatureKeyChanged) {
+        _scrollController = ScrollController();
+        _scrollController.addListener(() {
+          if (_scrollController.position.pixels ==
+                  _scrollController.position.maxScrollExtent //-
+              /*PAGEABLE_SCROLL_EXTENT_TOLERANCE*/) {
+            _getMoreData();
+          }
+        });
+      }
     }
+
+    _lastFeatureKey = featureKey;
   }
 
   @override
@@ -972,22 +971,22 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                   child: Padding(
                     padding: listPadding,
                     child: PageStorageConsumer(
-                      child: _useStandardList
-                          ? ListView.separated(
-                              key: listKey,
-                              controller: isPageable ? _scrollController : null,
-                              //shrinkWrap: true,
-                              itemCount: data.length + 1,
-                              itemBuilder: itemBuilder,
-                              separatorBuilder: separatorBuilder,
-                              padding: EdgeInsets.zero,
-                            )
-                          : ScrollablePositionedList.separated(
+                      child: widget.useScrollableIndexedList
+                          ? ScrollablePositionedList.separated(
                               key: listKey,
                               itemScrollController:
                                   isPageable ? _itemScrollController : null,
                               itemPositionsListener:
                                   isPageable ? _itemPositionsListener : null,
+                              itemCount: data.length + 1,
+                              itemBuilder: itemBuilder,
+                              separatorBuilder: separatorBuilder,
+                              padding: EdgeInsets.zero,
+                            )
+                          : ListView.separated(
+                              key: listKey,
+                              controller: isPageable ? _scrollController : null,
+                              //shrinkWrap: true,
                               itemCount: data.length + 1,
                               itemBuilder: itemBuilder,
                               separatorBuilder: separatorBuilder,
@@ -1167,7 +1166,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   bool get _isIndicatedIndexEnabled {
     var data = _getData();
 
-    return !_useStandardList &&
+    return widget.useScrollableIndexedList &&
         data is PageableList &&
         data.indicatedIndex != null &&
         data.indicatedIndex < data.length;

@@ -85,8 +85,10 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     //     (index) => service.getTypeGuiProvider(_presenter.argTypes[index].type));
 
     return WillPopScope(
-      child: SwipePopDetector(
-        onSwipe: () => _onCancel(context),
+      child: SwipeDetector(
+        onSwipe: service.settings.actionSwipeToClose
+            ? () => _onCancel(context)
+            : null,
         child: Scaffold(
           appBar: AppBar(title: Text('${_presenter.actionLabel}')),
           body: SafeArea(
