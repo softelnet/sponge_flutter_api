@@ -244,7 +244,7 @@ class ColoredTabBar extends StatelessWidget implements PreferredSizeWidget {
       );
 }
 
-typedef OnSwipePopCallback = void Function();
+typedef OnSwipePopCallback = void Function(BuildContext context);
 
 class SwipeDetector extends StatefulWidget {
   SwipeDetector({
@@ -284,7 +284,7 @@ class _SwipeDetectorState extends State<SwipeDetector> {
           var minDx = MediaQuery.of(context).size.width * widget.ratio;
 
           if (dx >= minDx) {
-            widget.onSwipe();
+            widget.onSwipe(context);
           }
         } else if (details.delta.dx < 0) {
           dx = 0;

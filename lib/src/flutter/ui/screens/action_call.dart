@@ -87,7 +87,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     return WillPopScope(
       child: SwipeDetector(
         onSwipe: service.settings.actionSwipeToClose
-            ? () => _onCancel(context)
+            ? (context) => _onCancel(context)
             : null,
         child: Scaffold(
           appBar: AppBar(title: Text('${_presenter.actionLabel}')),
@@ -446,7 +446,7 @@ Future<ActionData> showActionCall(
   if (!verifyIsActive ||
       await service.spongeService.isActionActive(actionData.actionMeta.name)) {
     return await Navigator.push(
-        context, MaterialPageRoute<ActionData>(builder: builder));
+        context, createPageRoute<ActionData>(context, builder: builder));
   } else {
     await showErrorDialog(context,
         'Action \'${actionData.actionMeta.label ?? actionData.actionMeta.name}\' is inactive');

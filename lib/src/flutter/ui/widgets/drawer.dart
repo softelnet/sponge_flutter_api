@@ -90,13 +90,6 @@ class HomeDrawer extends StatelessWidget {
               );
             },
           ),
-          // ListTile(
-          //     leading: Icon(Icons.build, color: iconColor),
-          //     title: Text('Administration'),
-          //     onTap: () {
-          //       Navigator.pop(context);
-          //       Navigator.push(context, MaterialPageRoute(builder: (context) => AdministrationWidget()));
-          //     }),
           Divider(),
           FutureBuilder<ActionData>(
               future: service.spongeService

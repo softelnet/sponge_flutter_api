@@ -90,7 +90,7 @@ class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
                       },
                       initialValue: _presenter.name,
                       validator: _presenter.validateName,
-                      autofocus: true,
+                      autofocus: !_presenter.editing,
                     ),
                     _buildConnectionFieldWidget(
                       key: Key('address'),

@@ -441,7 +441,7 @@ class MobileApplicationSettings extends ApplicationSettings {
       await _prefs.setInt(PREF_MAX_EVENT_COUNT, value);
 
   int get subscriptionWatchdogInterval =>
-      _prefs.getInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL) ?? 15;
+      _prefs.getInt(PREF_SUBSCRIPTION_WATCHDOG_INTERVAL) ?? 5;
 
   Future<bool> setSubscriptionWatchdogInterval(int value) async {
     Validate.isTrue(value >= 0 && value <= MAX_SUBSCRIPTION_WATCHDOG_INTERVAL,

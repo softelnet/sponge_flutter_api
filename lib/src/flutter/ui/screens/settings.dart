@@ -77,6 +77,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   _buildGroup(
                     name: 'theme',
                     title: 'Theme',
+                    initiallyExpanded: true,
                     children: [
                       ListTile(
                         title: Text('Dark theme'),
@@ -92,6 +93,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   _buildGroup(
                     name: 'actions',
                     title: 'Actions',
+                    initiallyExpanded: false,
                     children: [
                       ListTile(
                         title: Text(
@@ -187,6 +189,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   _buildGroup(
                     name: 'events',
                     title: 'Events',
+                    initiallyExpanded: false,
                     children: [
                       ListTile(
                         title: Text('Number of stored events ' +
@@ -237,6 +240,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   _buildGroup(
                     name: 'dataTypes',
                     title: 'Data types',
+                    initiallyExpanded: false,
                     children: [
                       ListTile(
                         title: Text('Use internal viewers if possible'),
@@ -292,6 +296,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   _buildGroup(
                     name: 'security',
                     title: 'Security',
+                    initiallyExpanded: false,
                     children: [
                       ListTile(
                         title: Text('Use authentication token'),
@@ -316,11 +321,12 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     @required String name,
     @required String title,
     @required List<Widget> children,
+    bool initiallyExpanded = true,
   }) {
     return ExpansionTile(
       key: PageStorageKey('setting-group-$name'),
       title: Text(title),
-      initiallyExpanded: true,
+      initiallyExpanded: initiallyExpanded,
       children: children,
     );
   }
@@ -343,7 +349,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           PopupMenuItem<String>(
             key: Key('settings-menu-reset'),
             value: 'reset',
-            child: Text('Reset settings'),
+            child: Text('Reset settings and connections'),
           ),
         ],
         padding: EdgeInsets.zero,

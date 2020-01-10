@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 
 String substring(String s, int maxLength) => s != null && s.length > maxLength
     ? s.substring(0, maxLength).trim() + '...'
@@ -64,3 +68,24 @@ bool hasListTypeScroll(DataType type, {bool recursively = false}) {
     return check(type);
   }
 }
+
+PageRoute<T> createPageRoute<T>(
+  BuildContext context, {
+  @required WidgetBuilder builder,
+  String title,
+  RouteSettings settings,
+  bool maintainState = true,
+  bool fullscreenDialog = false,
+}) =>
+    StateContainer.of(context).service.settings.actionSwipeToClose
+        ? CupertinoPageRoute<T>(
+            builder: builder,
+            title: title,
+            settings: settings,
+            maintainState: maintainState,
+            fullscreenDialog: fullscreenDialog)
+        : MaterialPageRoute<T>(
+            builder: builder,
+            settings: settings,
+            maintainState: maintainState,
+            fullscreenDialog: fullscreenDialog);

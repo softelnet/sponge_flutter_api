@@ -14,12 +14,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ActionResultWidget extends StatefulWidget {
   ActionResultWidget({
@@ -104,7 +106,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
   Widget _buildActualResultWidget(BuildContext context, dynamic result) {
     UnitTypeGuiProvider provider =
         getActionResultProvider(context, widget.actionData);
-    var createViewerContextCallback = () => TypeViewerContext(
+    var createViewerContext = () => TypeViewerContext(
         '${widget.actionData.actionMeta.name}-result',
         context,
         NoOpUiContextCallbacks(),
@@ -114,15 +116,8 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
         markNullable: false);
 
     return GestureDetector(
-      onTap: () {
-        Widget viewer =
-            provider.createExtendedViewer(createViewerContextCallback());
-        if (viewer != null) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => viewer));
-        }
-      },
-      child: provider.createCompactViewer(createViewerContextCallback()),
+      onTap: () => provider.navigateToExtendedViewer(createViewerContext()),
+      child: provider.createCompactViewer(createViewerContext()),
     );
   }
 }

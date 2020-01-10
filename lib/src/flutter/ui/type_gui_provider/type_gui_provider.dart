@@ -15,6 +15,8 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 
 typedef UnitTypeGuiProvider UnitTypeGuiProviderSupplier(DataType type);
 
@@ -56,4 +58,20 @@ abstract class UnitTypeGuiProvider<T extends DataType> {
   dynamic getValueFromString(String s);
 
   void setupContext(UiContext uiContext);
+
+  Future<void> navigateToExtendedViewer(TypeViewerContext viewerContext) async {
+    Widget viewer = createExtendedViewer(viewerContext);
+    if (viewer != null) {
+      await Navigator.push(
+        viewerContext.context,
+        createPageRoute(
+          viewerContext.context,
+          builder: (context) => SwipeDetector(
+            child: viewer,
+            onSwipe: (context) => Navigator.pop(context),
+          ),
+        ),
+      );
+    }
+  }
 }

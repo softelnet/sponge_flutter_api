@@ -249,13 +249,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     // TODO Binary viewer for images should have an option to be inline.
     return GestureDetector(
-      onTap: () {
-        Widget viewer = createExtendedViewer(viewerContext.copy());
-        if (viewer != null) {
-          Navigator.push(viewerContext.context,
-              MaterialPageRoute(builder: (context) => viewer));
-        }
-      },
+      onTap: () => navigateToExtendedViewer(viewerContext.copy()),
       child: createCompactViewer(viewerContext),
     );
   }
