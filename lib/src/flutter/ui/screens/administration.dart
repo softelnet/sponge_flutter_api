@@ -19,6 +19,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
+@deprecated
 class AdministrationWidget extends StatelessWidget {
   AdministrationWidget({Key key}) : super(key: key);
 
