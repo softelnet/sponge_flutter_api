@@ -285,8 +285,8 @@ class ActionCallPresenter
       var dynamicTypes = actionData.getDynamicTypeNestedTypes(
           List.of(namesToProvide)..addAll(currentNames));
 
-      // _logger.fine(
-      //     'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
+      _logger.fine(
+          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
 
       Map<String, ProvidedValue> newProvidedArgs = await service
           .spongeService.client
@@ -378,14 +378,12 @@ class ActionCallPresenter
           int limit = _getProvideFeature(
               features, argName, Features.PROVIDE_VALUE_LIMIT);
           if (limit == null) {
+            limit = pageableList.limit != null &&
+                    pageableList.limit > pageableList.length
+                ? pageableList.limit
+                : pageableList.length;
             _setProvideFeature(
-                features,
-                argName,
-                Features.PROVIDE_VALUE_LIMIT,
-                pageableList.limit != null &&
-                        pageableList.limit > pageableList.length
-                    ? pageableList.limit
-                    : pageableList.length);
+                features, argName, Features.PROVIDE_VALUE_LIMIT, limit);
           }
         }
       }

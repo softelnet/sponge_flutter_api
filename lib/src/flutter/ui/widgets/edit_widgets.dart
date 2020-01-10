@@ -762,6 +762,18 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   final _itemMargin = 1.0;
   String _lastFeatureKey;
 
+  final _lastListWidgetKey = GlobalKey();
+  double _lastListWidgetHeight;
+  double get lastListWidgetHeight {
+    if (_lastListWidgetHeight == null) {
+      final renderBox = _lastListWidgetKey.currentContext?.findRenderObject();
+      _lastListWidgetHeight =
+          renderBox is RenderBox ? renderBox.size?.height : null;
+    }
+
+    return _lastListWidgetHeight;
+  }
+
   FlutterApplicationService get service => StateContainer.of(context).service;
 
   bool get isPageable =>
@@ -787,34 +799,64 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         _itemScrollController = ItemScrollController();
         _itemPositionsListener = ItemPositionsListener.create();
 
-        _itemPositionsListener.itemPositions.addListener(() {
-          var data = _getData();
-          var positions = List.of(_itemPositionsListener.itemPositions.value);
-
-          if (positions.isNotEmpty) {
-            var lastPosition =
-                positions.map((position) => position.index).reduce(max);
-            if (lastPosition == data.length) {
-              _getMoreData();
-            }
-          }
-        });
+        _itemPositionsListener.itemPositions.addListener(_onScroll);
       }
     } else {
       if (_scrollController == null || isFeatureKeyChanged) {
         _scrollController = ScrollController();
-        _scrollController.addListener(() {
-          // print(
-          //     'position.pixels= ${_scrollController.position.pixels}, maxScrollExtent=${_scrollController.position.maxScrollExtent}');
-          if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent) {
-            _getMoreData();
-          }
-        });
+        _scrollController.addListener(_onScroll);
       }
     }
 
     _lastFeatureKey = featureKey;
+  }
+
+  bool _shouldGetMoreDataByScroll() {
+    if (widget.useScrollableIndexedList) {
+      var data = _getData();
+      var positions = List.of(_itemPositionsListener.itemPositions.value);
+
+      if (positions.isNotEmpty) {
+        var lastPosition =
+            positions.map((position) => position.index).reduce(max);
+        if (lastPosition == data.length) {
+          return true;
+        }
+      }
+    } else {
+      // print(
+      //     'position.pixels= ${_scrollController.position.pixels}, maxScrollExtent=${_scrollController.position.maxScrollExtent}');
+
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        return true;
+      }
+
+      // Defer calculation of `lastListWidgetHeight`.
+      if (lastListWidgetHeight != null &&
+          _scrollController.position.pixels >
+              _scrollController.position.maxScrollExtent -
+                  lastListWidgetHeight) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // double _getLastListWidgetHeight() {
+  //   final renderBox = _lastListWidgetKey.currentContext?.findRenderObject();
+  //   return renderBox is RenderBox ? renderBox.size?.height : null;
+  // }
+
+  void _onScroll() {
+    if (_shouldGetMoreDataByScroll()) {
+      _getMoreData();
+    }
+  }
+
+  void _tryGetMoreData() {
+    _onScroll();
   }
 
   @override
@@ -838,6 +880,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     if (isPageable) {
       _setupScrollController();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => _tryGetMoreData());
     }
 
     var elementType = widget.guiProvider.type.elementType;
@@ -1014,6 +1058,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
   Widget _buildProgressIndicator() {
     return Padding(
+      key: _lastListWidgetKey,
       padding: const EdgeInsets.all(5),
       child: Center(
         child: Opacity(
