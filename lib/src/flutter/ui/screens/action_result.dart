@@ -21,7 +21,6 @@ import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ActionResultWidget extends StatefulWidget {
   ActionResultWidget({
@@ -107,13 +106,15 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
     UnitTypeGuiProvider provider =
         getActionResultProvider(context, widget.actionData);
     var createViewerContext = () => TypeViewerContext(
-        '${widget.actionData.actionMeta.name}-result',
-        context,
-        NoOpUiContextCallbacks(),
-        QualifiedDataType(null, widget.actionData.actionMeta.result),
-        result,
-        typeLabel: resultLabel,
-        markNullable: false);
+          '${widget.actionData.actionMeta.name}-result',
+          context,
+          NoOpUiContextCallbacks(),
+          QualifiedDataType(null, widget.actionData.actionMeta.result),
+          result,
+          typeLabel: resultLabel,
+          markNullable: false,
+          providing: [],
+        );
 
     return GestureDetector(
       onTap: () => provider.navigateToExtendedViewer(createViewerContext()),

@@ -374,6 +374,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
                     !(widget.uiContext as TypeEditorContext).enabled,
         enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
             isRecordEnabled, // && ifFieldEnabled,
+        providing: widget.uiContext.providing,
       );
 
       if (qFieldType.type.provided?.hasValueSet ?? false) {
@@ -1111,6 +1112,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       qElementType,
       element,
       showLabel: false,
+      providing: widget.uiContext.providing,
     );
 
     var elementTypeProvider = widget.guiProvider.elementTypeProvider

@@ -17,6 +17,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
@@ -94,12 +95,12 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
           body: SafeArea(
             child: ModalProgressHUD(
               child: _presenter.hasProvidedArgs
-                  ? StreamBuilder<bool>(
+                  ? StreamBuilder<ProvideActionArgsState>(
                       stream: _presenter.provideArgs(),
                       builder: (context, snapshot) {
                         _presenter.error = null;
                         if (snapshot.hasData) {
-                          return _buildWidget(context);
+                          return _buildWidget(context, snapshot.data);
                         } else if (snapshot.hasError) {
                           _presenter.error = snapshot.error;
                           return Center(
@@ -109,7 +110,8 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
                       },
                     )
                   : Builder(
-                      builder: (BuildContext context) => _buildWidget(context)),
+                      builder: (BuildContext context) => _buildWidget(
+                          context, ProvideActionArgsStateNoInvocation())),
               inAsyncCall: _presenter.busy,
             ),
           ),
@@ -134,7 +136,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     }
   }
 
-  Widget _buildWidget(BuildContext context) {
+  Widget _buildWidget(BuildContext context, ProvideActionArgsState state) {
     var textStyle = getButtonTextStyle(context);
     var buttonBar = ButtonTheme(
       padding: EdgeInsets.zero,
@@ -183,7 +185,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
           ),
           shape: BeveledRectangleBorder(),
         ),
-      _buildActionArgumentsWidget(context),
+      _buildActionArgumentsWidget(context, state),
       buttonBar,
     ];
 
@@ -204,7 +206,8 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     );
   }
 
-  Widget _buildActionArgumentsWidget(BuildContext context) {
+  Widget _buildActionArgumentsWidget(
+      BuildContext context, ProvideActionArgsState state) {
     var argWidget = OptionalScrollContainer(
       child: _mainArgsGuiProvider.createEditor(
         TypeEditorContext(
@@ -215,6 +218,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
           _presenter.actionData.argsAsRecord,
           readOnly: widget.readOnly,
           enabled: true,
+          providing: state.providing,
         ),
       ),
       scrollable: _presenter.isScrollable(),

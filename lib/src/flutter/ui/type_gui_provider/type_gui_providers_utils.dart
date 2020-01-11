@@ -161,23 +161,20 @@ class TypeGuiProviderUtils {
     );
   }
 
-  /// Assumes that if the value is `null` and is not nullable and has dependencies and is read only then it means
-  /// that it is in a waiting state. This condition should probably be more accurate.
-  static bool isWaitingForValue(UiContext viewerContext) {
-    var type = viewerContext.qualifiedType.type;
-
-    return DataTypeUtils.isValueNotSet(viewerContext.value) &&
-        !type.nullable &&
-        DataTypeUtils.isProvidedRead(type) &&
-        (type.provided?.dependencies?.isNotEmpty ?? false) &&
-        (type.provided?.readOnly ?? false);
+  static bool isWaitingForValue(UiContext uiContext) {
+    return DataTypeUtils.isValueNotSet(uiContext.value) &&
+        (uiContext.qualifiedType.path != null &&
+            uiContext.providing.contains(uiContext.qualifiedType.path));
   }
 
   static Widget createWaitingViewer(UiContext viewerContext) {
     return Column(
       children: <Widget>[
         Align(
-          child: Text(viewerContext.getDecorationLabel() ?? ''),
+          child: Text(
+            viewerContext.getDecorationLabel() ?? '',
+            style: getArgLabelTextStyle(viewerContext.context),
+          ),
           alignment: Alignment.centerLeft,
         ),
         Padding(

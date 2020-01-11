@@ -14,6 +14,7 @@
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -210,7 +211,7 @@ class ActionCallPresenter
     return currentNames;
   }
 
-  Stream<bool> provideArgs() async* {
+  Stream<ProvideActionArgsState> provideArgs() async* {
     yield* _provideArgs(
         (qType) => !viewModel.providedArgs.containsKey(qType.path));
   }
@@ -222,7 +223,8 @@ class ActionCallPresenter
     return true;
   }
 
-  Stream<bool> _provideArgs(bool filter(QualifiedDataType qType),
+  Stream<ProvideActionArgsState> _provideArgs(
+      bool filter(QualifiedDataType qType),
       {Map<String, Map<String, Object>> features}) async* {
     //return await _lock.synchronized(() async {
     _dependencies ??= _Dependencies(actionData);
@@ -256,7 +258,7 @@ class ActionCallPresenter
               ListEquality().equals(newNamesToProvide, namesToProvide)) &&
           _argsToSubmit.isEmpty) {
         if (!emitted) {
-          yield false;
+          yield ProvideActionArgsStateNoInvocation();
         }
         return;
       }
@@ -284,6 +286,8 @@ class ActionCallPresenter
           actionData.getArgMap(currentNames, predefined: actualArgsToSubmit);
       var dynamicTypes = actionData.getDynamicTypeNestedTypes(
           List.of(namesToProvide)..addAll(currentNames));
+
+      yield ProvideActionArgsStateBeforeInvocation(providing: namesToProvide);
 
       _logger.fine(
           'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
@@ -326,7 +330,7 @@ class ActionCallPresenter
       // Update pageable lists.
       _updatePageableLists(newProvidedArgs);
 
-      yield true;
+      yield ProvideActionArgsStateAfterInvocation();
       emitted = true;
     }
     //});
