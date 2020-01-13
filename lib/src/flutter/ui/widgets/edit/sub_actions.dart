@@ -401,20 +401,17 @@ class SubActionsController extends BaseActionsController {
       try {
         if (showActionCallWidget) {
           // Call the sub-action in the ActionCall screen.
-          var newActionData = await showActionCall(
-            context,
-            actionData,
-            builder: (context) => ActionCallWidget(
-              actionData: actionData,
-              readOnly: readOnly,
-              bloc: bloc,
-              callImmediately: true,
-              showResultDialog: subActionSpec.resultSubstitution == null,
-              showResultDialogIfNoResult: showResultDialogIfNoResult,
-              header: header,
-            ),
-            verifyIsActive: false,
-          );
+          var newActionData = await showActionCall(context, actionData,
+              builder: (context) => ActionCallWidget(
+                    actionData: actionData,
+                    readOnly: readOnly,
+                    bloc: bloc,
+                    callImmediately: true,
+                    showResultDialog: subActionSpec.resultSubstitution == null,
+                    showResultDialogIfNoResult: showResultDialogIfNoResult,
+                    verifyIsActive: false,
+                    header: header,
+                  ));
           callState = newActionData != null
               ? ActionCallStateEnded(newActionData.resultInfo)
               : null;

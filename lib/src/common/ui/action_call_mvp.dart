@@ -531,6 +531,9 @@ class ActionCallPresenter
     return !actionMeta.args.any((arg) => hasListTypeScroll(arg));
   }
 
+  Future<bool> isActionActive() async =>
+      await service.spongeService.isActionActive(actionMeta.name);
+
   // Callbacks.
   void _onSaveOrUpdate(
       QualifiedDataType qType, dynamic value, bool refreshView) {

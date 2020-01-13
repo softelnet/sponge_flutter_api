@@ -37,6 +37,7 @@ class ActionCallWidget extends StatefulWidget {
     this.callImmediately = false,
     this.showResultDialog = true,
     this.showResultDialogIfNoResult = true,
+    this.verifyIsActive = true,
     @required this.bloc,
     this.header,
   }) : super(key: key);
@@ -46,6 +47,7 @@ class ActionCallWidget extends StatefulWidget {
   final bool callImmediately;
   final bool showResultDialog;
   final bool showResultDialogIfNoResult;
+  final bool verifyIsActive;
   // TODO Refactor to the presenter.
   final ActionCallBloc bloc;
   final String header;
@@ -94,24 +96,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
           appBar: AppBar(title: Text('${_presenter.actionLabel}')),
           body: SafeArea(
             child: ModalProgressHUD(
-              child: _presenter.hasProvidedArgs
-                  ? StreamBuilder<ProvideActionArgsState>(
-                      stream: _presenter.provideArgs(),
-                      builder: (context, snapshot) {
-                        _presenter.error = null;
-                        if (snapshot.hasData) {
-                          return _buildWidget(context, snapshot.data);
-                        } else if (snapshot.hasError) {
-                          _presenter.error = snapshot.error;
-                          return Center(
-                              child: ErrorPanelWidget(error: snapshot.error));
-                        }
-                        return Center(child: CircularProgressIndicator());
-                      },
-                    )
-                  : Builder(
-                      builder: (BuildContext context) => _buildWidget(
-                          context, ProvideActionArgsStateNoInvocation())),
+              child: _buildIsActiveWidget(context),
               inAsyncCall: _presenter.busy,
             ),
           ),
@@ -136,9 +121,88 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
     }
   }
 
-  Widget _buildWidget(BuildContext context, ProvideActionArgsState state) {
+  Widget _buildIsActiveWidget(BuildContext context) {
+    return widget.verifyIsActive && _presenter.actionMeta.activatable
+        ? FutureBuilder<bool>(
+            future: _presenter.isActionActive(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data
+                    ? _buildProvideArgsWidget(context)
+                    : Center(
+                        child: ErrorPanelWidget(
+                            error:
+                                'Action \'${_presenter.actionLabel}\' is inactive'));
+              } else if (snapshot.hasError) {
+                return Center(child: ErrorPanelWidget(error: snapshot.error));
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          )
+        : _buildProvideArgsWidget(context);
+  }
+
+  Widget _buildProvideArgsWidget(BuildContext context) {
+    return _presenter.hasProvidedArgs
+        ? StreamBuilder<ProvideActionArgsState>(
+            stream: _presenter.provideArgs(),
+            builder: (context, snapshot) {
+              _presenter.error = null;
+              if (snapshot.hasData) {
+                return _buildActionCallWidget(context, snapshot.data);
+              } else if (snapshot.hasError) {
+                _presenter.error = snapshot.error;
+                return Center(child: ErrorPanelWidget(error: snapshot.error));
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          )
+        : Builder(
+            builder: (BuildContext context) => _buildActionCallWidget(
+                context, ProvideActionArgsStateNoInvocation()));
+  }
+
+  Widget _buildActionCallWidget(
+      BuildContext context, ProvideActionArgsState state) {
+    var children = [
+      if (widget.header != null)
+        Card(
+          child: Padding(
+            child: Text(
+              widget.header,
+              textAlign: TextAlign.left,
+            ),
+            padding: EdgeInsets.all(10),
+          ),
+          shape: BeveledRectangleBorder(),
+        ),
+      _buildActionArgumentsWidget(context, state),
+      _buildButtonBar(context),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Form(
+        key: _formKey,
+        child: _presenter.isScrollable()
+            ? ListView(
+                shrinkWrap: true,
+                children: children,
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: children,
+              ),
+      ),
+    );
+  }
+
+  Widget _buildButtonBar(BuildContext context) {
     var textStyle = getButtonTextStyle(context);
-    var buttonBar = ButtonTheme(
+
+    return ButtonTheme(
       padding: EdgeInsets.zero,
       child: ButtonBar(
         children: [
@@ -170,38 +234,6 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
                   Text(_presenter.cancelLabel.toUpperCase(), style: textStyle),
             ),
         ],
-      ),
-    );
-
-    var children = [
-      if (widget.header != null)
-        Card(
-          child: Padding(
-            child: Text(
-              widget.header,
-              textAlign: TextAlign.left,
-            ),
-            padding: EdgeInsets.all(10),
-          ),
-          shape: BeveledRectangleBorder(),
-        ),
-      _buildActionArgumentsWidget(context, state),
-      buttonBar,
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Form(
-        key: this._formKey,
-        child: _presenter.isScrollable()
-            ? ListView(
-                shrinkWrap: true,
-                children: children,
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: children,
-              ),
       ),
     );
   }
@@ -444,16 +476,7 @@ Future<ActionData> showActionCall(
   BuildContext context,
   ActionData actionData, {
   @required WidgetBuilder builder,
-  bool verifyIsActive = true,
 }) async {
-  var service = StateContainer.of(context).service;
-  if (!verifyIsActive ||
-      await service.spongeService.isActionActive(actionData.actionMeta.name)) {
-    return await Navigator.push(
-        context, createPageRoute<ActionData>(context, builder: builder));
-  } else {
-    await showErrorDialog(context,
-        'Action \'${actionData.actionMeta.label ?? actionData.actionMeta.name}\' is inactive');
-    return null;
-  }
+  return await Navigator.push(
+      context, createPageRoute<ActionData>(context, builder: builder));
 }
