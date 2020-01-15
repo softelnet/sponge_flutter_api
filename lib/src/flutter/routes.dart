@@ -17,5 +17,4 @@ class Routes {
   static const String EVENTS = '/events';
   static const String CONNECTIONS = '/connections';
   static const String SETTINGS = '/settings';
-  static const String APP_DIGITS = '/app/digits';
 }

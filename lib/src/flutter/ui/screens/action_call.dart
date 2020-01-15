@@ -19,7 +19,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/action_call_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
@@ -70,7 +70,7 @@ class _ActionCallWidgetState extends State<ActionCallWidget>
 
   @override
   Widget build(BuildContext context) {
-    var service = StateContainer.of(context).service;
+    var service = ApplicationProvider.of(context).service;
 
     // Use a copy of the action data.
     _presenter ??=
@@ -437,7 +437,7 @@ Future<void> callActionImmediately({
   @required bool showResultDialog,
   @required bool showNoResultDialog,
 }) async {
-  final service = StateContainer.of(context).service;
+  final service = ApplicationProvider.of(context).service;
   var resultInfo;
 
   if (onBeforeCall != null) {

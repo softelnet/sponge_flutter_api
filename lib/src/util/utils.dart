@@ -77,7 +77,7 @@ PageRoute<T> createPageRoute<T>(
   bool maintainState = true,
   bool fullscreenDialog = false,
 }) =>
-    StateContainer.of(context).service.settings.actionSwipeToClose
+    ApplicationProvider.of(context).service.settings.actionSwipeToClose
         ? CupertinoPageRoute<T>(
             builder: builder,
             title: title,

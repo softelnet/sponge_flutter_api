@@ -19,8 +19,8 @@ import 'package:flutter/rendering.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -212,7 +212,8 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
 
   Widget _buldScrollContainer(Widget child) {
     var textViewerWidth =
-        (StateContainer.of(context).service.settings.textViewerWidth ?? 0) *
+        (ApplicationProvider.of(context).service.settings.textViewerWidth ??
+                0) *
             GuiConstants.TEXT_VIEWER_WIDTH_SCALE;
 
     return SingleChildScrollView(

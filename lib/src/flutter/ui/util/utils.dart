@@ -20,9 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/type/generic_type.dart';
@@ -299,7 +299,7 @@ class _SwipeDetectorState extends State<SwipeDetector> {
 
 Future<void> showEventHandlerActionById(
     BuildContext context, String eventId) async {
-  var service = StateContainer.of(context).service;
+  var service = ApplicationProvider.of(context).service;
   EventData eventData = service.spongeService.getEvent(eventId);
 
   if (eventData != null) {
@@ -309,7 +309,7 @@ Future<void> showEventHandlerActionById(
 
 Future<void> showEventHandlerAction(
     BuildContext context, EventData eventData) async {
-  var service = StateContainer.of(context).service;
+  var service = ApplicationProvider.of(context).service;
   ActionData handlerActionData =
       await service.spongeService.findEventHandlerAction(eventData);
 

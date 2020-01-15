@@ -16,7 +16,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 @deprecated
@@ -51,5 +51,5 @@ class AdministrationWidget extends StatelessWidget {
   }
 
   Future<ReloadResponse> _reloadSponge(BuildContext context) async =>
-      await StateContainer.of(context).service.spongeService.reload();
+      await ApplicationProvider.of(context).service.spongeService.reload();
 }

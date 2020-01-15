@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/ui/connections_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/connection_edit.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
@@ -41,7 +41,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
   @override
   Widget build(BuildContext context) {
     _presenter
-      ..setService(StateContainer.of(context).service)
+      ..setService(ApplicationProvider.of(context).service)
       ..refreshModel();
 
     return Scaffold(
@@ -112,7 +112,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
     try {
       await _presenter.toggleActiveConnection(connection);
 
-      StateContainer.of(context).updateConnection(connection);
+      ApplicationProvider.of(context).updateConnection(connection);
     } finally {
       setState(() {
         _presenter.busy = false;
@@ -139,7 +139,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
     var newConnection = await _presenter.editConnection(editedConnection);
 
     if (newConnection != null) {
-      StateContainer.of(context).updateConnection(newConnection);
+      ApplicationProvider.of(context).updateConnection(newConnection);
     }
 
     setState(() {});

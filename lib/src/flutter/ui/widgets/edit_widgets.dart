@@ -23,8 +23,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
@@ -195,7 +195,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   List<Widget> _buildFieldsWidgets(BuildContext context) {
     RecordType recordType = widget.uiContext.qualifiedType.type as RecordType;
 
-    var service = StateContainer.of(context).service;
+    var service = ApplicationProvider.of(context).service;
     _typeGuiProviders ??= Map.fromIterable(recordType.fields,
         key: (field) => field.name,
         value: (field) => service.getTypeGuiProvider(field));
@@ -775,7 +775,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return _lastListWidgetHeight;
   }
 
-  FlutterApplicationService get service => StateContainer.of(context).service;
+  FlutterApplicationService get service =>
+      ApplicationProvider.of(context).service;
 
   bool get isPageable =>
       widget.uiContext.features[Features.PROVIDE_VALUE_PAGEABLE] ?? false;

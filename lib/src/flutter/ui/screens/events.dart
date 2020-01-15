@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/ui/events_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
@@ -52,7 +52,7 @@ class _EventsWidgetState extends State<EventsWidget>
 
   @override
   Widget build(BuildContext context) {
-    var service = StateContainer.of(context).service;
+    var service = ApplicationProvider.of(context).service;
     _presenter ??= EventsPresenter(this);
     this._presenter.setService(service);
 

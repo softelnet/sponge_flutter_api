@@ -14,9 +14,9 @@
 
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
@@ -37,18 +37,18 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   TextEditingController _subscriptionWatchdogIntervalController;
 
   FlutterApplicationSettings get settings =>
-      StateContainer.of(context).service.settings;
+      ApplicationProvider.of(context).service.settings;
 
   @override
   Widget build(BuildContext context) {
     _textViewerWidthSliderValue ??=
-        StateContainer.of(context).service.settings.textViewerWidth ?? 0;
+        ApplicationProvider.of(context).service.settings.textViewerWidth ?? 0;
     if (_textViewerWidthSliderValue > MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE) {
       _textViewerWidthSliderValue = MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE;
     }
 
     _maxEventCountSliderValue ??=
-        (StateContainer.of(context).service.settings.maxEventCount ?? 0) ~/
+        (ApplicationProvider.of(context).service.settings.maxEventCount ?? 0) ~/
             MAX_EVENT_COUNT_RATIO;
     if (_maxEventCountSliderValue > MAX_MAX_EVENT_COUNT_SLIDER_VALUE) {
       _maxEventCountSliderValue = MAX_MAX_EVENT_COUNT_SLIDER_VALUE;
@@ -421,12 +421,12 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       return false;
     }
 
-    await StateContainer.of(context).service.clearConfiguration();
+    await ApplicationProvider.of(context).service.clearConfiguration();
     return true;
   }
 
   Future<bool> _submit() async {
-    StateContainer.of(context).service.spongeService?.maxEventCount =
+    ApplicationProvider.of(context).service.spongeService?.maxEventCount =
         _maxEventCountSliderValue * MAX_EVENT_COUNT_RATIO;
 
     return true;

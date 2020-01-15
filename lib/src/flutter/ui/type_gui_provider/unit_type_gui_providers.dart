@@ -294,7 +294,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         onChanged: onChanged,
       ));
     } else if (icon != null && !editorContext.qualifiedType.type.nullable) {
-      var service = StateContainer.of(editorContext.context).service;
+      var service = ApplicationProvider.of(editorContext.context).service;
 
       valueWidget = IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
@@ -572,7 +572,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   }
 
   bool _useScrollableIndexedList(UiContext uiContext) =>
-      StateContainer.of(uiContext.context)
+      ApplicationProvider.of(uiContext.context)
           .service
           .settings
           .useScrollableIndexedList;
@@ -969,7 +969,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
         : null;
 
     if (icon != null) {
-      var service = StateContainer.of(editorContext.context).service;
+      var service = ApplicationProvider.of(editorContext.context).service;
 
       return IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),

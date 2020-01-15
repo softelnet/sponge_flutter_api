@@ -20,7 +20,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/actions_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_list_item.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
@@ -72,7 +72,7 @@ class _ActionsWidgetState extends State<ActionsWidget>
 
   @override
   Widget build(BuildContext context) {
-    var service = StateContainer.of(context).service;
+    var service = ApplicationProvider.of(context).service;
     _presenter ??= ActionsPresenter(this);
 
     service.bindMainBuildContext(context);
@@ -319,7 +319,7 @@ class _ActionsWidgetState extends State<ActionsWidget>
 
   Future<void> _refreshActions(BuildContext context) async {
     await _presenter.refreshActions();
-    StateContainer.of(context)
+    ApplicationProvider.of(context)
         .updateConnection(_presenter.connection, force: true);
   }
 

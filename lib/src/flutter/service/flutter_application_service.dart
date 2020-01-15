@@ -23,10 +23,10 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -77,7 +77,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
       onAfterCall: (ActionMeta actionMeta, List args,
           ActionCallResultInfo resultInfo) async {
         await spongeService.clearActions();
-        StateContainer.of(mainBuildContext)
+        ApplicationProvider.of(mainBuildContext)
             .updateConnection(spongeService.connection);
       },
       onCallError: (ActionMeta actionMeta, List args) async {
@@ -94,7 +94,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
         await changeActiveConnectionCredentials(null, null);
 
         await spongeService.clearActions();
-        StateContainer.of(mainBuildContext)
+        ApplicationProvider.of(mainBuildContext)
             .updateConnection(spongeService.connection);
       },
       onCallError: (ActionMeta actionMeta, List args) async {
@@ -102,7 +102,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
         // In case of error, set the connection to anonymous.
         await changeActiveConnectionCredentials(null, null);
 
-        StateContainer.of(mainBuildContext)
+        ApplicationProvider.of(mainBuildContext)
             .updateConnection(spongeService.connection);
       },
       onIsAllowed: (ActionMeta actionMeta) => logged,
@@ -161,7 +161,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
 
   Future<void> _reset() async {
     await spongeService.clearActions();
-    StateContainer.of(mainBuildContext)
+    ApplicationProvider.of(mainBuildContext)
         .updateConnection(spongeService.connection, force: true);
   }
 

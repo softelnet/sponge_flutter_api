@@ -18,7 +18,6 @@ import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 
@@ -96,7 +95,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
       return actionData.resultProvider;
     }
 
-    return StateContainer.of(context)
+    return ApplicationProvider.of(context)
         .service
         .typeGuiProvider
         .getProvider(actionData.actionMeta.result);

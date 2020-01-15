@@ -19,7 +19,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/application_constants.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/ui/connection_edit_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
@@ -49,7 +49,7 @@ class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
 
   @override
   Widget build(BuildContext context) {
-    _presenter..setService(StateContainer.of(context).service);
+    _presenter..setService(ApplicationProvider.of(context).service);
 
     return Scaffold(
       appBar: AppBar(

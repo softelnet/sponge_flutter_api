@@ -16,8 +16,8 @@ import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 
-class StateContainer extends StatefulWidget {
-  StateContainer({
+class ApplicationProvider extends StatefulWidget {
+  ApplicationProvider({
     @required this.child,
     @required this.service,
   });
@@ -25,15 +25,15 @@ class StateContainer extends StatefulWidget {
   final Widget child;
   final FlutterApplicationService service;
 
-  static StateContainerState of(BuildContext context) => context
+  static ApplicationProviderState of(BuildContext context) => context
       .dependOnInheritedWidgetOfExactType<_InheritedStateContainer>()
       .data;
 
   @override
-  StateContainerState createState() => StateContainerState();
+  ApplicationProviderState createState() => ApplicationProviderState();
 }
 
-class StateContainerState extends State<StateContainer> {
+class ApplicationProviderState extends State<ApplicationProvider> {
   SpongeConnection _connection;
   FlutterApplicationService get service => widget.service;
   PageStorageBucket _bucket;
@@ -95,7 +95,7 @@ class _InheritedStateContainer extends InheritedWidget {
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final StateContainerState data;
+  final ApplicationProviderState data;
 
   @override
   bool updateShouldNotify(_InheritedStateContainer old) => true;
@@ -111,7 +111,7 @@ class PageStorageConsumer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var stateContainer = StateContainer.of(context);
+    var stateContainer = ApplicationProvider.of(context);
 
     return stateContainer != null
         ? PageStorage(

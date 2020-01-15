@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawing_painter.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
@@ -41,7 +41,7 @@ class _DrawWidgetState extends State<DrawWidget> {
   Widget build(BuildContext context) {
     _controller ??= PainterController()
       ..isAntiAlias =
-          StateContainer.of(context).service.settings.drawAntiAliasing;
+          ApplicationProvider.of(context).service.settings.drawAntiAliasing;
 
     return WillPopScope(
       child: Scaffold(

@@ -4,7 +4,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/async_popup_menu_button.dart';
@@ -53,7 +53,7 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
   Future<void> _onSelectedSubAction(SubActionSpec subActionSpec) async {
     try {
       if (widget.beforeSelectedSubAction != null) {
-        var service = StateContainer.of(context).service;
+        var service = ApplicationProvider.of(context).service;
 
         if (!(await widget.beforeSelectedSubAction(
             service.spongeService
@@ -84,7 +84,7 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
 
   PopupMenuEntry<SubActionSpec> _createSubActionMenuItem(
       BuildContext context, SubActionRuntimeSpec subActionRuntimeSpec) {
-    var service = StateContainer.of(context).service;
+    var service = ApplicationProvider.of(context).service;
     var actionMeta = service.spongeService
         .getCachedAction(subActionRuntimeSpec.spec.actionName)
         .actionMeta;
@@ -374,7 +374,7 @@ class SubActionsController extends BaseActionsController {
   }) async {
     // TODO implement busy state
     if (subActionSpec != null) {
-      var service = StateContainer.of(context).service;
+      var service = ApplicationProvider.of(context).service;
 
       // Check if the action exists.
       ActionData actionData =

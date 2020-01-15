@@ -16,7 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/flutter/state_container.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
 abstract class UiContextCallbacks {
@@ -119,7 +119,7 @@ abstract class UiContext {
   bool get enabled;
 
   TypeGuiProvider get typeGuiProvider =>
-      StateContainer.of(context).service.typeGuiProvider;
+      ApplicationProvider.of(context).service.typeGuiProvider;
 
   String get safeTypeLabel => typeLabel ?? qualifiedType.type.name;
 
