@@ -37,7 +37,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
   SharedPreferences _prefs;
   DefaultTypeGuiProvider typeGuiProvider = DefaultTypeGuiProvider();
   final icons = MdiIcons();
-  MobileApplicationSettings get settings => super.settings;
+  FlutterApplicationSettings get settings => super.settings;
   BuildContext _mainBuildContext;
   final Map<String, ActionIntentHandler> _actionIntentHandlers = {};
 
@@ -46,7 +46,7 @@ class FlutterApplicationService<S extends FlutterSpongeService>
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
-    settings = MobileApplicationSettings(_prefs);
+    settings = FlutterApplicationSettings(_prefs);
 
     _initActionIntentHandlers();
 
@@ -314,8 +314,8 @@ class FlutterSpongeService extends SpongeService<FlutterActionData> {
       FlutterActionData(actionMeta, typeGuiProvider);
 }
 
-class MobileApplicationSettings extends ApplicationSettings {
-  MobileApplicationSettings(this._prefs);
+class FlutterApplicationSettings extends ApplicationSettings {
+  FlutterApplicationSettings(this._prefs);
 
   static const String PREF_ACTION_LIST_TABS = 'tabsInActionList';
 

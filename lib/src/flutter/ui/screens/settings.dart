@@ -36,7 +36,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
   TextEditingController _subscriptionWatchdogIntervalController;
 
-  MobileApplicationSettings get settings =>
+  FlutterApplicationSettings get settings =>
       StateContainer.of(context).service.settings;
 
   @override

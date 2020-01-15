@@ -14,9 +14,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/app/digits/digits_mvp.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/state_container.dart';
@@ -91,19 +88,6 @@ class HomeDrawer extends StatelessWidget {
             },
           ),
           Divider(),
-          FutureBuilder<ActionData>(
-              future: service.spongeService
-                  ?.getAction(DigitsPresenter.ACTION_NAME, required: false),
-              builder: (context, snapshot) {
-                return ListTile(
-                  leading: Icon(MdiIcons.disqus, color: iconColor),
-                  title: Text('Digit recognition'),
-                  enabled: snapshot.hasData,
-                  onTap: () async =>
-                      showDistinctScreen(context, Routes.APP_DIGITS),
-                );
-              }),
-          Divider(),
           ListTile(
             leading: Icon(Icons.cloud, color: iconColor),
             title: Text('Connections'),
@@ -114,6 +98,7 @@ class HomeDrawer extends StatelessWidget {
             title: Text('Settings'),
             onTap: () async => showChildScreen(context, Routes.SETTINGS),
           ),
+          Divider(),
           ListTile(
             leading: Icon(Icons.info, color: iconColor),
             title: Text('About'),

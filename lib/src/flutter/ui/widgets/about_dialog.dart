@@ -20,7 +20,7 @@ import 'package:package_info/package_info.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
-Future showAboutAppDialog(BuildContext context) async {
+Future<void> showAboutAppDialog(BuildContext context) async {
   final ThemeData themeData = Theme.of(context);
   final TextStyle aboutTextStyle = themeData.textTheme.body2;
   final TextStyle linkStyle =
@@ -31,9 +31,8 @@ Future showAboutAppDialog(BuildContext context) async {
       context: context,
       applicationVersion: packageInfo.version,
       applicationIcon: Image.asset(
-        'assets/images/icon.png',
+        'assets/images/icon_small.png',
         fit: BoxFit.scaleDown,
-        width: 100.0,
       ),
       applicationLegalese: '© 2020 The Sponge Authors',
       children: <Widget>[
@@ -46,7 +45,7 @@ Future showAboutAppDialog(BuildContext context) async {
                   style: aboutTextStyle,
                   text:
                       'Sponge is an open-source action and event processing system. '
-                      'This application is a simple, generic GUI client to the Sponge REST API service. '
+                      'This application is a generic GUI client to the Sponge REST API service. '
                       'It allows users to call remote Sponge actions.'
                       '\n\nThe supported Sponge server versions are ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.x.',
                 ),
@@ -85,7 +84,7 @@ Future showAboutAppDialog(BuildContext context) async {
                 TextSpan(
                     style: aboutTextStyle,
                     text:
-                        '\n\nThe current version supports only limited set of data types and type features.'
+                        '\n\nThe current version supports only a limited set of data types and type features.'
                         ''),
               ],
             ),
