@@ -22,9 +22,75 @@ import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 Future<void> showAboutAppDialog(BuildContext context) async {
   final ThemeData themeData = Theme.of(context);
+  final TextStyle headerTextStyle =
+      themeData.textTheme.body2.apply(fontWeightDelta: 2);
   final TextStyle aboutTextStyle = themeData.textTheme.body2;
   final TextStyle linkStyle =
       themeData.textTheme.body2.copyWith(color: themeData.accentColor);
+  final TextStyle noteTextStyle =
+      themeData.textTheme.body2.apply(color: getSecondaryColor(context));
+
+  await showDefaultAboutAppDialog(
+    context,
+    contents: RichText(
+      text: TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+            style: headerTextStyle,
+            text:
+                '\n\nSponge Control is a generic GUI client to Sponge REST API services. '
+                'It allows users to call remote Sponge actions.',
+          ),
+          TextSpan(
+              style: aboutTextStyle,
+              text:
+                  '\n\nSponge is an open-source action and event processing system. '
+                  'The supported Sponge server versions are ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.x.'),
+          TextSpan(
+            style: aboutTextStyle,
+            text: '\n\nFor more information please visit the ',
+          ),
+          LinkTextSpan(
+            style: linkStyle,
+            url: 'https://sponge.openksavi.org/mobile',
+            text: 'Sponge Control',
+          ),
+          TextSpan(
+            style: aboutTextStyle,
+            text: ' home page and the ',
+          ),
+          LinkTextSpan(
+            style: linkStyle,
+            url: 'https://sponge.openksavi.org',
+            text: 'Sponge',
+          ),
+          TextSpan(
+            style: aboutTextStyle,
+            text:
+                ' project home page.\n\nTo see the source code of this app, please visit the Sponge Control ',
+          ),
+          LinkTextSpan(
+            style: linkStyle,
+            url: 'https://github.com/softelnet/sponge_flutter_client',
+            text: 'GitHub repo',
+          ),
+          TextSpan(
+            style: aboutTextStyle,
+            text: '.',
+          ),
+          TextSpan(
+              style: noteTextStyle,
+              text:
+                  '\n\nThe current version is in alpha phase and supports only a limited set of data types and type features.'
+                  ''),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> showDefaultAboutAppDialog(BuildContext context,
+    {@required Widget contents}) async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
   showAboutDialog(
@@ -36,59 +102,6 @@ Future<void> showAboutAppDialog(BuildContext context) async {
       ),
       applicationLegalese: '© 2020 The Sponge Authors',
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 24.0),
-          child: RichText(
-            text: TextSpan(
-              children: <TextSpan>[
-                TextSpan(
-                  style: aboutTextStyle,
-                  text:
-                      'Sponge is an open-source action and event processing system. '
-                      'This application is a generic GUI client to the Sponge REST API service. '
-                      'It allows users to call remote Sponge actions.'
-                      '\n\nThe supported Sponge server versions are ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.x.',
-                ),
-                TextSpan(
-                  style: aboutTextStyle,
-                  text: '\n\nFor more information please visit the ',
-                ),
-                LinkTextSpan(
-                  style: linkStyle,
-                  url: 'https://sponge.openksavi.org/mobile',
-                  text: 'Sponge mobile client application',
-                ),
-                TextSpan(
-                  style: aboutTextStyle,
-                  text: ' home page and the ',
-                ),
-                LinkTextSpan(
-                  style: linkStyle,
-                  url: 'https://sponge.openksavi.org',
-                  text: 'Sponge project',
-                ),
-                TextSpan(
-                  style: aboutTextStyle,
-                  text:
-                      ' home page.\n\nTo see the source code of this app, please visit the ',
-                ),
-                LinkTextSpan(
-                  style: linkStyle,
-                  url: 'https://github.com/softelnet/sponge_flutter_client',
-                  text: 'Sponge flutter client github repo',
-                ),
-                TextSpan(
-                  style: aboutTextStyle,
-                  text: '.',
-                ),
-                TextSpan(
-                    style: aboutTextStyle,
-                    text:
-                        '\n\nThe current version supports only a limited set of data types and type features.'
-                        ''),
-              ],
-            ),
-          ),
-        ),
+        contents,
       ]);
 }

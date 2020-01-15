@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
@@ -33,44 +33,8 @@ class HomeDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
-            child: Column(
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  fit: BoxFit.scaleDown,
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: FutureBuilder<PackageInfo>(
-                    future: PackageInfo.fromPlatform(),
-                    builder: (context, snapshot) {
-                      return Text(
-                          snapshot.hasData
-                              ? 'version ${snapshot.data.version}'
-                              : '',
-                          style: DefaultTextStyle.of(context)
-                              .style
-                              .apply(color: Colors.white)
-                              .apply(fontSizeFactor: 1.2));
-                    },
-                  ),
-                ),
-              ],
-            ),
-            decoration: BoxDecoration(
-              color: isDarkTheme(context)
-                  ? Theme.of(context).dialogBackgroundColor
-                  : Theme.of(context).accentColor,
-              image:
-                  /*isDarkTheme(context)
-                  ? null
-                  : */
-                  DecorationImage(
-                      image: AssetImage('assets/images/banner.png'),
-                      fit: BoxFit.cover),
-            ),
-          ),
+          DefaultDrawerHeader(
+              applicationName: ApplicationConstants.APPLICATION_NAME),
           ListTile(
             leading: Icon(Icons.directions_run, color: iconColor),
             title: Text('Actions'),
@@ -102,7 +66,7 @@ class HomeDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.info, color: iconColor),
             title: Text('About'),
-            onTap: () async => await showAboutAppDialog(context),
+            onTap: () async => await showDefaultAboutAppDialog(context),
           ),
         ],
       ),

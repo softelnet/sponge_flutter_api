@@ -15,6 +15,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:package_info/package_info.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 
@@ -89,3 +90,46 @@ PageRoute<T> createPageRoute<T>(
             settings: settings,
             maintainState: maintainState,
             fullscreenDialog: fullscreenDialog);
+
+class DefaultDrawerHeader extends StatelessWidget {
+  DefaultDrawerHeader({
+    Key key,
+    @required this.applicationName,
+  }) : assert(applicationName != null);
+
+  final String applicationName;
+
+  @override
+  Widget build(BuildContext context) {
+    return DrawerHeader(
+      child: Column(
+        children: [
+          Image.asset('assets/images/logo.png', fit: BoxFit.scaleDown),
+          Container(
+            alignment: Alignment.centerRight,
+            child: FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                return Text(
+                    snapshot.hasData
+                        ? '$applicationName, ver. ${snapshot.data.version}'
+                        : '',
+                    style: DefaultTextStyle.of(context)
+                        .style
+                        .apply(color: Colors.white)
+                        .apply(fontSizeFactor: 1.2));
+              },
+            ),
+          ),
+        ],
+      ),
+      decoration: BoxDecoration(
+        color: isDarkTheme(context)
+            ? Theme.of(context).dialogBackgroundColor
+            : Theme.of(context).accentColor,
+        image: DecorationImage(
+            image: AssetImage('assets/images/banner.png'), fit: BoxFit.cover),
+      ),
+    );
+  }
+}
