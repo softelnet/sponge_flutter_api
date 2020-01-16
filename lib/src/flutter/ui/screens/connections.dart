@@ -47,6 +47,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
     return Scaffold(
       appBar: AppBar(
         title: Text('Connections'),
+        actions: _buildMenu(context),
       ),
       body: SafeArea(
         child: ModalProgressHUD(
@@ -104,6 +105,29 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
     );
   }
 
+  List<Widget> _buildMenu(BuildContext context) => <Widget>[
+        PopupMenuButton<String>(
+          key: Key('connections-menu'),
+          onSelected: (value) async {
+            switch (value) {
+              case 'updateDefaultConnections':
+                await _presenter.service.updateDefaultConnections();
+                setState(() {});
+
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) => [
+            PopupMenuItem<String>(
+              key: Key('updateDefaultConnections'),
+              value: 'updateDefaultConnections',
+              child: Text('Update default connections'),
+            )
+          ],
+          padding: EdgeInsets.zero,
+        )
+      ];
+
   _toggleActiveConnection(SpongeConnection connection) async {
     setState(() {
       _presenter.busy = true;
@@ -150,9 +174,14 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
 
     setState(() {});
 
+    var backgroundColor = getSecondaryColor(context);
+
     Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text('Connection ${removedConnection?.name} removed'),
-      backgroundColor: Colors.red,
+      content: Text(
+        'Connection ${removedConnection?.name} removed',
+        style: TextStyle(color: getContrastColor(backgroundColor)),
+      ),
+      backgroundColor: backgroundColor,
     ));
   }
 

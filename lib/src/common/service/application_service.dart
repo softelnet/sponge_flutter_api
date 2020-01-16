@@ -66,7 +66,7 @@ abstract class ApplicationService<S extends SpongeService> {
     _typeConverter = typeConverter;
 
     await _connectionsConfiguration.init();
-    await _rebuildConnectionsConfiguration();
+    await updateDefaultConnections();
 
     try {
       var activeConnectionName =
@@ -81,7 +81,7 @@ abstract class ApplicationService<S extends SpongeService> {
     }
   }
 
-  Future<void> _rebuildConnectionsConfiguration() async {
+  Future<void> updateDefaultConnections() async {
     var existsDemoService = _connectionsConfiguration.getConnections().any(
         (c) =>
             c.name == ApplicationConstants.DEMO_SERVICE_NAME ||
@@ -181,7 +181,7 @@ abstract class ApplicationService<S extends SpongeService> {
 
   Future<void> clearConfiguration() async {
     await _connectionsConfiguration.clearConnections();
-    await _rebuildConnectionsConfiguration();
+    await updateDefaultConnections();
     await setActiveConnection(null);
   }
 
