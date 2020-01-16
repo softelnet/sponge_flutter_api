@@ -14,13 +14,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/ui/events_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawer.dart';
+import 'package:sponge_flutter_api/src/flutter/widget_factory.dart';
 
 class EventsWidget extends StatefulWidget {
   EventsWidget({Key key}) : super(key: key);
@@ -64,7 +65,8 @@ class _EventsWidgetState extends State<EventsWidget>
           title: _buildTitle(context),
           actions: _buildActionsWidget(context),
         ),
-        drawer: HomeDrawer(),
+        drawer:
+            Provider.of<SpongeWidgetsFactory>(context).createDrawer(context),
         body: SafeArea(
           child: _presenter.bloc != null
               ? StreamBuilder<EventData>(

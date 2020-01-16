@@ -16,7 +16,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/actions_mvp.dart';
@@ -25,7 +27,6 @@ import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_list_item.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawer.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
@@ -208,7 +209,7 @@ class _ActionsWidgetState extends State<ActionsWidget>
         actions: _buildConnectionsWidget(context),
         bottom: tabBar,
       ),
-      drawer: HomeDrawer(),
+      drawer: Provider.of<SpongeWidgetsFactory>(context).createDrawer(context),
       body: SafeArea(
         child: ModalProgressHUD(
           child: child,

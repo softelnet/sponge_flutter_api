@@ -81,7 +81,7 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
             ? 'Please activate a Sponge connection'
             : 'Please tap here to add a new Sponge connection'),
       ),
-      onTap: () => Navigator.pushNamed(context, Routes.CONNECTIONS),
+      onTap: () => Navigator.pushNamed(context, DefaultRoutes.CONNECTIONS),
     );
   }
 }

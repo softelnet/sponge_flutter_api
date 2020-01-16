@@ -15,11 +15,12 @@
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 
 class ApplicationConstants {
-  static const String APPLICATION_NAME = 'Sponge Remote';
-
   static const String URL_TEMPLATE =
       'http://:/${SpongeClientConstants.DEFAULT_PATH}';
 
   static const DEMO_SERVICE_ADDRESS = 'https://spongedemoapi.openksavi.org';
   static const DEMO_SERVICE_NAME = 'Demo service';
+
+  static const SUPPORTED_SPONGE_VERSION_MAJOR_MINOR =
+      SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR;
 }
