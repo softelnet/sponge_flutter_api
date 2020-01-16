@@ -66,7 +66,7 @@ class HomeDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.info, color: iconColor),
             title: Text('About'),
-            onTap: () async => await showDefaultAboutAppDialog(context),
+            onTap: () async => await showAboutAppDialog(context),
           ),
         ],
       ),

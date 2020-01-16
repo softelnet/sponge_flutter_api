@@ -33,6 +33,7 @@ Future<void> showAboutAppDialog(BuildContext context) async {
   await showDefaultAboutAppDialog(
     context,
     contents: RichText(
+      textAlign: TextAlign.justify,
       text: TextSpan(
         children: <TextSpan>[
           TextSpan(

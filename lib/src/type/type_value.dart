@@ -48,19 +48,41 @@ class DrawingBinaryValue extends BinaryValue {
     }
   }
 
-  DrawingBinaryValue.scale(DrawingBinaryValue source, double ratio)
-      : super(source.type) {
-    strokes = source.strokes
-        .map((stroke) => stroke
-            .map((offset) => GenericOffset.scale(offset, ratio, ratio))
-            .toList())
-        .toList();
-    expectedWidth = (source.expectedWidth * ratio).ceil();
-    expectedHeight = (source.expectedHeight * ratio).ceil();
-    strokeWidthRatio = source.strokeWidthRatio;
-    displaySize = GenericSize.scale(source.displaySize, ratio, ratio);
-    color = source.color;
-    background = source.background;
+  factory DrawingBinaryValue.scale(DrawingBinaryValue source, double ratio) {
+    return DrawingBinaryValue.copyWith(
+      source,
+      strokes: source.strokes
+          .map((stroke) => stroke
+              .map((offset) => GenericOffset.scale(offset, ratio, ratio))
+              .toList())
+          .toList(),
+      expectedWidth: (source.expectedWidth * ratio).ceil(),
+      expectedHeight: (source.expectedHeight * ratio).ceil(),
+      displaySize: GenericSize.scale(source.displaySize, ratio, ratio),
+    );
+  }
+
+  factory DrawingBinaryValue.copyWith(
+    DrawingBinaryValue source, {
+    List<List<GenericOffset>> strokes,
+    int expectedWidth,
+    int expectedHeight,
+    double strokeWidthRatio,
+    GenericSize displaySize,
+    GenericColor color,
+    GenericColor background,
+  }) {
+    var value = DrawingBinaryValue(source.type);
+
+    value.strokes = strokes ?? source.strokes;
+    value.expectedWidth = expectedWidth ?? source.expectedWidth;
+    value.expectedHeight = expectedHeight ?? source.expectedHeight;
+    value.strokeWidthRatio = strokeWidthRatio ?? source.strokeWidthRatio;
+    value.displaySize = displaySize ?? source.displaySize;
+    value.color = color ?? source.color;
+    value.background = background ?? source.background;
+
+    return value;
   }
 
   List<List<GenericOffset>> strokes = [];
