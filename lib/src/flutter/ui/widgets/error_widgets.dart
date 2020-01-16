@@ -15,7 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/login_dialog.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/login_widget.dart';
 
 class ErrorPanelWidget extends StatelessWidget {
   ErrorPanelWidget({Key key, @required this.error}) : super(key: key);

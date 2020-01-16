@@ -61,7 +61,7 @@ export 'src/flutter/ui/widgets/edit_widgets.dart';
 export 'src/flutter/ui/widgets/error_widgets.dart';
 export 'src/flutter/ui/widgets/external/async_popup_menu_button.dart';
 export 'src/flutter/ui/widgets/external/painter.dart';
-export 'src/flutter/ui/widgets/login_dialog.dart';
+export 'src/flutter/ui/widgets/login_widget.dart';
 export 'src/flutter/ui/widgets/view_widgets.dart';
 export 'src/flutter/widget_factory.dart';
 export 'src/type/generic_type.dart';
