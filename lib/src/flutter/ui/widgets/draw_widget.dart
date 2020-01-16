@@ -21,8 +21,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart'
 import 'package:sponge_flutter_api/src/type/type_value.dart';
 
 // TODO Move to edit_widgets
-class DrawWidget extends StatefulWidget {
-  DrawWidget({
+class DrawingPage extends StatefulWidget {
+  DrawingPage({
     Key key,
     @required this.name,
     @required this.drawingBinary,
@@ -32,10 +32,10 @@ class DrawWidget extends StatefulWidget {
   final DrawingBinaryValue drawingBinary;
 
   @override
-  createState() => _DrawWidgetState();
+  createState() => _DrawingPageState();
 }
 
-class _DrawWidgetState extends State<DrawWidget> {
+class _DrawingPageState extends State<DrawingPage> {
   PainterController _controller;
 
   Widget build(BuildContext context) {

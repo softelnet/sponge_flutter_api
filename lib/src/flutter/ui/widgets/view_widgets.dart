@@ -28,8 +28,8 @@ import 'package:sponge_flutter_api/src/util/utils.dart';
 
 typedef OnFileSaveCallback = Future<String> Function();
 
-class ImageViewWidget extends StatelessWidget {
-  ImageViewWidget({
+class ImageViewPage extends StatelessWidget {
+  ImageViewPage({
     Key key,
     @required this.name,
     @required this.imageData,

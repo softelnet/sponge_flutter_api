@@ -29,8 +29,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit_widgets.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-class ActionCallWidget extends StatefulWidget {
-  ActionCallWidget({
+class ActionCallPage extends StatefulWidget {
+  ActionCallPage({
     Key key,
     @required this.actionData,
     this.readOnly = false,
@@ -53,10 +53,10 @@ class ActionCallWidget extends StatefulWidget {
   final String header;
 
   @override
-  createState() => _ActionCallWidgetState();
+  createState() => _ActionCallPageState();
 }
 
-class _ActionCallWidgetState extends State<ActionCallWidget>
+class _ActionCallPageState extends State<ActionCallPage>
     implements ActionCallView {
   ActionCallPresenter _presenter;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();

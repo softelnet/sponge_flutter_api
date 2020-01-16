@@ -317,7 +317,7 @@ Future<void> showEventHandlerAction(
     ActionData resultActionData = await showActionCall(
       context,
       handlerActionData,
-      builder: (context) => ActionCallWidget(
+      builder: (context) => ActionCallPage(
         actionData: handlerActionData,
         bloc: service.spongeService
             .getActionCallBloc(handlerActionData.actionMeta.name),

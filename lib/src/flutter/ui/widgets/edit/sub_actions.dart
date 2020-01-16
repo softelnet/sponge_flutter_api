@@ -402,7 +402,7 @@ class SubActionsController extends BaseActionsController {
         if (showActionCallWidget) {
           // Call the sub-action in the ActionCall screen.
           var newActionData = await showActionCall(context, actionData,
-              builder: (context) => ActionCallWidget(
+              builder: (context) => ActionCallPage(
                     actionData: actionData,
                     readOnly: readOnly,
                     bloc: bloc,

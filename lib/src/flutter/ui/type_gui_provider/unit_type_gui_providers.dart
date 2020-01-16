@@ -174,7 +174,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
                         DrawingBinaryValue binaryValue = await Navigator.push(
                           editorContext.context,
                           MaterialPageRoute<DrawingBinaryValue>(
-                              builder: (context) => DrawWidget(
+                              builder: (context) => DrawingPage(
                                   name: editorContext.typeLabel,
                                   drawingBinary: oldValue)),
                         );

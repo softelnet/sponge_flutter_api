@@ -23,16 +23,16 @@ import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
-class ConnectionEditWidget extends StatefulWidget {
-  ConnectionEditWidget({Key key, this.originalConnection}) : super(key: key);
+class ConnectionEditPage extends StatefulWidget {
+  ConnectionEditPage({Key key, this.originalConnection}) : super(key: key);
 
   final SpongeConnection originalConnection;
 
   @override
-  createState() => _ConnectionEditWidgetState();
+  createState() => _ConnectionEditPageState();
 }
 
-class _ConnectionEditWidgetState extends State<ConnectionEditWidget>
+class _ConnectionEditPageState extends State<ConnectionEditPage>
     implements ConnectionEditView {
   static final Logger _logger = Logger('ConnectionEditWidget');
   ConnectionEditPresenter _presenter;

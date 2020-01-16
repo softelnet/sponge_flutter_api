@@ -23,14 +23,14 @@ import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/widget_factory.dart';
 
-class EventsWidget extends StatefulWidget {
-  EventsWidget({Key key}) : super(key: key);
+class EventsPage extends StatefulWidget {
+  EventsPage({Key key}) : super(key: key);
 
   @override
-  _EventsWidgetState createState() => _EventsWidgetState();
+  _EventsPageState createState() => _EventsPageState();
 }
 
-class _EventsWidgetState extends State<EventsWidget>
+class _EventsPageState extends State<EventsPage>
     with SingleTickerProviderStateMixin
     implements EventsView {
   static const String DISMISS_ALL = 'dismissAll';
@@ -199,7 +199,7 @@ class _EventsWidgetState extends State<EventsWidget>
       var resultActionData = await showActionCall(
         context,
         subscriptionActionData,
-        builder: (context) => ActionCallWidget(
+        builder: (context) => ActionCallPage(
           actionData: subscriptionActionData,
           bloc: _presenter.service.spongeService
               .getActionCallBloc(subscriptionActionData.actionMeta.name),

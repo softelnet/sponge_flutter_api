@@ -99,7 +99,7 @@ class UsernamePasswordNotSetWidget extends StatelessWidget {
       child: Center(
         child: Text('Please tap here to login to $connectionName'),
       ),
-      onTap: () async => await showLoginDialog(context, connectionName),
+      onTap: () async => await showLoginPage(context, connectionName),
     );
   }
 }

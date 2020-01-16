@@ -30,11 +30,11 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-class ActionsWidget extends StatefulWidget {
-  ActionsWidget({Key key}) : super(key: key);
+class ActionsPage extends StatefulWidget {
+  ActionsPage({Key key}) : super(key: key);
 
   @override
-  _ActionsWidgetState createState() => _ActionsWidgetState();
+  _ActionsPageState createState() => _ActionsPageState();
 }
 
 class _ActionGroup {
@@ -44,7 +44,7 @@ class _ActionGroup {
   final List<ActionData> actions;
 }
 
-class _ActionsWidgetState extends State<ActionsWidget>
+class _ActionsPageState extends State<ActionsPage>
     with TickerProviderStateMixin
     implements ActionsView {
   ActionsPresenter _presenter;
@@ -378,7 +378,7 @@ class _ActionsWidgetState extends State<ActionsWidget>
     return await showActionCall(
       context,
       actionData,
-      builder: (context) => ActionCallWidget(
+      builder: (context) => ActionCallPage(
         actionData: actionData,
         bloc: _presenter.service.spongeService
             .getActionCallBloc(actionData.actionMeta.name),

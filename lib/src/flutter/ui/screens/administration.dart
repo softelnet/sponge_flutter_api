@@ -20,8 +20,8 @@ import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 @deprecated
-class AdministrationWidget extends StatelessWidget {
-  AdministrationWidget({Key key}) : super(key: key);
+class AdministrationPage extends StatelessWidget {
+  AdministrationPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

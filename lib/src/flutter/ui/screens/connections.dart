@@ -20,14 +20,14 @@ import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/connection_edit.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
-class ConnectionsWidget extends StatefulWidget {
-  ConnectionsWidget({Key key}) : super(key: key);
+class ConnectionsPage extends StatefulWidget {
+  ConnectionsPage({Key key}) : super(key: key);
 
   @override
-  createState() => _ConnectionsWidgetState();
+  createState() => _ConnectionsPageState();
 }
 
-class _ConnectionsWidgetState extends State<ConnectionsWidget>
+class _ConnectionsPageState extends State<ConnectionsPage>
     implements ConnectionsView {
   ConnectionsPresenter _presenter;
 
@@ -188,7 +188,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
   Future<SpongeConnection> addConnection() async => await Navigator.push(
         context,
         MaterialPageRoute<SpongeConnection>(
-          builder: (context) => ConnectionEditWidget(),
+          builder: (context) => ConnectionEditPage(),
         ),
       );
 
@@ -197,7 +197,7 @@ class _ConnectionsWidgetState extends State<ConnectionsWidget>
       context,
       MaterialPageRoute<SpongeConnection>(
         builder: (context) =>
-            ConnectionEditWidget(originalConnection: connection),
+            ConnectionEditPage(originalConnection: connection),
       ),
     );
   }

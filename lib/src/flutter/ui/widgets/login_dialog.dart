@@ -27,16 +27,16 @@ class LoginData {
   String password;
 }
 
-class LoginDialog extends StatefulWidget {
-  LoginDialog({Key key, @required this.connectionName}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  LoginPage({Key key, @required this.connectionName}) : super(key: key);
 
   final String connectionName;
 
   @override
-  _LoginDialogState createState() => _LoginDialogState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginDialogState extends State<LoginDialog> {
+class _LoginPageState extends State<LoginPage> {
   final _loginData = LoginData();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static const double PADDING = 10.0;
@@ -143,13 +143,13 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 }
 
-Future<LoginData> showLoginDialog(
+Future<LoginData> showLoginPage(
     BuildContext context, String connectionName) async {
   return await Navigator.push(
       context,
       MaterialPageRoute<LoginData>(
         builder: (BuildContext context) =>
-            LoginDialog(connectionName: connectionName),
+            LoginPage(connectionName: connectionName),
         fullscreenDialog: true,
       ));
 }

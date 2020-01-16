@@ -20,14 +20,14 @@ import 'package:sponge_flutter_api/src/flutter/service/flutter_application_servi
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
-class SettingsWidget extends StatefulWidget {
-  SettingsWidget({Key key}) : super(key: key);
+class SettingsPage extends StatefulWidget {
+  SettingsPage({Key key}) : super(key: key);
 
   @override
-  createState() => _SettingsWidgetState();
+  createState() => _SettingsPageState();
 }
 
-class _SettingsWidgetState extends State<SettingsWidget> {
+class _SettingsPageState extends State<SettingsPage> {
   int _textViewerWidthSliderValue;
   static const MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE = 10;
   int _maxEventCountSliderValue;
