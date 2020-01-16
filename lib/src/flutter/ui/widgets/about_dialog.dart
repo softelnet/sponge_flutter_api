@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/application_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 Future<void> showAboutAppDialog(BuildContext context) async {
@@ -39,7 +40,7 @@ Future<void> showAboutAppDialog(BuildContext context) async {
           TextSpan(
             style: headerTextStyle,
             text:
-                '\n\nSponge Control is a generic GUI client to Sponge REST API services. '
+                '\n\n${ApplicationConstants.APPLICATION_NAME} is a generic GUI client to Sponge REST API services. '
                 'It allows users to call remote Sponge actions.',
           ),
           TextSpan(
@@ -54,7 +55,7 @@ Future<void> showAboutAppDialog(BuildContext context) async {
           LinkTextSpan(
             style: linkStyle,
             url: 'https://sponge.openksavi.org/mobile',
-            text: 'Sponge Control',
+            text: '${ApplicationConstants.APPLICATION_NAME}',
           ),
           TextSpan(
             style: aboutTextStyle,
@@ -68,7 +69,7 @@ Future<void> showAboutAppDialog(BuildContext context) async {
           TextSpan(
             style: aboutTextStyle,
             text:
-                ' project home page.\n\nTo see the source code of this app, please visit the Sponge Control ',
+                ' project home page.\n\nTo see the source code of this app, please visit the ${ApplicationConstants.APPLICATION_NAME} ',
           ),
           LinkTextSpan(
             style: linkStyle,
