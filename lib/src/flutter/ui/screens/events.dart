@@ -22,6 +22,7 @@ import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/widget_factory.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class EventsPage extends StatefulWidget {
   EventsPage({Key key}) : super(key: key);
@@ -169,7 +170,10 @@ class _EventsPageState extends State<EventsPage>
         itemBuilder: (BuildContext context) => [
           PopupMenuItem<String>(
             value: DISMISS_ALL,
-            child: Text('Dismiss all'),
+            child: IconTextPopupMenuItemWidget(
+              icon: Icons.clear_all,
+              text: 'Dismiss all',
+            ),
           ),
         ],
       )

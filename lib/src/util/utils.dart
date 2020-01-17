@@ -133,3 +133,32 @@ class DefaultDrawerHeader extends StatelessWidget {
     );
   }
 }
+
+class IconTextPopupMenuItemWidget extends StatelessWidget {
+  const IconTextPopupMenuItemWidget({
+    Key key,
+    @required this.icon,
+    @required this.text,
+  }) : super(key: key);
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 20),
+          child: Icon(
+            icon,
+            color: getSecondaryColor(context),
+          ),
+        ),
+        Expanded(
+          child: Text(text),
+        ),
+      ],
+    );
+  }
+}

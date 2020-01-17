@@ -23,6 +23,8 @@ class ConnectionsViewModel extends BaseViewModel {
 abstract class ConnectionsView extends BaseView {
   Future<SpongeConnection> addConnection();
   Future<SpongeConnection> editConnection(SpongeConnection connection);
+
+  void refresh();
 }
 
 class ConnectionsPresenter
@@ -73,7 +75,7 @@ class ConnectionsPresenter
         viewModel.connections, viewModel.activeConnectionName);
   }
 
-  Future<void> addConnection() async {
+  Future<void> showAddConnection() async {
     var connection = await view.addConnection();
     if (connection != null) {
       viewModel.connections.add(connection);
@@ -81,7 +83,7 @@ class ConnectionsPresenter
     }
   }
 
-  Future<SpongeConnection> editConnection(
+  Future<SpongeConnection> showEditConnection(
       SpongeConnection editedConnection) async {
     var newConnection = await view.editConnection(editedConnection);
 
@@ -115,5 +117,18 @@ class ConnectionsPresenter
     await _commitData();
 
     return removedConnection;
+  }
+
+  void refresh() {
+    if (isBound) {
+      view.refresh();
+    }
+  }
+
+  Future<void> addConnections(List<SpongeConnection> connections) async {
+    if (connections.isNotEmpty) {
+      viewModel.connections.addAll(connections);
+      await _commitData();
+    }
   }
 }

@@ -48,6 +48,13 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   }
 
   @override
+  void dispose() {
+    _presenter.unbound();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _presenter..setService(ApplicationProvider.of(context).service);
 
@@ -237,7 +244,10 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
 
       try {
         var version = await _presenter.testConnection();
-        await verifyServerVersion(context, version);
+
+        if (_presenter.isBound) {
+          await verifyServerVersion(context, version);
+        }
       } finally {
         try {
           snackController.close();

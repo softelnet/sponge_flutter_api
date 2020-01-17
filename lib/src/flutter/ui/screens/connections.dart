@@ -14,11 +14,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/ui/connections_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/connection_edit.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/widget_factory.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ConnectionsPage extends StatefulWidget {
   ConnectionsPage({Key key}) : super(key: key);
@@ -36,6 +39,13 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     super.initState();
 
     _presenter = ConnectionsPresenter(ConnectionsViewModel(), this);
+  }
+
+  @override
+  void dispose() {
+    _presenter.unbound();
+
+    super.dispose();
   }
 
   @override
@@ -105,28 +115,48 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     );
   }
 
-  List<Widget> _buildMenu(BuildContext context) => <Widget>[
-        PopupMenuButton<String>(
-          key: Key('connections-menu'),
-          onSelected: (value) async {
+  List<Widget> _buildMenu(BuildContext context) {
+    var customItems = Provider.of<SpongeWidgetsFactory>(context)
+        .createConnectionsPageMenuItems(context);
+
+    return <Widget>[
+      PopupMenuButton<String>(
+        key: Key('connections-menu'),
+        onSelected: (value) async {
+          var customOnSelected = customItems
+              .firstWhere((config) => config.value == value, orElse: () => null)
+              ?.onSelected;
+          if (customOnSelected != null) {
+            customOnSelected(_presenter);
+          } else {
             switch (value) {
               case 'updateDefaultConnections':
-                await _presenter.service.updateDefaultConnections();
-                setState(() {});
-
+                setState(() => _presenter.busy = true);
+                try {
+                  await _presenter.service.updateDefaultConnections();
+                } finally {
+                  setState(() => _presenter.busy = false);
+                }
                 break;
             }
-          },
-          itemBuilder: (BuildContext context) => [
-            PopupMenuItem<String>(
-              key: Key('updateDefaultConnections'),
-              value: 'updateDefaultConnections',
-              child: Text('Update default connections'),
-            )
-          ],
-          padding: EdgeInsets.zero,
-        )
-      ];
+          }
+        },
+        itemBuilder: (BuildContext context) => [
+          ...customItems.map((config) => config.itemBuilder(context)).toList(),
+          if (customItems.isNotEmpty) PopupMenuDivider(),
+          PopupMenuItem<String>(
+            key: Key('updateDefaultConnections'),
+            value: 'updateDefaultConnections',
+            child: IconTextPopupMenuItemWidget(
+              icon: Icons.update,
+              text: 'Update default services',
+            ),
+          ),
+        ],
+        padding: EdgeInsets.zero,
+      )
+    ];
+  }
 
   _toggleActiveConnection(SpongeConnection connection) async {
     setState(() {
@@ -136,7 +166,8 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     try {
       await _presenter.toggleActiveConnection(connection);
 
-      ApplicationProvider.of(context).updateConnection(connection);
+      ApplicationProvider.of(context)
+          .updateConnection(connection, refresh: false);
     } finally {
       setState(() {
         _presenter.busy = false;
@@ -150,7 +181,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     });
 
     try {
-      await _presenter.addConnection();
+      await _presenter.showAddConnection();
     } finally {
       setState(() {
         _presenter.busy = false;
@@ -160,7 +191,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
   _editConnection(
       BuildContext context, SpongeConnection editedConnection) async {
-    var newConnection = await _presenter.editConnection(editedConnection);
+    var newConnection = await _presenter.showEditConnection(editedConnection);
 
     if (newConnection != null) {
       ApplicationProvider.of(context).updateConnection(newConnection);
@@ -171,8 +202,6 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
   _removeConnection(BuildContext context, int index) async {
     var removedConnection = await _presenter.removeConnection(index);
-
-    setState(() {});
 
     var backgroundColor = getSecondaryColor(context);
 
@@ -200,5 +229,10 @@ class _ConnectionsPageState extends State<ConnectionsPage>
             ConnectionEditPage(originalConnection: connection),
       ),
     );
+  }
+
+  @override
+  void refresh() {
+    setState(() {});
   }
 }

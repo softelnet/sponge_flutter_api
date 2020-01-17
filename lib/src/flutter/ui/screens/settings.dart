@@ -19,6 +19,7 @@ import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
@@ -349,7 +350,10 @@ class _SettingsPageState extends State<SettingsPage> {
           PopupMenuItem<String>(
             key: Key('settings-menu-reset'),
             value: 'reset',
-            child: Text('Reset settings and connections'),
+            child: IconTextPopupMenuItemWidget(
+              icon: Icons.restore,
+              text: 'Reset to defaults',
+            ),
           ),
         ],
         padding: EdgeInsets.zero,
@@ -417,7 +421,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<bool> _clearConfiguration(BuildContext context) async {
     if (!await showConfirmationDialog(context,
-        'Do you want to reset the current settings (including the configured connections)?')) {
+        'Do you want to reset the current settings and remove the connections?')) {
       return false;
     }
 

@@ -19,15 +19,25 @@ abstract class BaseViewModel {}
 abstract class BaseView {}
 
 abstract class BasePresenter<M extends BaseViewModel, V extends BaseView> {
-  BasePresenter(this.viewModel, this.view);
+  BasePresenter(this.viewModel, V view) : _view = view;
 
   M viewModel;
-  V view;
+  V _view;
+
+  V get view => _view;
 
   ApplicationService _service;
   ApplicationService get service => _service;
 
+  bool _isBound = true;
+  bool get isBound => _isBound;
+
   void setService(ApplicationService service) => _service = service;
 
   void updateModel(M viewModel) => this.viewModel = viewModel;
+
+  void unbound() {
+    _isBound = false;
+    _view = null;
+  }
 }
