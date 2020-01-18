@@ -56,18 +56,11 @@ class ConnectionsPresenter
     await service.setActiveConnection(viewModel.activeConnectionName);
   }
 
-  void _setupData() {
-    if (viewModel.activeConnectionName == null &&
-        viewModel.connections.length == 1) {
-      viewModel.activeConnectionName = viewModel.connections[0].name;
-    } else if (viewModel.activeConnectionName != null &&
+  Future<void> _commitData() async {
+    if (viewModel.activeConnectionName != null &&
         viewModel.connections.isEmpty) {
       viewModel.activeConnectionName = null;
     }
-  }
-
-  Future<void> _commitData() async {
-    _setupData();
 
     viewModel.connections.sort();
 
