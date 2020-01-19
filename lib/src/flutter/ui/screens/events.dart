@@ -126,10 +126,13 @@ class _EventsPageState extends State<EventsPage>
   }
 
   Widget _buildTitle(BuildContext context) {
-    return Text('Events' +
-        (_presenter.connectionName != null
-            ? ' (${_presenter.connectionName})'
-            : ''));
+    return Text(
+      _presenter.connectionName != null
+          ? '${_presenter.connectionName} (Events)'
+          : 'Events',
+      softWrap: true,
+      overflow: TextOverflow.visible,
+    );
   }
 
   List<Widget> _buildActionsWidget(BuildContext context) {
@@ -172,7 +175,7 @@ class _EventsPageState extends State<EventsPage>
             value: DISMISS_ALL,
             child: IconTextPopupMenuItemWidget(
               icon: Icons.clear_all,
-              text: 'Dismiss all',
+              text: 'Dismiss all events',
             ),
           ),
         ],

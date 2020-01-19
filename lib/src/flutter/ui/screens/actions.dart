@@ -253,10 +253,18 @@ class _ActionsPageState extends State<ActionsPage>
   }
 
   Widget _buildTitle(BuildContext context) {
-    return Text('Actions' +
-        (_presenter.connectionName != null
-            ? ' (${_presenter.connectionName})'
-            : ''));
+    return Tooltip(
+      child: Text(
+        _presenter.connectionName != null
+            ? '${_presenter.connectionName}'
+            : 'Actions',
+        softWrap: true,
+        overflow: TextOverflow.visible,
+      ),
+      message: _presenter.connectionName != null
+          ? '${_presenter.connectionName} actions'
+          : null,
+    );
   }
 
   Future<void> _changeConnection(BuildContext context, String name) async {
