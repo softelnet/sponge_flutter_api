@@ -161,12 +161,6 @@ class TypeGuiProviderUtils {
     );
   }
 
-  static bool isWaitingForValue(UiContext uiContext) {
-    return DataTypeUtils.isValueNotSet(uiContext.value) &&
-        (uiContext.qualifiedType.path != null &&
-            uiContext.providing.contains(uiContext.qualifiedType.path));
-  }
-
   static Widget createWaitingViewer(UiContext viewerContext) {
     return Column(
       children: <Widget>[

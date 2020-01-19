@@ -16,18 +16,16 @@ import 'package:meta/meta.dart';
 
 class ProvideActionArgsState {
   ProvideActionArgsState({
-    @required List<String> providing,
-  }) : providing = providing ?? [];
+    @required List<String> loading,
+  }) : loading = loading ?? [];
 
-  final List<String> providing;
+  final List<String> loading;
 }
 
 class ProvideActionArgsStateBeforeInvocation extends ProvideActionArgsState {
   ProvideActionArgsStateBeforeInvocation({
-    @required List<String> providing,
-  }) : super(
-          providing: providing,
-        );
+    @required List<String> loading,
+  }) : super(loading: loading);
 }
 
 class ProvideActionArgsStateAfterInvocation extends ProvideActionArgsState {}

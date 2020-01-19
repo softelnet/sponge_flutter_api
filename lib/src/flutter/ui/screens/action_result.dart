@@ -112,7 +112,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
           result,
           typeLabel: resultLabel,
           markNullable: false,
-          providing: [],
+          loading: [],
         );
 
     return GestureDetector(

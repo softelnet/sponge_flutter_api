@@ -307,16 +307,14 @@ class _ActionsPageState extends State<ActionsPage>
           : null;
 
   Widget _buildFloatingActionButton(BuildContext context) =>
-      _presenter.connected
-          ? FloatingActionButton(
-              onPressed: () => _refreshActions(context)
-                  .then((_) => setState(() {}))
-                  .catchError((e) => handleError(context, e)),
-              tooltip: 'Refresh actions',
-              child: Icon(Icons.refresh),
-              backgroundColor: getFloatingButtonBackgroudColor(context),
-            )
-          : null;
+      FloatingActionButton(
+        onPressed: () => _refreshActions(context)
+            .then((_) => setState(() {}))
+            .catchError((e) => handleError(context, e)),
+        tooltip: 'Refresh actions',
+        child: Icon(Icons.refresh),
+        backgroundColor: getFloatingButtonBackgroudColor(context),
+      );
 
   Future<void> _refreshActions(BuildContext context) async {
     await _presenter.refreshActions();

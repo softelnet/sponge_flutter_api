@@ -374,7 +374,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
                     !(widget.uiContext as TypeEditorContext).enabled,
         enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
             isRecordEnabled, // && ifFieldEnabled,
-        providing: widget.uiContext.providing,
+        loading: widget.uiContext.loading,
       );
 
       if (qFieldType.type.provided?.hasValueSet ?? false) {
@@ -1109,7 +1109,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       qElementType,
       element,
       showLabel: false,
-      providing: widget.uiContext.providing,
+      loading: widget.uiContext.loading,
     );
 
     // TODO Can elementTypeProvider be cached?
@@ -1544,7 +1544,7 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
                       widget.uiContext.qualifiedType.createChild(type.keyType),
                       key,
                       showLabel: false, // TODO Show label.
-                      providing: widget.uiContext.providing,
+                      loading: widget.uiContext.loading,
                     );
 
                     var valueContext = TypeViewerContext(
@@ -1555,7 +1555,7 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
                           .createChild(type.valueType),
                       valueMap[key],
                       showLabel: false, // TODO Show label.
-                      providing: widget.uiContext.providing,
+                      loading: widget.uiContext.loading,
                     );
 
                     return ListTile(

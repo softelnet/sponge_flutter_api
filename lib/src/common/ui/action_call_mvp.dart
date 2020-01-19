@@ -287,10 +287,18 @@ class ActionCallPresenter
       var dynamicTypes = actionData.getDynamicTypeNestedTypes(
           List.of(namesToProvide)..addAll(currentNames));
 
-      yield ProvideActionArgsStateBeforeInvocation(providing: namesToProvide);
+      // Arguments influenced by the submitted arguments (their values can be provided not explicitly).
+      var influencedBySummitted = actualArgsToSubmit.keys
+          .expand((submit) =>
+              actionData.getArgType(submit).provided.submittable.influences)
+          .toList();
+
+      var loading = namesToProvide + influencedBySummitted;
+
+      yield ProvideActionArgsStateBeforeInvocation(loading: loading);
 
       _logger.finer(
-          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features');
+          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features, loading: $loading');
 
       Map<String, ProvidedValue> newProvidedArgs = await service
           .spongeService.client
@@ -541,7 +549,7 @@ class ActionCallPresenter
       value = _normalizeValue(qType.type, value);
       _setArg(qType.path, value);
 
-      if ((qType.type.provided?.submittable ?? false) && qType.path != null) {
+      if ((qType.type.provided?.submittable != null) && qType.path != null) {
         _argsToSubmit[qType.path] = value;
       }
 
@@ -566,7 +574,7 @@ class ActionCallPresenter
 
   @override
   void onActivate(QualifiedDataType qType, value) {
-    if ((qType.type.provided?.submittable ?? false) && qType.path != null) {
+    if ((qType.type.provided?.submittable != null) && qType.path != null) {
       _argsToSubmit[qType.path] = value;
 
       view.refresh();

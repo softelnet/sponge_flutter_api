@@ -250,7 +250,7 @@ class _ActionCallPageState extends State<ActionCallPage>
           _presenter.actionData.argsAsRecord,
           readOnly: widget.readOnly,
           enabled: true,
-          providing: state.providing,
+          loading: state.loading,
         ),
       ),
       scrollable: _presenter.isScrollable(),

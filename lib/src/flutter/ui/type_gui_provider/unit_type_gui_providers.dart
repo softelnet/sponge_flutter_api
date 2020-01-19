@@ -30,16 +30,40 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
 
   static final Logger _logger = Logger('BaseUnitTypeGuiProvider');
 
+  Widget _wrapIfLoading(WidgetBuilder builder, UiContext uiContext) {
+    bool isLoading = uiContext.qualifiedType.path != null &&
+        uiContext.loading.contains(uiContext.qualifiedType.path);
+
+    if (DataTypeUtils.isValueNotSet(uiContext.value) && isLoading) {
+      return TypeGuiProviderUtils.createWaitingViewer(uiContext);
+    }
+
+    var widget = builder(uiContext.context);
+
+    return widget != null && isLoading
+        ? AbsorbPointer(
+            child: widget,
+            absorbing: true,
+          )
+        : widget;
+
+    // TODO ModalProgressHUD would be the best widget here but causes rendering errors, e.g. for pageable lists.
+
+    // return widget != null
+    //     ? ModalProgressHUD(
+    //         child: widget,
+    //         inAsyncCall: TypeGuiProviderUtils.isWaitingForValue(uiContext),
+    //       )
+    //     : null;
+  }
+
   @override
   Widget createEditor(TypeEditorContext editorContext) {
     setupContext(editorContext);
 
     try {
-      if (TypeGuiProviderUtils.isWaitingForValue(editorContext)) {
-        return TypeGuiProviderUtils.createWaitingViewer(editorContext);
-      }
-
-      return doCreateEditor(editorContext) ??
+      return _wrapIfLoading(
+              (_) => doCreateEditor(editorContext), editorContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeEditor(this,
               labelText: editorContext.safeTypeLabel,
               hintText: editorContext.hintText);
@@ -58,17 +82,16 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     setupContext(viewerContext);
 
     try {
-      if (TypeGuiProviderUtils.isWaitingForValue(viewerContext)) {
-        return TypeGuiProviderUtils.createWaitingViewer(viewerContext);
-      }
-
       // TODO createCompactViewer with valueLabel. Is this OK?
       if (viewerContext.valueLabel != null) {
-        return TypeGuiProviderUtils.createTextBasedCompactViewer(
-            this, viewerContext.copy()..value = viewerContext.valueLabel);
+        return _wrapIfLoading(
+            (_) => TypeGuiProviderUtils.createTextBasedCompactViewer(
+                this, viewerContext.copy()..value = viewerContext.valueLabel),
+            viewerContext);
       }
 
-      return doCreateCompactViewer(viewerContext) ??
+      return _wrapIfLoading(
+              (_) => doCreateCompactViewer(viewerContext), viewerContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeViewer(this,
               labelText: viewerContext.safeTypeLabel);
     } catch (e) {
@@ -83,12 +106,9 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
   Widget createViewer(TypeViewerContext viewerContext) {
     setupContext(viewerContext);
 
-    if (TypeGuiProviderUtils.isWaitingForValue(viewerContext)) {
-      return TypeGuiProviderUtils.createWaitingViewer(viewerContext);
-    }
-
     try {
-      return doCreateViewer(viewerContext) ??
+      return _wrapIfLoading(
+              (_) => doCreateViewer(viewerContext), viewerContext) ??
           TypeGuiProviderUtils.createUnsupportedTypeViewer(this,
               labelText: viewerContext.safeTypeLabel);
     } catch (e) {
@@ -98,8 +118,6 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
   }
 
   Widget doCreateViewer(TypeViewerContext viewerContext) => null;
-  //   return _createTextBasedViewer(viewerContext);
-  // }
 
   @override
   Widget createExtendedViewer(TypeViewerContext viewerContext) {
@@ -972,7 +990,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
 
     var onTap = editorContext.enabled &&
             !editorContext.readOnly &&
-            (editorContext.qualifiedType.type.provided?.submittable ?? false)
+            (editorContext.qualifiedType.type.provided?.submittable != null)
         ? () => editorContext.onSave(null)
         : null;
 

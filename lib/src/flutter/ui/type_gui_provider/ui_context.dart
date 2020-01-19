@@ -92,13 +92,13 @@ abstract class UiContext {
     @required Map<String, Object> features,
     @required bool markNullable,
     @required bool showLabel,
-    @required List<String> providing,
+    @required List<String> loading,
   })  : this.features = features != null ? Map.from(features) : {},
         this.markNullable = markNullable ?? true {
     this.typeLabel = typeLabel ?? qualifiedType.type.label;
     this.typeDescription = typeDescription ?? qualifiedType.type.description;
     this.showLabel = showLabel ?? true;
-    this.providing = providing ?? [];
+    this.loading = loading ?? [];
   }
 
   final String name;
@@ -114,7 +114,7 @@ abstract class UiContext {
   Map<String, Object> features;
   bool markNullable;
   bool showLabel;
-  List<String> providing;
+  List<String> loading;
 
   bool get enabled;
 
@@ -156,7 +156,7 @@ class TypeEditorContext extends UiContext {
     this.readOnly = false,
     @required bool enabled,
     bool showLabel,
-    @required List<String> providing,
+    @required List<String> loading,
   }) : super(
           name,
           context,
@@ -170,7 +170,7 @@ class TypeEditorContext extends UiContext {
           features: features,
           markNullable: markNullable,
           showLabel: showLabel,
-          providing: providing,
+          loading: loading,
         ) {
     this.enabled = enabled ?? true;
   }
@@ -201,7 +201,7 @@ class TypeEditorContext extends UiContext {
         readOnly: readOnly,
         enabled: enabled,
         showLabel: showLabel,
-        providing: providing,
+        loading: loading,
       );
 
   TypeViewerContext copyAsViewer() => TypeViewerContext(
@@ -217,7 +217,7 @@ class TypeEditorContext extends UiContext {
         features: Map.from(features),
         markNullable: markNullable,
         showLabel: showLabel,
-        providing: providing,
+        loading: loading,
       );
 }
 
@@ -235,7 +235,7 @@ class TypeViewerContext extends UiContext {
     Map<String, Object> features,
     bool markNullable,
     bool showLabel,
-    @required List<String> providing,
+    @required List<String> loading,
   }) : super(
           name,
           context,
@@ -249,7 +249,7 @@ class TypeViewerContext extends UiContext {
           features: features,
           markNullable: markNullable,
           showLabel: showLabel,
-          providing: providing,
+          loading: loading,
         );
 
   bool get enabled => false;
@@ -267,7 +267,7 @@ class TypeViewerContext extends UiContext {
         features: Map.from(features),
         markNullable: markNullable,
         showLabel: showLabel,
-        providing: providing,
+        loading: loading,
       );
 
   TypeEditorContext copyAsEditor() => TypeEditorContext(
@@ -284,6 +284,6 @@ class TypeViewerContext extends UiContext {
         markNullable: markNullable,
         showLabel: showLabel,
         enabled: true,
-        providing: providing,
+        loading: loading,
       );
 }
