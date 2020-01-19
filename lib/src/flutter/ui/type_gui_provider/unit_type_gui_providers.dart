@@ -642,6 +642,14 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
 
 class MapTypeGuiProvider extends BaseUnitTypeGuiProvider<MapType> {
   MapTypeGuiProvider(DataType type) : super(type);
+
+  @override
+  Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
+      MapTypeWidget(uiContext: viewerContext);
+
+  @override
+  Widget doCreateViewer(TypeViewerContext viewerContext) =>
+      MapTypeWidget(uiContext: viewerContext);
 }
 
 class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {

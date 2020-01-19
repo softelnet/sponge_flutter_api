@@ -758,7 +758,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   ItemScrollController _itemScrollController;
   ItemPositionsListener _itemPositionsListener;
 
-  bool _busy = false;
   bool _fetchingData = false;
   final _itemMargin = 1.0;
   String _lastFeatureKey;
@@ -989,72 +988,69 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     var separatorBuilder =
         (BuildContext context, int index) => Container(height: _itemMargin);
-    return ModalProgressHUD(
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Padding(
-                child: Text(
-                  label ?? '',
-                  style: getArgLabelTextStyle(context),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 10),
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Padding(
+              child: Text(
+                label ?? '',
+                style: getArgLabelTextStyle(context),
               ),
-              Expanded(
-                child: ButtonBar(
-                  children: buttons,
-                  buttonPadding: EdgeInsets.zero,
-                  alignment: MainAxisAlignment.end,
-                ),
+              padding: EdgeInsets.symmetric(vertical: 10),
+            ),
+            Expanded(
+              child: ButtonBar(
+                children: buttons,
+                buttonPadding: EdgeInsets.zero,
+                alignment: MainAxisAlignment.end,
               ),
-            ],
-          ),
-          isListScroll
-              ? Expanded(
-                  child: Padding(
-                    padding: listPadding,
-                    child: PageStorageConsumer(
-                      child: widget.useScrollableIndexedList
-                          ? ScrollablePositionedList.separated(
-                              key: listKey,
-                              itemScrollController:
-                                  isPageable ? _itemScrollController : null,
-                              itemPositionsListener:
-                                  isPageable ? _itemPositionsListener : null,
-                              itemCount: data.length + 1,
-                              itemBuilder: itemBuilder,
-                              separatorBuilder: separatorBuilder,
-                              padding: EdgeInsets.zero,
-                            )
-                          : ListView.separated(
-                              key: listKey,
-                              controller: isPageable ? _scrollController : null,
-                              //shrinkWrap: true,
-                              itemCount: data.length + 1,
-                              itemBuilder: itemBuilder,
-                              separatorBuilder: separatorBuilder,
-                              padding: EdgeInsets.zero,
-                            ),
-                    ),
-                  ),
-                )
-              : Padding(
+            ),
+          ],
+        ),
+        isListScroll
+            ? Expanded(
+                child: Padding(
                   padding: listPadding,
-                  child: ListBody(
-                    children: data
-                        .asMap()
-                        .map((index, element) => MapEntry(
-                            index,
-                            _createElementWidget(index, qElementType, element,
-                                verticalMargin: _itemMargin)))
-                        .values
-                        .toList(),
+                  child: PageStorageConsumer(
+                    child: widget.useScrollableIndexedList
+                        ? ScrollablePositionedList.separated(
+                            key: listKey,
+                            itemScrollController:
+                                isPageable ? _itemScrollController : null,
+                            itemPositionsListener:
+                                isPageable ? _itemPositionsListener : null,
+                            itemCount: data.length + 1,
+                            itemBuilder: itemBuilder,
+                            separatorBuilder: separatorBuilder,
+                            padding: EdgeInsets.zero,
+                          )
+                        : ListView.separated(
+                            key: listKey,
+                            controller: isPageable ? _scrollController : null,
+                            //shrinkWrap: true,
+                            itemCount: data.length + 1,
+                            itemBuilder: itemBuilder,
+                            separatorBuilder: separatorBuilder,
+                            padding: EdgeInsets.zero,
+                          ),
                   ),
                 ),
-        ],
-      ),
-      inAsyncCall: _busy,
+              )
+            : Padding(
+                padding: listPadding,
+                child: ListBody(
+                  children: data
+                      .asMap()
+                      .map((index, element) => MapEntry(
+                          index,
+                          _createElementWidget(index, qElementType, element,
+                              verticalMargin: _itemMargin)))
+                      .values
+                      .toList(),
+                ),
+              ),
+      ],
     );
   }
 
@@ -1116,6 +1112,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       providing: widget.uiContext.providing,
     );
 
+    // TODO Can elementTypeProvider be cached?
     var elementTypeProvider = widget.guiProvider.elementTypeProvider
       ..setupContext(subUiContext);
 
@@ -1505,6 +1502,77 @@ class _TextEditWidgetState extends State<TextEditWidget> {
       maxLines: obscure ? 1 : maxLines,
       enabled: editorContext.enabled && !editorContext.readOnly,
       obscureText: obscure,
+    );
+  }
+}
+
+class MapTypeWidget extends StatefulWidget {
+  MapTypeWidget({Key key, this.uiContext}) : super(key: key);
+
+  final UiContext uiContext;
+
+  @override
+  _MapTypeWidgetState createState() => _MapTypeWidgetState();
+}
+
+class _MapTypeWidgetState extends State<MapTypeWidget> {
+  MapType get type => widget.uiContext.qualifiedType.type;
+
+  @override
+  Widget build(BuildContext context) {
+    var label = widget.uiContext.getDecorationLabel();
+    var valueMap = widget.uiContext.value as Map;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (label != null)
+          Padding(
+            child: Text(
+              label,
+              style: getArgLabelTextStyle(context),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 10),
+          ),
+        ListBody(
+          children: ListTile.divideTiles(
+                  tiles: valueMap.keys.map<Widget>((key) {
+                    var keyContext = TypeViewerContext(
+                      widget.uiContext.name + '-key',
+                      context,
+                      widget.uiContext.callbacks,
+                      widget.uiContext.qualifiedType.createChild(type.keyType),
+                      key,
+                      showLabel: false, // TODO Show label.
+                      providing: widget.uiContext.providing,
+                    );
+
+                    var valueContext = TypeViewerContext(
+                      widget.uiContext.name + '-value',
+                      context,
+                      widget.uiContext.callbacks,
+                      widget.uiContext.qualifiedType
+                          .createChild(type.valueType),
+                      valueMap[key],
+                      showLabel: false, // TODO Show label.
+                      providing: widget.uiContext.providing,
+                    );
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: widget.uiContext.typeGuiProvider
+                          .getProvider(type.keyType)
+                          .createViewer(keyContext),
+                      subtitle: widget.uiContext.typeGuiProvider
+                          .getProvider(type.valueType)
+                          .createViewer(valueContext),
+                      dense: true,
+                    );
+                  }),
+                  context: context)
+              .toList(),
+        ),
+      ],
     );
   }
 }
