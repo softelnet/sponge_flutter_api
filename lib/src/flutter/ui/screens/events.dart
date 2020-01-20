@@ -126,12 +126,17 @@ class _EventsPageState extends State<EventsPage>
   }
 
   Widget _buildTitle(BuildContext context) {
-    return Text(
-      _presenter.connectionName != null
-          ? '${_presenter.connectionName} (Events)'
+    return Tooltip(
+      child: Text(
+        _presenter.connectionName != null
+            ? '${_presenter.connectionName}'
+            : 'Events',
+        softWrap: true,
+        overflow: TextOverflow.visible,
+      ),
+      message: _presenter.connectionName != null
+          ? '${_presenter.connectionName} events'
           : 'Events',
-      softWrap: true,
-      overflow: TextOverflow.visible,
     );
   }
 

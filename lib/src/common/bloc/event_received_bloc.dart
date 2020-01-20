@@ -22,7 +22,7 @@ class EventReceivedBloc {
   }
 
   BehaviorSubject<EventData> onEvent;
-  Observable<EventData> event;
+  Stream<EventData> event;
 
   void dispose() => onEvent.close();
   void clear() => onEvent.add(null);

@@ -448,8 +448,7 @@ class SubActionsController extends BaseActionsController {
           }
 
           callState = await bloc.state
-              .firstWhere((state) => state.isFinal, orElse: () => null)
-              .wrapped;
+              .firstWhere((state) => state.isFinal, orElse: () => null);
         }
       } finally {
         // TODO Always refreshes. Maybe feature "refreshAfterCall"?

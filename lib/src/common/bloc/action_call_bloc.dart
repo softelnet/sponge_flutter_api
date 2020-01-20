@@ -42,7 +42,7 @@ class ActionCallBloc {
   }
 
   BehaviorSubject<List> onActionCall;
-  Observable<ActionCallState> state;
+  Stream<ActionCallState> state;
 
   ActionCallState startState;
 

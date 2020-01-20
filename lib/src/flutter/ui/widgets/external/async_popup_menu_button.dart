@@ -196,7 +196,9 @@ class _AsyncPopupMenuButton<T> extends State<AsyncPopupMenuButton<T>> {
       case TargetPlatform.fuchsia:
         return const Icon(Icons.more_vert);
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         return const Icon(Icons.more_horiz);
+        break;
     }
     return null;
   }

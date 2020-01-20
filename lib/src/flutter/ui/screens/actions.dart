@@ -253,6 +253,16 @@ class _ActionsPageState extends State<ActionsPage>
   }
 
   Widget _buildTitle(BuildContext context) {
+    // TODO Page title
+    // if (_presenter.connectionName != null) {
+    //   return ListTile(
+    //     trailing: Icon(Icons.directions_run, color: getSecondaryColor(context)),
+    //     title: Text(_presenter.connectionName),
+    //   );
+    // } else {
+    //   return Text('Actions');
+    // }
+
     return Tooltip(
       child: Text(
         _presenter.connectionName != null
@@ -263,7 +273,7 @@ class _ActionsPageState extends State<ActionsPage>
       ),
       message: _presenter.connectionName != null
           ? '${_presenter.connectionName} actions'
-          : null,
+          : 'Actions',
     );
   }
 
