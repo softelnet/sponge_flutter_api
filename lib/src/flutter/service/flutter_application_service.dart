@@ -353,7 +353,12 @@ class FlutterApplicationSettings extends ApplicationSettings {
   static const String PREF_DRAWING_STROKE_UPDATE_DELTA_THRESHOLD_RATIO =
       '$_PREF_PREFIX.drawingStrokeUpdateDeltaThresholdRatio';
 
+  static const String PREF_SERVICE_DISCOVERY_TIMEOUT =
+      '$_PREF_PREFIX.serviceDiscoveryTimeout';
+
   static const int MAX_SUBSCRIPTION_WATCHDOG_INTERVAL = 360;
+
+  static const int MAX_SERVICE_DISCOVERY_TIMEOUT = 60;
 
   final SharedPreferences _prefs;
 
@@ -475,6 +480,16 @@ class FlutterApplicationSettings extends ApplicationSettings {
   Future<bool> setDrawingStrokeUpdateDeltaThresholdRatio(double value) async =>
       await _prefs.setDouble(
           PREF_DRAWING_STROKE_UPDATE_DELTA_THRESHOLD_RATIO, value);
+
+  int get serviceDiscoveryTimeout =>
+      _prefs.getInt(PREF_SERVICE_DISCOVERY_TIMEOUT) ?? 5;
+
+  Future<bool> setServiceDiscoveryTimeout(int value) async {
+    Validate.isTrue(value >= 0 && value <= MAX_SERVICE_DISCOVERY_TIMEOUT,
+        'The service discovery timeout must be a value between 0 and $MAX_SERVICE_DISCOVERY_TIMEOUT');
+
+    return await _prefs.setInt(PREF_SERVICE_DISCOVERY_TIMEOUT, value);
+  }
 
   @override
   Future<void> clear() async {

@@ -36,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   static const MAX_EVENT_COUNT_RATIO = 10;
 
   TextEditingController _subscriptionWatchdogIntervalController;
+  TextEditingController _serviceDiscoveryTimeoutController;
 
   FlutterApplicationSettings get settings =>
       ApplicationProvider.of(context).service.settings;
@@ -57,6 +58,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
     _subscriptionWatchdogIntervalController ??= TextEditingController(
       text: '${settings.subscriptionWatchdogInterval}',
+    );
+
+    _serviceDiscoveryTimeoutController ??= TextEditingController(
+      text: '${settings.serviceDiscoveryTimeout}',
     );
 
     return WillPopScope(
@@ -220,7 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         subtitle: TextField(
                           // The key is required here, see https://github.com/flutter/flutter/issues/36539.
                           key: PageStorageKey(
-                              'setting-setSubscriptionWatchdogInterval'),
+                              'setting-subscriptionWatchdogInterval'),
                           keyboardType: TextInputType.number,
                           controller: _subscriptionWatchdogIntervalController,
                           onSubmitted: (value) async {
@@ -316,8 +321,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                   _buildGroup(
-                    name: 'security',
-                    title: 'Security',
+                    name: 'connections',
+                    title: 'Connections',
                     initiallyExpanded: false,
                     children: [
                       ListTile(
@@ -326,6 +331,29 @@ class _SettingsPageState extends State<SettingsPage> {
                             value: settings.autoUseAuthToken,
                             onChanged: (value) => _toggleAutoUseAuthToken()),
                         onTap: () => _toggleAutoUseAuthToken(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Service discovery timeot (in seconds)'),
+                        subtitle: TextField(
+                          // The key is required here, see https://github.com/flutter/flutter/issues/36539.
+                          key:
+                              PageStorageKey('setting-serviceDiscoveryTimeout'),
+                          keyboardType: TextInputType.number,
+                          controller: _serviceDiscoveryTimeoutController,
+                          onSubmitted: (value) async {
+                            try {
+                              await settings
+                                  .setServiceDiscoveryTimeout(int.parse(value));
+                            } catch (e) {
+                              await handleError(context, e);
+                              _serviceDiscoveryTimeoutController.text =
+                                  '${settings.serviceDiscoveryTimeout}';
+                            }
+                          },
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder()),
+                        ),
                       ),
                     ],
                   ),
