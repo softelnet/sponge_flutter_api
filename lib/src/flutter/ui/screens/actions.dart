@@ -34,10 +34,10 @@ import 'package:sponge_flutter_api/src/util/utils.dart';
 class ActionsPage extends StatefulWidget {
   ActionsPage({
     Key key,
-    this.onGetNetworkName,
+    this.onGetNetworkStatus,
   }) : super(key: key);
 
-  final AsyncValueGetter<String> onGetNetworkName;
+  final AsyncValueGetter<NetworkStatus> onGetNetworkStatus;
 
   @override
   _ActionsPageState createState() => _ActionsPageState();
@@ -331,20 +331,20 @@ class _ActionsPageState extends State<ActionsPage>
         },
         itemBuilder: (BuildContext context) async {
           var connections = _presenter.getConnections(
-              widget.onGetNetworkName != null &&
+              widget.onGetNetworkStatus != null &&
                   service.settings.filterConnectionsByNetwork,
-              widget.onGetNetworkName != null
-                  ? await widget.onGetNetworkName()
+              widget.onGetNetworkStatus != null
+                  ? await widget.onGetNetworkStatus()
                   : null);
           return [
-            if (widget.onGetNetworkName != null)
+            if (widget.onGetNetworkStatus != null)
               CheckedPopupMenuItem<String>(
                 key: Key('filterByNetwork'),
                 value: 'filterByNetwork',
                 checked: service.settings.filterConnectionsByNetwork,
                 child: Text('Filter by network'),
               ),
-            if (widget.onGetNetworkName != null && connections.isNotEmpty)
+            if (widget.onGetNetworkStatus != null && connections.isNotEmpty)
               PopupMenuDivider(),
             ...connections
                 .map(

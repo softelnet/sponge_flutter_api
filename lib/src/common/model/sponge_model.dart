@@ -73,3 +73,10 @@ class SpongeConnection implements Comparable {
 
   bool isSecure() => url != null && url.toLowerCase().startsWith('https');
 }
+
+class NetworkStatus {
+  NetworkStatus(this.name, this.isLocal);
+
+  final String name;
+  final bool isLocal;
+}

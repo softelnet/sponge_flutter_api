@@ -46,11 +46,11 @@ class ConnectionsPresenter
   List<SpongeConnection> get connections => viewModel.connections;
 
   List<SpongeConnection> getFilteredConnections(
-      bool isFilterByNetwork, String network) {
+      bool isFilterByNetwork, NetworkStatus networkStatus) {
     return viewModel.connections
         .where((connection) =>
             !isFilterByNetwork ||
-            shouldConnectionBeFiltered(connection, network))
+            shouldConnectionBeFiltered(connection, networkStatus))
         .toList();
   }
 

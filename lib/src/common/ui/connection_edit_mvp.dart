@@ -44,8 +44,21 @@ class ConnectionEditPresenter
 
   String get name => viewModel.connection.name;
   set name(String value) => viewModel.connection.name = value?.trim();
-  String validateName(String value) =>
-      value.isEmpty ? 'The connection name must not be empty' : null;
+  String validateName(String value) {
+    value = value?.trim();
+
+    if (value.isEmpty) {
+      return 'The connection name must not be empty';
+    }
+
+    if (service.connectionsConfiguration
+        .getConnections()
+        .any((con) => con.name == value)) {
+      return 'A connection with that name already exists';
+    }
+
+    return null;
+  }
 
   String get url => viewModel.connection.url;
   set url(String value) => viewModel.connection.url = value?.trim();

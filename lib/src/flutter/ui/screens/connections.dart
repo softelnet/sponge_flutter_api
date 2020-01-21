@@ -29,10 +29,10 @@ import 'package:sponge_flutter_api/src/util/utils.dart';
 class ConnectionsPage extends StatefulWidget {
   ConnectionsPage({
     Key key,
-    this.onGetNetworkName,
+    this.onGetNetworkStatus,
   }) : super(key: key);
 
-  final AsyncValueGetter<String> onGetNetworkName;
+  final AsyncValueGetter<NetworkStatus> onGetNetworkStatus;
 
   @override
   createState() => _ConnectionsPageState();
@@ -86,15 +86,16 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   Widget _buildWidget() {
     var service = _presenter.service as FlutterApplicationService;
 
-    return FutureBuilder<String>(
-      future:
-          widget.onGetNetworkName != null ? widget.onGetNetworkName() : null,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+    return FutureBuilder<NetworkStatus>(
+      future: widget.onGetNetworkStatus != null
+          ? widget.onGetNetworkStatus()
+          : null,
+      builder: (BuildContext context, AsyncSnapshot<NetworkStatus> snapshot) {
         List<SpongeConnection> connections = snapshot.hasData
             ? _presenter.getFilteredConnections(
-                widget.onGetNetworkName != null &&
+                widget.onGetNetworkStatus != null &&
                     service.settings.filterConnectionsByNetwork,
-                widget.onGetNetworkName != null ? snapshot.data : null)
+                snapshot.data)
             : _presenter.connections;
 
         return ListView.builder(
@@ -160,6 +161,9 @@ class _ConnectionsPageState extends State<ConnectionsPage>
                     !service.settings.filterConnectionsByNetwork);
                 setState(() {});
                 break;
+              case 'refreshConnections':
+                setState(() {});
+                break;
               case 'updateDefaultConnections':
                 setState(() => _presenter.busy = true);
                 try {
@@ -179,7 +183,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
               .map((config) => config.itemBuilder(_presenter, context))
               .toList(),
           if (customItems.isNotEmpty) PopupMenuDivider(),
-          if (widget.onGetNetworkName != null)
+          if (widget.onGetNetworkStatus != null)
             PopupMenuItem<String>(
               key: Key('filterByNetwork'),
               value: 'filterByNetwork',
@@ -189,6 +193,16 @@ class _ConnectionsPageState extends State<ConnectionsPage>
                 isOn: service.settings.filterConnectionsByNetwork,
               ),
             ),
+          if (widget.onGetNetworkStatus != null)
+            PopupMenuItem<String>(
+              key: Key('refreshConnections'),
+              value: 'refreshConnections',
+              child: IconTextPopupMenuItemWidget(
+                icon: Icons.refresh,
+                text: 'Refresh connections',
+              ),
+            ),
+          if (widget.onGetNetworkStatus != null) PopupMenuDivider(),
           PopupMenuItem<String>(
             key: Key('updateDefaultConnections'),
             value: 'updateDefaultConnections',

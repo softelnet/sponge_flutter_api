@@ -335,9 +335,10 @@ Future<void> showEventHandlerAction(
 
 String createDataTypeKeyValue(QualifiedDataType qType) => 'value-${qType.path}';
 
-
-bool shouldConnectionBeFiltered(SpongeConnection connection, String network) {
+bool shouldConnectionBeFiltered(
+    SpongeConnection connection, NetworkStatus networkStatus) {
   return connection.network == null ||
-                connection.network.isEmpty ||
-                connection.network?.toLowerCase() == network?.toLowerCase();
+      connection.network.isEmpty ||
+      networkStatus == null ||
+      connection.network?.toLowerCase() == networkStatus.name?.toLowerCase();
 }

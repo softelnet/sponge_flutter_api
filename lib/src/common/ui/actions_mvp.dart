@@ -38,12 +38,12 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
   ActionsPresenter(ActionsView view) : super(ActionsViewModel(), view);
 
   List<SpongeConnectionViewModel> getConnections(
-      bool isFilterByNetwork, String network) {
+      bool isFilterByNetwork, NetworkStatus networkStatus) {
     return service.connectionsConfiguration
         .getConnections()
         .where((connection) =>
             !isFilterByNetwork ||
-            shouldConnectionBeFiltered(connection, network))
+            shouldConnectionBeFiltered(connection, networkStatus))
         .map((connection) => SpongeConnectionViewModel(
             connection.name, service.isConnectionActive(connection.name)))
         .toList();
