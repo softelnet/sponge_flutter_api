@@ -34,6 +34,8 @@ abstract class ApplicationSettings {
   int maxEventCount;
   String dateTimeFormat = 'yyyy-MM-dd HH:mm:ss';
   int defaultPageableListPageSize = 20;
+
+  Future<void> clear();
 }
 
 abstract class ApplicationService<S extends SpongeService> {
@@ -179,10 +181,15 @@ abstract class ApplicationService<S extends SpongeService> {
     await _setupActiveConnection(connectionName, forceRefresh: forceRefresh);
   }
 
-  Future<void> clearConfiguration() async {
+  Future<void> clearSettings() async {
+    await settings?.clear();
+  }
+
+  Future<void> clearConnections() async {
     await _connectionsConfiguration.clearConnections();
     await updateDefaultConnections();
     await setActiveConnection(null);
+    connectionBloc.add(SpongeConnectionStateNotConnected());
   }
 
   Future<void> setConnections(

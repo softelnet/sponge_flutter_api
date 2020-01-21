@@ -52,6 +52,9 @@ class ConnectionEditPresenter
   String validateUrl(String value) =>
       value.isEmpty ? 'The Sponge address must not be empty' : null;
 
+  String get network => viewModel.connection.network;
+  set network(String value) => viewModel.connection.network = value?.trim();
+
   bool get anonymous => viewModel.connection.anonymous;
   set anonymous(bool value) {
     viewModel.connection.anonymous = value;

@@ -50,6 +50,7 @@
 //   if this flag is set.
 
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -135,10 +136,21 @@ class _PainterState extends State<Painter> {
   }
 
   void _onPanUpdate(DragUpdateDetails update) {
-    Offset pos = (context.findRenderObject() as RenderBox)
-        .globalToLocal(update.globalPosition);
-    widget.painterController._pathHistory.updateCurrent(pos);
-    widget.painterController._notifyListeners();
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+
+    Offset pos = renderBox.globalToLocal(update.globalPosition);
+    Offset prev = widget.painterController._pathHistory.strokes.last.last;
+    Offset delta = pos - prev;
+
+    var thresholdSquared =
+        widget.painterController.strokeUpdateDeltaThresholdSquared;
+
+    if (thresholdSquared == 0 || delta.distanceSquared < thresholdSquared) {
+      // print(
+      //     'update: $pos, delta: $delta, box: ${renderBox.size}, threshold: ${sqrt(thresholdSquared)}');
+      widget.painterController._pathHistory.updateCurrent(pos);
+      widget.painterController._notifyListeners();
+    }
   }
 
   void _onPanEnd(DragEndDetails end) {
@@ -268,6 +280,8 @@ class _PathHistory {
 }
 
 class PainterController extends ChangeNotifier {
+  static const double DEFAULT_STROKE_UPDATE_DELTA_THRESHOLD_RATIO = 0.15;
+
   Color _drawColor = Color.fromARGB(255, 0, 0, 0);
   Color _backgroundColor = Color.fromARGB(255, 255, 255, 255);
   mat.Image _bgimage;
@@ -278,6 +292,29 @@ class PainterController extends ChangeNotifier {
 
   bool isAntiAlias = true;
   double useSubpathsStrokeWidthRatioThreshold = 0.05;
+
+  double _strokeUpdateDeltaThresholdRatio =
+      DEFAULT_STROKE_UPDATE_DELTA_THRESHOLD_RATIO;
+
+  double _strokeUpdateDeltaThresholdSquaredCached;
+
+  double get strokeUpdateDeltaThresholdSquared {
+    if (_size == null) {
+      return 0;
+    }
+
+    if (_strokeUpdateDeltaThresholdSquaredCached == null) {
+      _strokeUpdateDeltaThresholdSquaredCached =
+          pow(_size.longestSide * _strokeUpdateDeltaThresholdRatio, 2);
+    }
+
+    return _strokeUpdateDeltaThresholdSquaredCached;
+  }
+
+  set strokeUpdateDeltaThresholdRatio(double value) {
+    _strokeUpdateDeltaThresholdRatio = value;
+    _strokeUpdateDeltaThresholdSquaredCached = null;
+  }
 
   Size get size => _size;
   set size(Size value) {
@@ -295,6 +332,8 @@ class PainterController extends ChangeNotifier {
 
       _pathHistory.clear();
       addStrokes(newStrokes);
+
+      _strokeUpdateDeltaThresholdSquaredCached = null;
     }
 
     _size = value;

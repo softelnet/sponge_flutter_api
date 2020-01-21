@@ -74,6 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
             builder: (BuildContext context) => Container(
               margin: const EdgeInsets.only(top: 20.0, bottom: 20.0),
               child: ListView(
+                key: PageStorageKey('settings-groups'),
                 children: <Widget>[
                   _buildGroup(
                     name: 'theme',
@@ -258,7 +259,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 : '(default)')),
                         subtitle: Slider(
                           activeColor: Theme.of(context).accentColor,
-                          label: 'a$_textViewerWidthSliderValue',
+                          label: '$_textViewerWidthSliderValue',
                           min: 0,
                           max: MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE
                               .roundToDouble(),
@@ -281,6 +282,26 @@ class _SettingsPageState extends State<SettingsPage> {
                                 _toggleUseScrollableIndexedList()),
                         onTap: () => _toggleUseScrollableIndexedList(),
                       ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text(
+                            'Drawing stroke update delta threshold ratio (${settings.drawingStrokeUpdateDeltaThresholdRatio})'),
+                        subtitle: Slider(
+                          activeColor: Theme.of(context).accentColor,
+                          label:
+                              '${settings.drawingStrokeUpdateDeltaThresholdRatio}',
+                          value:
+                              settings.drawingStrokeUpdateDeltaThresholdRatio,
+                          divisions: 20,
+                          onChanged: (value) async {
+                            await settings
+                                .setDrawingStrokeUpdateDeltaThresholdRatio(
+                                    value);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+
                       // TODO Remove drawAntiAliasing.
                       // _buildDivider(),
                       // ListTile(
@@ -403,7 +424,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _resetToDefaults(BuildContext context) async {
     try {
-      bool cleared = await _clearConfiguration(context);
+      bool cleared = await _clearSettings(context);
       if (cleared) {
         var backgroudColor = getPrimaryColor(context);
         Scaffold.of(context).showSnackBar(SnackBar(
@@ -419,13 +440,16 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<bool> _clearConfiguration(BuildContext context) async {
+  Future<bool> _clearSettings(BuildContext context) async {
     if (!await showConfirmationDialog(context,
-        'Do you want to reset the current settings and remove the connections?')) {
+        'Do you want to reset the current settings to the default values?')) {
       return false;
     }
 
-    await ApplicationProvider.of(context).service.clearConfiguration();
+    await ApplicationProvider.of(context).service.clearSettings();
+
+    setState(() {});
+
     return true;
   }
 

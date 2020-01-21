@@ -29,6 +29,7 @@ import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configu
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class FlutterApplicationService<S extends FlutterSpongeService>
@@ -193,12 +194,6 @@ class FlutterApplicationService<S extends FlutterSpongeService>
 
   BuildContext get mainBuildContext => _mainBuildContext;
 
-  Future<void> clearConfiguration() async {
-    await _prefs.clear();
-
-    await super.clearConfiguration();
-  }
-
   UnitTypeGuiProvider getTypeGuiProvider(DataType type) =>
       typeGuiProvider.getProvider(type);
 
@@ -317,35 +312,46 @@ class FlutterSpongeService extends SpongeService<FlutterActionData> {
 class FlutterApplicationSettings extends ApplicationSettings {
   FlutterApplicationSettings(this._prefs);
 
-  static const String PREF_ACTION_LIST_TABS = 'tabsInActionList';
+  static const String _PREF_PREFIX = 'settings.';
 
-  static const String PREF_ACTION_CALL_ON_TAP = 'actionCallOnTap';
+  static const String PREF_ACTION_LIST_TABS = '$_PREF_PREFIX.tabsInActionList';
 
-  static const String PREF_ACTION_SWIPE_TO_CLOSE = 'actionSwipeToClose';
+  static const String PREF_ACTION_CALL_ON_TAP = '$_PREF_PREFIX.actionCallOnTap';
 
-  static const String PREF_USE_INTERNAL_VIEWERS = 'useInternalViewers';
+  static const String PREF_ACTION_SWIPE_TO_CLOSE =
+      '$_PREF_PREFIX.actionSwipeToClose';
 
-  static const String PREF_TEXT_VIEWER_WIDTH = 'textViewerWidth';
+  static const String PREF_USE_INTERNAL_VIEWERS =
+      '$_PREF_PREFIX.useInternalViewers';
+
+  static const String PREF_TEXT_VIEWER_WIDTH = '$_PREF_PREFIX.textViewerWidth';
 
   static const String PREF_ARGUMENT_LIST_ELEMENT_TAP_BEHAVIOR =
-      'argumentListElementTapBehavior';
+      '$_PREF_PREFIX.argumentListElementTapBehavior';
 
-  static const String PREF_ACTION_ICONS_VIEW = 'actionIconsView';
+  static const String PREF_ACTION_ICONS_VIEW = '$_PREF_PREFIX.actionIconsView';
 
-  static const String PREF_ACTIONS_ORDER = 'actionsOrder';
+  static const String PREF_ACTIONS_ORDER = '$_PREF_PREFIX.actionsOrder';
 
   // TODO Remove drawAntiAliasing.
-  //static const String PREF_DRAW_ANTI_ALIASING = 'drawAntiAliasing';
+  //static const String PREF_DRAW_ANTI_ALIASING = '$PREF_PREFIX.drawAntiAliasing';
 
-  static const String PREF_AUTO_USE_AUTH_TOKEN = 'autoUseAuthToken';
+  static const String PREF_AUTO_USE_AUTH_TOKEN =
+      '$_PREF_PREFIX.autoUseAuthToken';
 
-  static const String PREF_MAX_EVENT_COUNT = 'maxEventCount';
+  static const String PREF_MAX_EVENT_COUNT = '$_PREF_PREFIX.maxEventCount';
 
   static const String PREF_SUBSCRIPTION_WATCHDOG_INTERVAL =
-      'subscriptionWatchdogInterval';
+      '$_PREF_PREFIX.subscriptionWatchdogInterval';
 
   static const String PREF_USE_SCROLLABLE_INDEXED_LIST =
-      'useScrollableIndexedList';
+      '$_PREF_PREFIX.useScrollableIndexedList';
+
+  static const String PREF_FILTER_CONNECTIONS_BY_NETWORK =
+      '$_PREF_PREFIX.filterConnectionsByNetwork';
+
+  static const String PREF_DRAWING_STROKE_UPDATE_DELTA_THRESHOLD_RATIO =
+      '$_PREF_PREFIX.drawingStrokeUpdateDeltaThresholdRatio';
 
   static const int MAX_SUBSCRIPTION_WATCHDOG_INTERVAL = 360;
 
@@ -455,6 +461,30 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   Future<bool> setUseScrollableIndexedList(bool value) async =>
       await _prefs.setBool(PREF_USE_SCROLLABLE_INDEXED_LIST, value);
+
+  bool get filterConnectionsByNetwork =>
+      _prefs.getBool(PREF_FILTER_CONNECTIONS_BY_NETWORK) ?? false;
+
+  Future<bool> setFilterConnectionsByNetwork(bool value) async =>
+      await _prefs.setBool(PREF_FILTER_CONNECTIONS_BY_NETWORK, value);
+
+  double get drawingStrokeUpdateDeltaThresholdRatio =>
+      _prefs.getDouble(PREF_DRAWING_STROKE_UPDATE_DELTA_THRESHOLD_RATIO) ??
+      PainterController.DEFAULT_STROKE_UPDATE_DELTA_THRESHOLD_RATIO;
+
+  Future<bool> setDrawingStrokeUpdateDeltaThresholdRatio(double value) async =>
+      await _prefs.setDouble(
+          PREF_DRAWING_STROKE_UPDATE_DELTA_THRESHOLD_RATIO, value);
+
+  @override
+  Future<void> clear() async {
+    for (var key in _prefs
+        .getKeys()
+        .where((key) => key.startsWith(_PREF_PREFIX))
+        .toList()) {
+      await _prefs.remove(key);
+    }
+  }
 }
 
 class EventNotificationState with ChangeNotifier {

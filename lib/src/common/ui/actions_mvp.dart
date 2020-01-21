@@ -17,6 +17,7 @@ import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ActionsViewModel extends BaseViewModel {}
@@ -36,11 +37,17 @@ abstract class ActionsView extends BaseView {
 class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
   ActionsPresenter(ActionsView view) : super(ActionsViewModel(), view);
 
-  List<SpongeConnectionViewModel> getConnections() => service
-      .getAllConnectionNames()
-      .map((connectionName) => SpongeConnectionViewModel(
-          connectionName, service.isConnectionActive(connectionName)))
-      .toList();
+  List<SpongeConnectionViewModel> getConnections(
+      bool isFilterByNetwork, String network) {
+    return service.connectionsConfiguration
+        .getConnections()
+        .where((connection) =>
+            !isFilterByNetwork ||
+            shouldConnectionBeFiltered(connection, network))
+        .map((connection) => SpongeConnectionViewModel(
+            connection.name, service.isConnectionActive(connection.name)))
+        .toList();
+  }
 
   bool get hasConnections => service.hasConnections;
 

@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
@@ -333,3 +334,10 @@ Future<void> showEventHandlerAction(
 }
 
 String createDataTypeKeyValue(QualifiedDataType qType) => 'value-${qType.path}';
+
+
+bool shouldConnectionBeFiltered(SpongeConnection connection, String network) {
+  return connection.network == null ||
+                connection.network.isEmpty ||
+                connection.network?.toLowerCase() == network?.toLowerCase();
+}

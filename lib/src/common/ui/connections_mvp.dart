@@ -14,6 +14,9 @@
 
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+
+typedef OnRefreshCallback = void Function();
 
 class ConnectionsViewModel extends BaseViewModel {
   List<SpongeConnection> connections;
@@ -24,7 +27,7 @@ abstract class ConnectionsView extends BaseView {
   Future<SpongeConnection> addConnection();
   Future<SpongeConnection> editConnection(SpongeConnection connection);
 
-  void refresh();
+  void refresh([OnRefreshCallback callback]);
 }
 
 class ConnectionsPresenter
@@ -41,6 +44,15 @@ class ConnectionsPresenter
   }
 
   List<SpongeConnection> get connections => viewModel.connections;
+
+  List<SpongeConnection> getFilteredConnections(
+      bool isFilterByNetwork, String network) {
+    return viewModel.connections
+        .where((connection) =>
+            !isFilterByNetwork ||
+            shouldConnectionBeFiltered(connection, network))
+        .toList();
+  }
 
   bool isConnectionActive(String connectionName) =>
       service.isConnectionActive(connectionName);
@@ -99,22 +111,27 @@ class ConnectionsPresenter
     return newConnection;
   }
 
-  Future<SpongeConnection> removeConnection(int index) async {
-    SpongeConnection removedConnection = viewModel.connections.removeAt(index);
+  Future<SpongeConnection> removeConnection(String name) async {
+    var removedConnection = viewModel.connections.firstWhere(
+        (connection) => connection.name == name,
+        orElse: () => null);
+    if (removedConnection != null) {
+      viewModel.connections.remove(removedConnection);
 
-    if (viewModel.activeConnectionName != null &&
-        viewModel.activeConnectionName == removedConnection.name) {
-      viewModel.activeConnectionName = null;
+      if (viewModel.activeConnectionName != null &&
+          viewModel.activeConnectionName == removedConnection.name) {
+        viewModel.activeConnectionName = null;
+      }
+
+      await _commitData();
     }
-
-    await _commitData();
 
     return removedConnection;
   }
 
-  void refresh() {
+  void refresh([OnRefreshCallback callback]) {
     if (isBound) {
-      view.refresh();
+      view.refresh(callback);
     }
   }
 

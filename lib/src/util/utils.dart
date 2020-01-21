@@ -139,10 +139,12 @@ class IconTextPopupMenuItemWidget extends StatelessWidget {
     Key key,
     @required this.icon,
     @required this.text,
+    this.isOn,
   }) : super(key: key);
 
   final IconData icon;
   final String text;
+  final bool isOn;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +154,7 @@ class IconTextPopupMenuItemWidget extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           child: Icon(
             icon,
-            color: getSecondaryColor(context),
+            color: (isOn ?? true) ? getSecondaryColor(context) : getThemedBackgroundColor(context),
           ),
         ),
         Expanded(

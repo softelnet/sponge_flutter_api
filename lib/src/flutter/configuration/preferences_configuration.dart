@@ -108,6 +108,8 @@ class SharedPreferencesConnectionsConfiguration
         '$_KEY_PREFIX${connection.name}.anonymous', connection.anonymous);
     await _prefs.setBool(
         '$_KEY_PREFIX${connection.name}.savePassword', connection.savePassword);
+    await _prefs.setString(
+        '$_KEY_PREFIX${connection.name}.network', connection.network);
     await _prefs.setBool(
         '$_KEY_PREFIX${connection.name}.subscribe', connection.subscribe);
     await _prefs.setStringList('$_KEY_PREFIX${connection.name}.subscription',
@@ -123,6 +125,7 @@ class SharedPreferencesConnectionsConfiguration
           .decode(_prefs.getString('$_KEY_PREFIX$name.password')),
       anonymous: _prefs.getBool('$_KEY_PREFIX$name.anonymous'),
       savePassword: _prefs.getBool('$_KEY_PREFIX$name.savePassword'),
+      network: _prefs.getString('$_KEY_PREFIX$name.network'),
       subscribe: _prefs.getBool('$_KEY_PREFIX$name.subscribe'),
       subscriptionEventNames:
           _prefs.getStringList('$_KEY_PREFIX$name.subscription'),
@@ -135,6 +138,7 @@ class SharedPreferencesConnectionsConfiguration
     await _prefs.remove('$_KEY_PREFIX${connection.name}.password');
     await _prefs.remove('$_KEY_PREFIX${connection.name}.anonymous');
     await _prefs.remove('$_KEY_PREFIX${connection.name}.savePassword');
+    await _prefs.remove('$_KEY_PREFIX${connection.name}.network');
     await _prefs.remove('$_KEY_PREFIX${connection.name}.subscribe');
     await _prefs.remove('$_KEY_PREFIX${connection.name}.subscription');
   }

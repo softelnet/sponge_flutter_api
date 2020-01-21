@@ -14,6 +14,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,12 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ActionsPage extends StatefulWidget {
-  ActionsPage({Key key}) : super(key: key);
+  ActionsPage({
+    Key key,
+    this.onGetNetworkName,
+  }) : super(key: key);
+
+  final AsyncValueGetter<String> onGetNetworkName;
 
   @override
   _ActionsPageState createState() => _ActionsPageState();
@@ -304,25 +310,58 @@ class _ActionsPageState extends State<ActionsPage>
     }
   }
 
-  List<Widget> _buildConnectionsWidget(BuildContext context) =>
-      _presenter.hasConnections
-          ? <Widget>[
-              PopupMenuButton<String>(
-                key: Key('connections'),
-                onSelected: (value) => _changeConnection(context, value),
-                itemBuilder: (BuildContext context) => _presenter
-                    .getConnections()
-                    .map((c) => CheckedPopupMenuItem<String>(
-                          key: Key('connection-${c.name}'),
-                          value: c.name,
-                          checked: c.isActive,
-                          child: Text(c.name),
-                        ))
-                    .toList(),
-                padding: EdgeInsets.zero,
-              )
-            ]
-          : null;
+  List<Widget> _buildConnectionsWidget(BuildContext context) {
+    if (!_presenter.hasConnections) {
+      return null;
+    }
+
+    var service = _presenter.service as FlutterApplicationService;
+
+    return <Widget>[
+      AsyncPopupMenuButton<String>(
+        key: Key('connections'),
+        onSelected: (value) async {
+          if (value.startsWith('connection-')) {
+            await _changeConnection(
+                context, value.substring('connection-'.length));
+          } else if (value == 'filterByNetwork') {
+            await service.settings.setFilterConnectionsByNetwork(
+                !service.settings.filterConnectionsByNetwork);
+          }
+        },
+        itemBuilder: (BuildContext context) async {
+          var connections = _presenter.getConnections(
+              widget.onGetNetworkName != null &&
+                  service.settings.filterConnectionsByNetwork,
+              widget.onGetNetworkName != null
+                  ? await widget.onGetNetworkName()
+                  : null);
+          return [
+            if (widget.onGetNetworkName != null)
+              CheckedPopupMenuItem<String>(
+                key: Key('filterByNetwork'),
+                value: 'filterByNetwork',
+                checked: service.settings.filterConnectionsByNetwork,
+                child: Text('Filter by network'),
+              ),
+            if (widget.onGetNetworkName != null && connections.isNotEmpty)
+              PopupMenuDivider(),
+            ...connections
+                .map(
+                  (c) => CheckedPopupMenuItem<String>(
+                    key: Key('connection-${c.name}'),
+                    value: 'connection-${c.name}',
+                    checked: c.isActive,
+                    child: Text(c.name),
+                  ),
+                )
+                .toList(),
+          ];
+        },
+        padding: EdgeInsets.zero,
+      )
+    ];
+  }
 
   Widget _buildFloatingActionButton(BuildContext context) =>
       FloatingActionButton(

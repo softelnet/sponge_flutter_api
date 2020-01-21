@@ -60,9 +60,13 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_presenter.editing
-            ? 'Edit connection ${_presenter.originalConnection.name}'
-            : 'Create a new connection'),
+        title: Text(
+          _presenter.editing
+              ? 'Edit connection: ${_presenter.originalConnection.name}'
+              : 'Create a new connection',
+          softWrap: true,
+          overflow: TextOverflow.visible,
+        ),
       ),
       body: SafeArea(
         child: ModalProgressHUD(
@@ -110,6 +114,16 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       initialValue:
                           _presenter.url ?? ApplicationConstants.URL_TEMPLATE,
                       validator: _presenter.validateUrl,
+                    ),
+                    _buildConnectionFieldWidget(
+                      key: Key('network'),
+                      keyboardType: TextInputType.text,
+                      labelText: 'Network',
+                      icon: Icon(Icons.wifi),
+                      onSaved: (String value) {
+                        setState(() => _presenter.network = value);
+                      },
+                      initialValue: _presenter.network,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: PADDING),

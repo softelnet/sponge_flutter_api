@@ -20,6 +20,7 @@ class SpongeConnection implements Comparable {
     this.password,
     this.anonymous,
     this.savePassword = true,
+    this.network,
     this.subscribe = false,
     List<String> subscriptionEventNames,
   }) : this.subscriptionEventNames = subscriptionEventNames ?? [];
@@ -30,6 +31,7 @@ class SpongeConnection implements Comparable {
   String password;
   bool anonymous;
   bool savePassword;
+  String network;
   bool subscribe;
   List<String> subscriptionEventNames;
 
@@ -40,6 +42,7 @@ class SpongeConnection implements Comparable {
         password: other.password,
         anonymous: other.anonymous,
         savePassword: other.savePassword,
+        network: other.network,
         subscribe: other.subscribe,
         subscriptionEventNames: other.subscriptionEventNames?.toList(),
       );
@@ -52,7 +55,8 @@ class SpongeConnection implements Comparable {
         url == connection?.url &&
         username == connection?.username &&
         password == connection?.password &&
-        anonymous == connection?.anonymous;
+        anonymous == connection?.anonymous &&
+        network == connection?.network;
   }
 
   void setFrom(SpongeConnection connection) {
@@ -62,6 +66,7 @@ class SpongeConnection implements Comparable {
     password = connection.password;
     anonymous = connection.anonymous;
     savePassword = connection.savePassword;
+    network = connection.network;
     subscribe = connection.subscribe;
     subscriptionEventNames = connection.subscriptionEventNames?.toList();
   }
