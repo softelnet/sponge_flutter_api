@@ -34,6 +34,7 @@ abstract class ApplicationSettings {
   int maxEventCount;
   String dateTimeFormat = 'yyyy-MM-dd HH:mm:ss';
   int defaultPageableListPageSize = 20;
+  bool get showNewEventNotification;
 
   Future<void> clear();
 }

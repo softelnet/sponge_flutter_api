@@ -249,7 +249,9 @@ class FlutterApplicationService<S extends FlutterSpongeService>
                         'Subscription ${subscription.id ?? ''} - received event: ${event.id}, ${event.name}, ${event.label}, ${event.attributes}');
                     await spongeService.addEvent(eventData);
 
-                    await showEventNotification(eventData);
+                    if (settings.showNewEventNotification) {
+                      await showEventNotification(eventData);
+                    }
                   }
                 } catch (e) {
                   _logger.severe(
@@ -355,6 +357,9 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   static const String PREF_SERVICE_DISCOVERY_TIMEOUT =
       '$_PREF_PREFIX.serviceDiscoveryTimeout';
+
+  static const String PREF_SHOW_NEW_EVENT_NOTIFICATION =
+      '$_PREF_PREFIX.showNewEventNotification';
 
   static const int MAX_SUBSCRIPTION_WATCHDOG_INTERVAL = 360;
 
@@ -490,6 +495,12 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
     return await _prefs.setInt(PREF_SERVICE_DISCOVERY_TIMEOUT, value);
   }
+
+  bool get showNewEventNotification =>
+      _prefs.getBool(PREF_SHOW_NEW_EVENT_NOTIFICATION) ?? true;
+
+  Future<bool> setShowNewEventNotification(bool value) async =>
+      await _prefs.setBool(PREF_SHOW_NEW_EVENT_NOTIFICATION, value);
 
   @override
   Future<void> clear() async {

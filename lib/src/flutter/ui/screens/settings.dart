@@ -242,6 +242,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               border: const OutlineInputBorder()),
                         ),
                       ),
+                      Divider(),
+                      ListTile(
+                        title: Text('Show new event notification'),
+                        trailing: Switch(
+                            value: settings.showNewEventNotification,
+                            onChanged: (value) =>
+                                _toggleShowNewEventNotification()),
+                        onTap: () => _toggleShowNewEventNotification(),
+                      ),
                     ],
                   ),
                   _buildGroup(
@@ -442,6 +451,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _toggleAutoUseAuthToken() async {
     await settings.setAutoUseAuthToken(!settings.autoUseAuthToken);
+    setState(() {});
+  }
+
+  Future<void> _toggleShowNewEventNotification() async {
+    await settings
+        .setShowNewEventNotification(!settings.showNewEventNotification);
     setState(() {});
   }
 
