@@ -118,7 +118,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
                   color: getIconColor(context),
                 )
               : null,
-          trailing: GestureDetector(
+          trailing: InkResponse(
             child: Icon(Icons.edit, color: getIconColor(context)),
             onTap: () => _editConnection(context, connection)
                 .catchError((e) => handleError(context, e)),

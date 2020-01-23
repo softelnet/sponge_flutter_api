@@ -266,7 +266,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   @override
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     // TODO Binary viewer for images should have an option to be inline.
-    return GestureDetector(
+    return InkResponse(
       onTap: () => navigateToExtendedViewer(viewerContext.copy()),
       child: createCompactViewer(viewerContext),
     );
@@ -1003,7 +1003,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
         onPressed: onTap,
       );
     }
-    return GestureDetector(
+    return InkResponse(
       child: Chip(
         label: Text(editorContext.typeLabel ?? ''),
       ),

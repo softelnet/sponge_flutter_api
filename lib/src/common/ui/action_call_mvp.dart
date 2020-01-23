@@ -17,6 +17,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 import 'package:collection/collection.dart';
@@ -519,8 +520,8 @@ class ActionCallPresenter
       actionMeta.features, Features.ACTION_CALL_CANCEL_LABEL, () => 'CANCEL');
 
   dynamic _normalizeValue(DataType type, value) {
-    if (value is String && value.isEmpty) {
-      value = null;
+    if (value is String) {
+      value = normalizeString(value);
     }
 
     // TODO What about a dynamic value?

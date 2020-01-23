@@ -342,3 +342,17 @@ bool shouldConnectionBeFiltered(
       networkStatus == null ||
       connection.network?.toLowerCase() == networkStatus.name?.toLowerCase();
 }
+
+String normalizeString(String value) {
+  if (value == null) {
+    return null;
+  }
+
+  value = value.trim();
+
+  if (value.isEmpty) {
+    return null;
+  }
+
+  return value;
+}

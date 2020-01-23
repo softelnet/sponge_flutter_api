@@ -275,7 +275,9 @@ class FlutterApplicationService<S extends FlutterSpongeService>
         _subscriptionWatchdog = Timer.periodic(
             Duration(seconds: settings.subscriptionWatchdogInterval),
             (timer) async {
-          if (activeConnection.subscribe && !spongeService.isSubscribed) {
+          if (activeConnection != null &&
+              activeConnection.subscribe &&
+              !spongeService.isSubscribed) {
             // Cancel the current watchdog.
             timer.cancel();
 

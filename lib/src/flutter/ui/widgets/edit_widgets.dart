@@ -669,28 +669,26 @@ class DateTimeEditWidget extends StatefulWidget {
 class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (widget.name != null) Text(widget.name),
-            FlatButton(
-              child: Text(widget.initialValue != null
-                  ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
-                  : 'DATE'),
-              onPressed: () =>
-                  _showDatePicker().catchError((e) => handleError(context, e)),
-            ),
-            FlatButton(
-              child: Text(widget.initialValue != null
-                  ? DateFormat('HH:mm').format(widget.initialValue)
-                  : 'TIME'),
-              onPressed: () =>
-                  _showTimePicker().catchError((e) => handleError(context, e)),
-            ),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (widget.name != null) Text(widget.name),
+        FlatButton(
+          child: Text(widget.initialValue != null
+              ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
+              : 'DATE'),
+          onPressed: () =>
+              _showDatePicker().catchError((e) => handleError(context, e)),
         ),
-        onTap: () async {});
+        FlatButton(
+          child: Text(widget.initialValue != null
+              ? DateFormat('HH:mm').format(widget.initialValue)
+              : 'TIME'),
+          onPressed: () =>
+              _showTimePicker().catchError((e) => handleError(context, e)),
+        ),
+      ],
+    );
   }
 
   Future<void> _showDatePicker() async {
@@ -1463,7 +1461,7 @@ class _TextEditWidgetState extends State<TextEditWidget> {
         labelStyle: getArgLabelTextStyle(editorContext.context),
         hintText: editorContext.hintText,
         suffixIcon: editorContext.enabled && !editorContext.readOnly
-            ? GestureDetector(
+            ? InkResponse(
                 key: Key('text-clear'),
                 child: Icon(
                   MdiIcons.close,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
@@ -43,11 +44,11 @@ class ConnectionEditPresenter
   SpongeConnection get connection => viewModel.connection;
 
   String get name => viewModel.connection.name;
-  set name(String value) => viewModel.connection.name = value?.trim();
+  set name(String value) => viewModel.connection.name = normalizeString(value);
   String validateName(String value) {
     value = value?.trim();
 
-    if (value.isEmpty) {
+    if (value == null || value.isEmpty) {
       return 'The connection name must not be empty';
     }
 
@@ -61,12 +62,14 @@ class ConnectionEditPresenter
   }
 
   String get url => viewModel.connection.url;
-  set url(String value) => viewModel.connection.url = value?.trim();
-  String validateUrl(String value) =>
-      value.isEmpty ? 'The Sponge address must not be empty' : null;
+  set url(String value) => viewModel.connection.url = normalizeString(value);
+  String validateUrl(String value) => (value == null || value.isEmpty)
+      ? 'The Sponge address must not be empty'
+      : null;
 
   String get network => viewModel.connection.network;
-  set network(String value) => viewModel.connection.network = value?.trim();
+  set network(String value) =>
+      viewModel.connection.network = normalizeString(value);
 
   bool get anonymous => viewModel.connection.anonymous;
   set anonymous(bool value) {
@@ -74,17 +77,20 @@ class ConnectionEditPresenter
   }
 
   String get username => viewModel.connection.username;
-  set username(String value) => viewModel.connection.username =
-      value != null && value.trim().isNotEmpty ? value.trim() : null;
+  set username(String value) =>
+      viewModel.connection.username = normalizeString(value);
   String validateUsername(String value) =>
-      !anonymous && value.isEmpty ? 'The user name must not be empty' : null;
+      !anonymous && (value == null || value.isEmpty)
+          ? 'The user name must not be empty'
+          : null;
 
   String get password => viewModel.connection.password;
-  set password(String value) => viewModel.connection.password =
-      value != null && value.trim().isNotEmpty ? value.trim() : null;
-  String validatePassword(String value) => !anonymous && value.isEmpty
-      ? 'The user password must not be empty'
-      : null;
+  set password(String value) =>
+      viewModel.connection.password = normalizeString(value);
+  String validatePassword(String value) =>
+      !anonymous && (value == null || value.isEmpty)
+          ? 'The user password must not be empty'
+          : null;
 
   bool get savePassword => viewModel.connection.savePassword;
   set savePassword(bool value) => viewModel.connection.savePassword = value;

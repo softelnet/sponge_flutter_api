@@ -115,7 +115,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
           loading: [],
         );
 
-    return GestureDetector(
+    return InkWell(
       onTap: () => provider.navigateToExtendedViewer(createViewerContext()),
       child: provider.createCompactViewer(createViewerContext()),
     );

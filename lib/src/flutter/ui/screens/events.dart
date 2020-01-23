@@ -109,7 +109,7 @@ class _EventsPageState extends State<EventsPage>
               //         color: Theme.of(context).primaryColor,
               //       )
               //     : null,
-              trailing: GestureDetector(
+              trailing: InkResponse(
                 child: Icon(Icons.delete_sweep),
                 onTap: () => _removeEvent(context, eventData.event.id),
               ),
@@ -156,7 +156,7 @@ class _EventsPageState extends State<EventsPage>
                   _controller.stop(canceled: false);
                 }
 
-                return GestureDetector(
+                return InkResponse(
                   child: SpinningWidget(
                     controller: _controller,
                     child: icon,

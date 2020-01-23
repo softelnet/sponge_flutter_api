@@ -55,7 +55,7 @@ class ErrorCircleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkResponse(
       child: CircleAvatar(
         child: Icon(Icons.error_outline),
         foregroundColor: Colors.white,

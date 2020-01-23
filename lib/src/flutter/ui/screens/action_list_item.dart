@@ -90,7 +90,7 @@ class _ActionListItemState extends State<ActionListItem>
                             message: _presenter.isInstantActionCallAllowed
                                 ? 'Run the action'
                                 : 'Set the arguments and run the action',
-                            child: GestureDetector(
+                            child: InkResponse(
                               child: _presenter.isInstantActionCallAllowed
                                   ? Icon(Icons.play_arrow,
                                       color: getCallIconColor(context))
