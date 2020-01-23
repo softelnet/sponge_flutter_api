@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 
@@ -72,17 +73,20 @@ class ApplicationProviderState extends State<ApplicationProvider> {
 
   void _createPageStorage() {
     _bucket = PageStorageBucket();
-    _storageKey = PageStorageKey('state-container-${_connection?.name}');
+    _storageKey = PageStorageKey('application-provider-${_connection?.name}');
   }
 
   @override
   Widget build(BuildContext context) {
     return _InheritedStateContainer(
       data: this,
-      child: PageStorage(
-        bucket: _bucket,
-        key: _storageKey,
-        child: widget.child,
+      child: ChangeNotifierProvider<ApplicationStateNotifier>(
+        create: (_) => widget.service.stateNotifier,
+        child: PageStorage(
+          bucket: _bucket,
+          key: _storageKey,
+          child: widget.child,
+        ),
       ),
     );
   }

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
@@ -89,8 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ListTile(
                         title: Text('Dark theme'),
                         trailing: Switch(
-                          value:
-                              Theme.of(context).brightness == Brightness.dark,
+                          value: settings.isDarkMode,
                           onChanged: (value) => _toggleTheme(context),
                         ),
                         onTap: () => _toggleTheme(context),
@@ -460,9 +458,8 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {});
   }
 
-  void _toggleTheme(BuildContext context) {
-    DynamicTheme.of(context).setBrightness(
-        isDarkTheme(context) ? Brightness.light : Brightness.dark);
+  Future<void> _toggleTheme(BuildContext context) async {
+    await settings.setIsDarkMode(!settings.isDarkMode);
   }
 
   Future<void> _resetToDefaults(BuildContext context) async {

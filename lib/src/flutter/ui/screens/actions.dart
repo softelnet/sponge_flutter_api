@@ -79,12 +79,11 @@ class _ActionsPageState extends State<ActionsPage>
 
   @override
   Widget build(BuildContext context) {
-    var service = ApplicationProvider.of(context).service;
     _presenter ??= ActionsPresenter(this);
 
+    var service = ApplicationProvider.of(context).service;
     service.bindMainBuildContext(context);
-
-    this._presenter.setService(service);
+    _presenter.setService(service);
 
     return WillPopScope(
       child: StreamBuilder(
@@ -115,72 +114,7 @@ class _ActionsPageState extends State<ActionsPage>
                   ),
                 );
               } else {
-                return FutureBuilder<List<_ActionGroup>>(
-                  future:
-                      _busyNoConnection ? Future(() => []) : _getActionGroups(),
-                  builder: (context, snapshot) {
-                    _useTabs = service.settings.tabsInActionList &&
-                        _isDone(snapshot) &&
-                        snapshot.data.length > 1;
-
-                    _lastConnectionName ??= _presenter.connectionName;
-                    if (_useTabs) {
-                      if (_lastConnectionName != _presenter.connectionName) {
-                        _initialTabIndex = 0;
-                      } else {
-                        _initialTabIndex =
-                            _useTabs && _initialTabIndex < snapshot.data.length
-                                ? _initialTabIndex
-                                : 0;
-                      }
-                    }
-
-                    _lastConnectionName = _presenter.connectionName;
-
-                    var tabBar = _useTabs
-                        ? ColoredTabBar(
-                            child: TabBar(
-                              // TODO Parametrize tabbar scroll in settings.
-                              isScrollable: snapshot.data.length > 3,
-                              tabs: snapshot.data
-                                  .map((group) => Tab(
-                                        key: Key('group-${group.name}'),
-                                        child: Tooltip(
-                                          child: Text(group.name.toUpperCase()),
-                                          message: group.name,
-                                        ),
-                                      ))
-                                  .toList(),
-                              onTap: (index) => _initialTabIndex = index,
-                              //labelColor: getSecondaryColor(context),
-                              //unselectedLabelColor: getTextColor(context),
-                              indicatorColor: getSecondaryColor(context),
-                            ),
-                            color: getThemedBackgroundColor(context),
-                          )
-                        : null;
-
-                    var scaffold = _buildScaffold(
-                      context,
-                      child: _presenter.connected
-                          ? (_busyNoConnection
-                              ? Center(child: CircularProgressIndicator())
-                              : _buildActionGroupWidget(context, snapshot))
-                          : ConnectionNotInitializedWidget(
-                              hasConnections: _presenter.hasConnections),
-                      tabBar: tabBar,
-                      actionGroupsSnapshot: snapshot,
-                    );
-
-                    return _useTabs
-                        ? DefaultTabController(
-                            length: snapshot.data.length,
-                            child: scaffold,
-                            initialIndex: _initialTabIndex,
-                          )
-                        : scaffold;
-                  },
-                );
+                return _buildMainWidget(context, service);
               }
             } else if (snapshot.hasError) {
               return _buildScaffold(
@@ -199,6 +133,75 @@ class _ActionsPageState extends State<ActionsPage>
             }
           }),
       onWillPop: () async => await showAppExitConfirmationDialog(context),
+    );
+  }
+
+  Widget _buildMainWidget(
+      BuildContext context, FlutterApplicationService service) {
+    return FutureBuilder<List<_ActionGroup>>(
+      future: _busyNoConnection ? Future(() => []) : _getActionGroups(),
+      builder: (context, snapshot) {
+        _useTabs = service.settings.tabsInActionList &&
+            _isDone(snapshot) &&
+            snapshot.data.length > 1;
+
+        _lastConnectionName ??= _presenter.connectionName;
+        if (_useTabs) {
+          if (_lastConnectionName != _presenter.connectionName) {
+            _initialTabIndex = 0;
+          } else {
+            _initialTabIndex =
+                _useTabs && _initialTabIndex < snapshot.data.length
+                    ? _initialTabIndex
+                    : 0;
+          }
+        }
+
+        _lastConnectionName = _presenter.connectionName;
+
+        var tabBar = _useTabs
+            ? ColoredTabBar(
+                child: TabBar(
+                  // TODO Parametrize tabbar scroll in settings.
+                  isScrollable: snapshot.data.length > 3,
+                  tabs: snapshot.data
+                      .map((group) => Tab(
+                            key: Key('group-${group.name}'),
+                            child: Tooltip(
+                              child: Text(group.name.toUpperCase()),
+                              message: group.name,
+                            ),
+                          ))
+                      .toList(),
+                  onTap: (index) => _initialTabIndex = index,
+                  //labelColor: getSecondaryColor(context),
+                  //unselectedLabelColor: getTextColor(context),
+                  indicatorColor: getSecondaryColor(context),
+                ),
+                color: getThemedBackgroundColor(context),
+              )
+            : null;
+
+        var scaffold = _buildScaffold(
+          context,
+          child: _presenter.connected
+              ? (_busyNoConnection
+                  ? Center(child: CircularProgressIndicator())
+                  : _buildActionGroupWidget(context, snapshot))
+              : ConnectionNotInitializedWidget(
+                  hasConnections: _presenter.hasConnections),
+          tabBar: tabBar,
+          actionGroupsSnapshot: snapshot,
+        );
+
+        return _useTabs
+            ? DefaultTabController(
+                length: snapshot.data.length,
+                child: scaffold,
+                initialIndex: _initialTabIndex,
+              )
+            : scaffold;
+      },
     );
   }
 

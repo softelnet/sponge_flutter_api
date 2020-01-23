@@ -32,6 +32,16 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_pro
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
+class ApplicationStateNotifier extends ChangeNotifier {
+  ApplicationStateNotifier(this.service);
+
+  final FlutterApplicationService service;
+
+  void notify() {
+    notifyListeners();
+  }
+}
+
 class FlutterApplicationService<S extends FlutterSpongeService>
     extends ApplicationService<S> {
   static final Logger _logger = Logger('FlutterApplicationService');
@@ -44,10 +54,13 @@ class FlutterApplicationService<S extends FlutterSpongeService>
 
   Timer _subscriptionWatchdog;
 
+  ApplicationStateNotifier stateNotifier;
+
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
-    settings = FlutterApplicationSettings(_prefs);
+    stateNotifier = ApplicationStateNotifier(this);
+    settings = FlutterApplicationSettings(_prefs, stateNotifier);
 
     _initActionIntentHandlers();
 
@@ -314,9 +327,11 @@ class FlutterSpongeService extends SpongeService<FlutterActionData> {
 }
 
 class FlutterApplicationSettings extends ApplicationSettings {
-  FlutterApplicationSettings(this._prefs);
+  FlutterApplicationSettings(this._prefs, this._stateNotifier);
 
   static const String _PREF_PREFIX = 'settings.';
+
+  static const String PREF_IS_DARK_MODE = '$_PREF_PREFIX.isDarkMode';
 
   static const String PREF_ACTION_LIST_TABS = '$_PREF_PREFIX.tabsInActionList';
 
@@ -369,7 +384,17 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   final SharedPreferences _prefs;
 
-  Brightness get defaultThemeBrightness => Brightness.dark;
+  final ApplicationStateNotifier _stateNotifier;
+
+  bool get isDarkMode => _prefs.getBool(PREF_IS_DARK_MODE) ?? true;
+
+  Future<bool> setIsDarkMode(bool value) async {
+    var result = await _prefs.setBool(PREF_IS_DARK_MODE, value);
+
+    _stateNotifier.notify();
+
+    return result;
+  }
 
   bool get tabsInActionList => _prefs.getBool(PREF_ACTION_LIST_TABS) ?? true;
 
