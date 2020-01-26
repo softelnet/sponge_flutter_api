@@ -56,7 +56,14 @@ class FlutterApplicationService<S extends FlutterSpongeService>
 
   ApplicationStateNotifier stateNotifier;
 
+  bool _initialized = false;
+  bool get initialized => _initialized;
+
   Future<void> init() async {
+    if (_initialized) {
+      return;
+    }
+
     _prefs = await SharedPreferences.getInstance();
 
     stateNotifier = ApplicationStateNotifier(this);
@@ -67,6 +74,8 @@ class FlutterApplicationService<S extends FlutterSpongeService>
     await configure(SharedPreferencesConnectionsConfiguration(_prefs),
         createTypeConverter(this),
         connectSynchronously: false);
+
+    _initialized = true;
   }
 
   void _initActionIntentHandlers() {
