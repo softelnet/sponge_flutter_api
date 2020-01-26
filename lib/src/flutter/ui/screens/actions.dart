@@ -225,9 +225,12 @@ class _ActionsPageState extends State<ActionsPage>
           inAsyncCall: _presenter.busy,
         ),
       ),
-      floatingActionButton: _buildFloatingActionButton(
-        context,
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: _presenter.service.connectionBloc.state
+              is SpongeConnectionStateNotConnected
+          ? null
+          : _buildFloatingActionButton(
+              context,
+            ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 

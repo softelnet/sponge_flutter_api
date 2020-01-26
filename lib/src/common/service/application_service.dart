@@ -143,6 +143,7 @@ abstract class ApplicationService<S extends SpongeService> {
     } else {
       await closeSpongeService();
       _spongeService = null;
+      connectionBloc.add(SpongeConnectionStateNotConnected());
     }
   }
 
