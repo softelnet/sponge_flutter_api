@@ -160,25 +160,20 @@ class _ActionsPageState extends State<ActionsPage>
         _lastConnectionName = _presenter.connectionName;
 
         var tabBar = _useTabs
-            ? ColoredTabBar(
-                child: TabBar(
-                  // TODO Parametrize tabbar scroll in settings.
-                  isScrollable: snapshot.data.length > 3,
-                  tabs: snapshot.data
-                      .map((group) => Tab(
-                            key: Key('group-${group.name}'),
-                            child: Tooltip(
-                              child: Text(group.name.toUpperCase()),
-                              message: group.name,
-                            ),
-                          ))
-                      .toList(),
-                  onTap: (index) => _initialTabIndex = index,
-                  //labelColor: getSecondaryColor(context),
-                  //unselectedLabelColor: getTextColor(context),
-                  indicatorColor: getSecondaryColor(context),
-                ),
-                color: getThemedBackgroundColor(context),
+            ? TabBar(
+                // TODO Parametrize tabbar scroll in settings.
+                isScrollable: snapshot.data.length > 3,
+                tabs: snapshot.data
+                    .map((group) => Tab(
+                          key: Key('group-${group.name}'),
+                          child: Tooltip(
+                            child: Text(group.name.toUpperCase()),
+                            message: group.name,
+                          ),
+                        ))
+                    .toList(),
+                onTap: (index) => _initialTabIndex = index,
+                indicatorColor: getSecondaryColor(context),
               )
             : null;
 
