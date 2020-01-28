@@ -52,10 +52,13 @@ class ConnectionEditPresenter
       return 'The connection name must not be empty';
     }
 
-    if (service.connectionsConfiguration
-        .getConnections()
-        .any((con) => con.name == value)) {
-      return 'A connection with that name already exists';
+    // If the name has been changed.
+    if (value != name) {
+      if (service.connectionsConfiguration
+          .getConnections()
+          .any((con) => con.name == value)) {
+        return 'A connection with that name already exists';
+      }
     }
 
     return null;
