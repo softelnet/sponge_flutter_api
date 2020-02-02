@@ -202,9 +202,12 @@ class SpongeService<AD extends ActionData> {
           actionMetaList.map((meta) => createActionData(meta)).toList();
 
       // Create BLoCs.
-      actionDataList.forEach((actionData) => _actionCallBloc[
-              actionData.actionMeta.name] =
-          ActionCallBloc(this, actionData.actionMeta.name, saveState: true));
+      actionDataList.forEach((actionData) =>
+          _actionCallBloc[actionData.actionMeta.name] = ActionCallBloc(
+            this,
+            actionData.actionMeta.name,
+            saveState: actionData.hasCacheableArgs,
+          ));
 
       // Set actions cache at the end of this method.
       _actions = actionDataList;

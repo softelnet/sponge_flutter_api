@@ -269,7 +269,10 @@ class SubActionsController extends BaseActionsController {
   void setupSubAction(
       ActionData actionData, SubActionSpec subActionSpec, dynamic sourceValue) {
     if (subActionSpec.hasArgSubstitutions) {
-      actionData.clear();
+      if (!actionData.hasCacheableContextArgs) {
+        actionData.clear();
+      }
+
       actionData.args =
           _substituteArgs(subActionSpec, elementType, sourceValue);
     }
@@ -366,7 +369,7 @@ class SubActionsController extends BaseActionsController {
   Future<void> _onElementSubAction({
     @required BuildContext context,
     @required SubActionSpec subActionSpec,
-    void setupCallback(ActionData _),
+    void Function(ActionData _) setupCallback,
     int index,
     bool readOnly = false,
     String header,
@@ -388,10 +391,10 @@ class SubActionsController extends BaseActionsController {
         setupCallback(actionData);
       }
 
-      ActionCallBloc bloc = ActionCallBloc(
+      var bloc = ActionCallBloc(
         service.spongeService,
         subActionSpec.actionName,
-        saveState: false,
+        saveState: actionData.hasCacheableContextArgs,
       );
 
       ActionCallState callState;

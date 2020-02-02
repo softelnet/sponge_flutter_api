@@ -437,7 +437,6 @@ Future<void> callActionImmediately({
   @required bool showResultDialog,
   @required bool showNoResultDialog,
 }) async {
-  final service = ApplicationProvider.of(context).service;
   var resultInfo;
 
   if (onBeforeCall != null) {
@@ -445,10 +444,15 @@ Future<void> callActionImmediately({
   }
 
   try {
-    // TODO Save args is always false in this case!
-    // BLoC is not used here.
-    resultInfo = await service.spongeService.callAction(actionData.actionMeta,
-        args: actionData.args, saveArgsAndResult: false);
+    bloc.onActionCall.add(actionData.args);
+
+    // Wait for the server response.
+    var callState = await bloc.state
+        .firstWhere((state) => state.isFinal, orElse: () => null);
+
+    if (callState is ActionCallStateEnded) {
+      resultInfo = callState.resultInfo;
+    }
   } finally {
     if (onAfterCall != null) {
       onAfterCall();
@@ -458,10 +462,6 @@ Future<void> callActionImmediately({
   if (!(actionData.actionMeta.result is VoidType &&
           actionData.actionMeta.result.label == null) ||
       showNoResultDialog) {
-    // widget.bloc.onActionCall.add(_presenter.actionData.args);
-    // await widget.bloc.state
-    //     .any((_) => true); // firstWhere((state) => state.isFinal);
-
     if (showResultDialog) {
       await showActionResultDialog(
         context: context,

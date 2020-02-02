@@ -64,9 +64,10 @@ class ActionCallBloc {
           }
 
           final resultInfo = await spongeService.callAction(
-              actionData.actionMeta,
-              args: args,
-              saveArgsAndResult: saveState);
+            actionData.actionMeta,
+            args: args,
+            saveArgsAndResult: saveState,
+          );
           yield ActionCallStateEnded(resultInfo);
         }
       } catch (e) {
