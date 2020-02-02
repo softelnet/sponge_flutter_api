@@ -79,7 +79,7 @@ class SpongeService<AD extends ActionData> {
       _grpcClient = createSpongeGrpcClient(_client, _connection);
     }
 
-    eventReceivedBloc?.dispose();
+    eventReceivedBloc?.close();
     eventReceivedBloc = EventReceivedBloc();
     unawaited(subscriptionBloc?.close());
     subscriptionBloc = ForwardingBloc<bool>(initialValue: false);
@@ -171,7 +171,7 @@ class SpongeService<AD extends ActionData> {
   }
 
   Future<void> close() async {
-    eventReceivedBloc?.dispose();
+    eventReceivedBloc?.close();
     await _grpcClient?.close(terminate: true);
   }
 

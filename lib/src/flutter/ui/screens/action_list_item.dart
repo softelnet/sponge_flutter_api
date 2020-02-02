@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/action_list_item_mvp.dart';
@@ -61,16 +63,14 @@ class _ActionListItemState extends State<ActionListItem>
 
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 
-    return StreamBuilder<ActionCallState>(
-        stream: _presenter.bloc,
-        initialData: ActionCallStateInitialize(),
-        builder:
-            (BuildContext context, AsyncSnapshot<ActionCallState> snapshot) {
-          _presenter.state = snapshot.data;
+    return BlocBuilder<ActionCallBloc, ActionCallState>(
+        bloc: _presenter.bloc,
+        builder: (BuildContext context, ActionCallState state) {
+          _presenter.state = state;
 
           var resultWidget = showCallIcon
               ? _buildResultWidget()
-              : _buildAdvancedSubtitle(context, snapshot);
+              : _buildAdvancedSubtitle(context);
 
           // TODO Wrap in a widget to disable when the action is called/checked if it is active.
           return Card(
@@ -110,7 +110,7 @@ class _ActionListItemState extends State<ActionListItem>
                     subtitle: _showResultAsSubtitle
                         ? (showCallIcon
                             ? _buildResultWidget()
-                            : _buildAdvancedSubtitle(context, snapshot))
+                            : _buildAdvancedSubtitle(context))
                         : null,
                     onTap: callTapOnlyOnCallIcon
                         ? null
@@ -176,8 +176,7 @@ class _ActionListItemState extends State<ActionListItem>
     return null;
   }
 
-  Widget _buildAdvancedSubtitle(
-      BuildContext context, AsyncSnapshot<ActionCallState> snapshot) {
+  Widget _buildAdvancedSubtitle(BuildContext context) {
     var resultWidget = _buildResultWidget();
 
     return Column(children: [

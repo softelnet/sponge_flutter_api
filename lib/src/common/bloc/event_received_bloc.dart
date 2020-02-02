@@ -17,12 +17,15 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 
 class EventReceivedBloc {
   EventReceivedBloc() {
-    onEvent = BehaviorSubject<EventData>();
-    event = onEvent.asBroadcastStream();
+    _onEvent = BehaviorSubject<EventData>();
+    _event = _onEvent.asBroadcastStream();
   }
 
-  BehaviorSubject<EventData> onEvent;
-  Stream<EventData> event;
+  BehaviorSubject<EventData> _onEvent;
+  Stream<EventData> _event;
 
-  void dispose() => onEvent.close();
+  BehaviorSubject<EventData> get onEvent => _onEvent;
+  Stream<EventData> get event => _event;
+
+  void close() => _onEvent.close();
 }
