@@ -113,8 +113,8 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
       actionData.args = newActionData.args;
     }
 
-    var bloc =
-        service.spongeService.getActionCallBloc(actionData.actionMeta.name);
-    bloc.onActionCall.add(actionData.args ?? []);
+    service.spongeService
+        .getActionCallBloc(actionData.actionMeta.name)
+        .add(actionData.args ?? []);
   }
 }

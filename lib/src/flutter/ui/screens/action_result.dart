@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
@@ -39,14 +40,10 @@ class ActionResultWidget extends StatefulWidget {
 class _ActionResultWidgetState extends State<ActionResultWidget> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ActionCallState>(
-        stream: widget.bloc.state,
-        initialData: widget.bloc.startState != null
-            ? widget.bloc.startState
-            : ActionCallStateInitialize(),
-        builder:
-            (BuildContext context, AsyncSnapshot<ActionCallState> snapshot) {
-          return _buildResultWidget(context, snapshot.data);
+    return BlocBuilder<ActionCallBloc, ActionCallState>(
+        bloc: widget.bloc,
+        builder: (BuildContext context, ActionCallState state) {
+          return _buildResultWidget(context, state);
         });
   }
 

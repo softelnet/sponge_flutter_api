@@ -129,7 +129,6 @@ class ActionCallPresenter
 
   static final Logger _logger = Logger('ActionCallPresenter');
   bool busy = false;
-  //final Lock _lock = Lock(reentrant: true);
   bool get callable => actionMeta.callable ?? true;
   _Dependencies _dependencies;
   bool _actionPrepared = false;
@@ -227,7 +226,6 @@ class ActionCallPresenter
   Stream<ProvideActionArgsState> _provideArgs(
       bool filter(QualifiedDataType qType),
       {Map<String, Map<String, Object>> features}) async* {
-    //return await _lock.synchronized(() async {
     _dependencies ??= _Dependencies(actionData);
     _dependencies.rebuild();
 

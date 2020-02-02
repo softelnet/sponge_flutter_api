@@ -13,43 +13,49 @@
 // limitations under the License.
 
 import 'dart:async';
+import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 
-class ActionCallBloc {
-  ActionCallBloc(
-    SpongeService spongeService,
-    String actionName, {
+class ActionCallBloc extends Bloc<List, ActionCallState> {
+  ActionCallBloc({
+    @required SpongeService spongeService,
+    @required String actionName,
+    ActionCallState initialState,
     @required bool saveState,
-    this.startState,
-  }) {
-    onActionCall = BehaviorSubject<List>();
-    state = onActionCall
-        //.debounce(const Duration(milliseconds: 250))
-        // If another call is initiated, the previous call is discarded so we don't deliver stale results.
-        .switchMap<ActionCallState>((List args) =>
-            _callAction(spongeService, actionName, args, saveState));
+  })  : _spongeService = spongeService,
+        _actionName = actionName,
+        _initialState = initialState ?? ActionCallStateInitialize(),
+        _saveState = saveState;
 
-    if (startState != null) {
-      // The optional initial state to deliver to the screen.
-      state = state.startWith(startState);
-    }
+  final SpongeService _spongeService;
+  final String _actionName;
+  final ActionCallState _initialState;
+  final bool _saveState;
 
-    state = state.asBroadcastStream();
+  // A non null event indicationg a `clear` event.
+  static const _clearArgsEvent = [];
+
+  @override
+  ActionCallState get initialState => _initialState;
+
+  @override
+  Stream<ActionCallState> mapEventToState(List actionArgs) {
+    return _callAction(_spongeService, _actionName, actionArgs, _saveState);
   }
 
-  BehaviorSubject<List> onActionCall;
-  Stream<ActionCallState> state;
-
-  ActionCallState startState;
+  @override
+  Stream<ActionCallState> transformStates(Stream<ActionCallState> states) =>
+      //.debounce(const Duration(milliseconds: 250))
+      // If another call is initiated, the previous call is discarded so we don't deliver stale results.
+      super.transformStates(states).asBroadcastStream();
 
   Stream<ActionCallState> _callAction(SpongeService spongeService,
       String actionName, List args, bool saveState) async* {
     ActionData actionData;
-    if (args == null) {
+    if (identical(args, _clearArgsEvent)) {
       yield ActionCallStateClear();
     } else {
       try {
@@ -80,7 +86,5 @@ class ActionCallBloc {
     }
   }
 
-  void dispose() => onActionCall.close();
-
-  void clear() => onActionCall.add(null);
+  void clear() => add(_clearArgsEvent);
 }

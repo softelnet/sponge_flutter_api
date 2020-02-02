@@ -62,7 +62,7 @@ class _ActionListItemState extends State<ActionListItem>
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 
     return StreamBuilder<ActionCallState>(
-        stream: _presenter.bloc.state,
+        stream: _presenter.bloc,
         initialData: ActionCallStateInitialize(),
         builder:
             (BuildContext context, AsyncSnapshot<ActionCallState> snapshot) {

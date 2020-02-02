@@ -40,7 +40,7 @@ class SpongeService<AD extends ActionData> {
   SpongeGrpcClient _grpcClient;
   SpongeGrpcClient get grpcClient => _grpcClient;
 
-  final Lock _lock = Lock(reentrant: true);
+  final Lock _lock = Lock();
   List<AD> _actions;
   Map<String, ActionCallBloc> _actionCallBloc = {};
   Map<String, ActionIntentHandler> actionIntentHandlers;
@@ -176,7 +176,14 @@ class SpongeService<AD extends ActionData> {
   }
 
   Future<AD> getAction(String actionName, {bool required = true}) async {
+    var actionData = getCachedAction(actionName, required: false);
+    if (actionData != null) {
+      return actionData;
+    }
+
+    // Featch all actions from the server.
     await getActions();
+
     return getCachedAction(actionName, required: required);
   }
 
@@ -190,8 +197,12 @@ class SpongeService<AD extends ActionData> {
       }
 
       // Clear BLoCs.
-      _actions?.forEach((actionData) =>
-          _actionCallBloc[actionData.actionMeta.name]?.dispose());
+      if (_actions != null) {
+        for (var actionData in _actions) {
+          unawaited(_actionCallBloc[actionData.actionMeta.name]?.close());
+        }
+      }
+
       _actionCallBloc = {};
 
       _actions = null;
@@ -204,8 +215,8 @@ class SpongeService<AD extends ActionData> {
       // Create BLoCs.
       actionDataList.forEach((actionData) =>
           _actionCallBloc[actionData.actionMeta.name] = ActionCallBloc(
-            this,
-            actionData.actionMeta.name,
+            spongeService: this,
+            actionName: actionData.actionMeta.name,
             saveState: actionData.hasCacheableArgs,
           ));
 

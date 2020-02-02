@@ -25,5 +25,4 @@ class EventReceivedBloc {
   Stream<EventData> event;
 
   void dispose() => onEvent.close();
-  void clear() => onEvent.add(null);
 }

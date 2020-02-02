@@ -392,8 +392,8 @@ class SubActionsController extends BaseActionsController {
       }
 
       var bloc = ActionCallBloc(
-        service.spongeService,
-        subActionSpec.actionName,
+        spongeService: service.spongeService,
+        actionName: subActionSpec.actionName,
         saveState: actionData.hasCacheableContextArgs,
       );
 
@@ -437,7 +437,7 @@ class SubActionsController extends BaseActionsController {
             await onBeforeInstantCall();
           }
 
-          bloc.onActionCall.add(actionData.args);
+          bloc.add(actionData.args);
 
           if (!autoClosing) {
             if (subActionSpec.resultSubstitution == null) {
@@ -450,8 +450,8 @@ class SubActionsController extends BaseActionsController {
             }
           }
 
-          callState = await bloc.state
-              .firstWhere((state) => state.isFinal, orElse: () => null);
+          callState = await bloc.firstWhere((state) => state.isFinal,
+              orElse: () => null);
         }
       } finally {
         // TODO Always refreshes. Maybe feature "refreshAfterCall"?
@@ -459,7 +459,7 @@ class SubActionsController extends BaseActionsController {
           await onAfterCall(subActionSpec, callState, index);
         }
 
-        bloc.dispose();
+        bloc.close();
       }
     }
   }

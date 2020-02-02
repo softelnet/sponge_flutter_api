@@ -391,7 +391,7 @@ Future<void> showActionResultDialog({
 
   if (autoClosing) {
     WidgetsBinding.instance
-        .addPostFrameCallback((_) => bloc.state.listen((state) {
+        .addPostFrameCallback((_) => bloc.listen((state) {
               if (state is ActionCallStateEnded && dialogContext != null) {
                 Navigator.of(dialogContext).pop(null);
               }
@@ -444,11 +444,10 @@ Future<void> callActionImmediately({
   }
 
   try {
-    bloc.onActionCall.add(actionData.args);
+    bloc.add(actionData.args);
 
     // Wait for the server response.
-    var callState = await bloc.state
-        .firstWhere((state) => state.isFinal, orElse: () => null);
+    var callState = await bloc.firstWhere((state) => state.isFinal, orElse: () => null);
 
     if (callState is ActionCallStateEnded) {
       resultInfo = callState.resultInfo;
