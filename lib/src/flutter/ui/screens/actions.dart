@@ -16,6 +16,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
@@ -86,50 +87,30 @@ class _ActionsPageState extends State<ActionsPage>
     _presenter.setService(service);
 
     return WillPopScope(
-      child: StreamBuilder(
-          stream: service.connectionBloc,
-          initialData: service.connectionBloc.state,
-          builder: (BuildContext context,
-              AsyncSnapshot<SpongeConnectionState> snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data is SpongeConnectionStateNotConnected) {
-                return _buildScaffold(
-                  context,
-                  child: ConnectionNotInitializedWidget(
-                      hasConnections: _presenter.hasConnections),
-                );
-              } else if (snapshot.data is SpongeConnectionStateConnecting) {
-                return _buildScaffold(
-                  context,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              } else if (snapshot.data is SpongeConnectionStateError) {
-                return _buildScaffold(
-                  context,
-                  child: Center(
-                    child: ErrorPanelWidget(
-                      error:
-                          (snapshot.data as SpongeConnectionStateError).error,
-                    ),
-                  ),
-                );
-              } else {
-                return _buildMainWidget(context, service);
-              }
-            } else if (snapshot.hasError) {
+      child: BlocBuilder<ForwardingBloc<SpongeConnectionState>,
+              SpongeConnectionState>(
+          bloc: service.connectionBloc,
+          builder: (BuildContext context, SpongeConnectionState state) {
+            if (state is SpongeConnectionStateNotConnected) {
               return _buildScaffold(
                 context,
-                child: Center(
-                  child: ErrorPanelWidget(
-                    error: snapshot.error,
-                  ),
-                ),
+                child: ConnectionNotInitializedWidget(
+                    hasConnections: _presenter.hasConnections),
               );
-            } else {
+            } else if (state is SpongeConnectionStateConnecting) {
               return _buildScaffold(
                 context,
                 child: Center(child: CircularProgressIndicator()),
               );
+            } else if (state is SpongeConnectionStateError) {
+              return _buildScaffold(
+                context,
+                child: Center(
+                  child: ErrorPanelWidget(error: state.error),
+                ),
+              );
+            } else {
+              return _buildMainWidget(context, service);
             }
           }),
       onWillPop: () async => await showAppExitConfirmationDialog(context),
