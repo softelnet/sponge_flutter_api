@@ -130,11 +130,17 @@ class _ActionCallPageState extends State<ActionCallPage>
                 return snapshot.data
                     ? _buildProvideArgsWidget(context)
                     : Center(
-                        child: ErrorPanelWidget(
-                            error:
-                                'Action \'${_presenter.actionLabel}\' is inactive'));
+                        child: NotificationPanelWidget(
+                        message: '${_presenter.actionLabel} is inactive.',
+                        type: NotificationPanelType.info,
+                      ));
               } else if (snapshot.hasError) {
-                return Center(child: ErrorPanelWidget(error: snapshot.error));
+                return Center(
+                  child: NotificationPanelWidget(
+                    message: snapshot.error,
+                    type: NotificationPanelType.error,
+                  ),
+                );
               } else {
                 return Center(child: CircularProgressIndicator());
               }
@@ -153,7 +159,12 @@ class _ActionCallPageState extends State<ActionCallPage>
                 return _buildActionCallWidget(context, snapshot.data);
               } else if (snapshot.hasError) {
                 _presenter.error = snapshot.error;
-                return Center(child: ErrorPanelWidget(error: snapshot.error));
+                return Center(
+                  child: NotificationPanelWidget(
+                    message: snapshot.error,
+                    type: NotificationPanelType.error,
+                  ),
+                );
               } else {
                 return Center(child: CircularProgressIndicator());
               }
@@ -390,12 +401,11 @@ Future<void> showActionResultDialog({
   BuildContext dialogContext;
 
   if (autoClosing) {
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => bloc.listen((state) {
-              if (state is ActionCallStateEnded && dialogContext != null) {
-                Navigator.of(dialogContext).pop(null);
-              }
-            }));
+    WidgetsBinding.instance.addPostFrameCallback((_) => bloc.listen((state) {
+          if (state is ActionCallStateEnded && dialogContext != null) {
+            Navigator.of(dialogContext).pop(null);
+          }
+        }));
   }
 
   await showDialog(
@@ -447,7 +457,8 @@ Future<void> callActionImmediately({
     bloc.add(actionData.args);
 
     // Wait for the server response.
-    var callState = await bloc.firstWhere((state) => state.isFinal, orElse: () => null);
+    var callState =
+        await bloc.firstWhere((state) => state.isFinal, orElse: () => null);
 
     if (callState is ActionCallStateEnded) {
       resultInfo = callState.resultInfo;

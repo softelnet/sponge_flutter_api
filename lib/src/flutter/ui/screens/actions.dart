@@ -106,7 +106,10 @@ class _ActionsPageState extends State<ActionsPage>
               return _buildScaffold(
                 context,
                 child: Center(
-                  child: ErrorPanelWidget(error: state.error),
+                  child: NotificationPanelWidget(
+                    message: state.error,
+                    type: NotificationPanelType.error,
+                  ),
                 ),
               );
             } else {
@@ -396,7 +399,10 @@ class _ActionsPageState extends State<ActionsPage>
           return UsernamePasswordNotSetWidget(
               connectionName: _presenter.connectionName);
         } else {
-          return ErrorPanelWidget(error: snapshot.error);
+          return NotificationPanelWidget(
+            message: snapshot.error,
+            type: NotificationPanelType.error,
+          );
         }
       }
     }

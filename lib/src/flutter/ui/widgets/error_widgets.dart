@@ -17,31 +17,54 @@ import 'package:sponge_flutter_api/src/flutter/routes.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/login_widget.dart';
 
-class ErrorPanelWidget extends StatelessWidget {
-  ErrorPanelWidget({Key key, @required this.error}) : super(key: key);
+enum NotificationPanelType { error, info }
 
-  final dynamic error;
+class NotificationPanelWidget extends StatelessWidget {
+  NotificationPanelWidget({
+    Key key,
+    @required dynamic message,
+    @required NotificationPanelType type,
+  })  : _message = message,
+        _type = type,
+        super(key: key);
+
+  final dynamic _message;
+  final NotificationPanelType _type;
 
   @override
   Widget build(BuildContext context) {
-    // TODO Verify error is SocketException.
-    var isSocketException = error?.runtimeType?.toString() ==
-        'SocketException'; //error is SocketException
+    String title;
+    IconData icon;
+    Color color;
+    switch (_type) {
+      case NotificationPanelType.error:
+        // TODO Verify error is SocketException.
+        var isSocketException = _message?.runtimeType?.toString() ==
+            'SocketException'; //error is SocketException
+        title = isSocketException ? 'Connection error' : 'Error';
+        icon = Icons.error;
+        color = Colors.red;
+        break;
+      case NotificationPanelType.info:
+        title = 'Information';
+        icon = Icons.info;
+        color = Colors.blue;
+        break;
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(
-                Icons.error,
-                color: Colors.red,
-              ),
-              title: Text(isSocketException ? 'Connection error' : 'Error'),
-              subtitle: Text('$error'),
-            ),
-          ],
+        child: ListTile(
+          leading: Icon(
+            icon,
+            color: color,
+          ),
+          title: Text(title),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text('$_message'),
+          ),
         ),
       ),
     );

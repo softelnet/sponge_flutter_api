@@ -144,6 +144,8 @@ class ActionCallPresenter
 
   dynamic error;
 
+  bool _isActive;
+
   List<QualifiedDataType> _getQualifiedTypes() {
     List<QualifiedDataType> qualifiedTypes = [];
     actionData.traverseArguments(
@@ -167,14 +169,19 @@ class ActionCallPresenter
       _eventSubscription =
           service.spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
-        if (_running) {
+        if (_isRunningAndActive) {
           await view.refreshArgs(modal: false);
         }
       }, onError: (e) {
-        _logger.severe('Event subscription error', e);
+        if (_isRunningAndActive) {
+          _logger.severe('Event subscription error', e);
+        }
       });
     }
   }
+
+  bool get _isRunningAndActive =>
+      _running && (!actionMeta.activatable || (_isActive ?? false));
 
   void ensureRunning() {
     _ensureEventSubscription();
@@ -538,8 +545,12 @@ class ActionCallPresenter
     return !actionMeta.args.any((arg) => hasListTypeScroll(arg));
   }
 
-  Future<bool> isActionActive() async =>
-      await service.spongeService.isActionActive(actionMeta.name);
+  Future<bool> isActionActive() async {
+    // Cache the value.
+    _isActive ??= await service.spongeService.isActionActive(actionMeta.name);
+
+    return _isActive;
+  }
 
   // Callbacks.
   void _onSaveOrUpdate(

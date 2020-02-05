@@ -100,7 +100,12 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     try {
       return _build(context);
     } catch (e) {
-      return Center(child: ErrorPanelWidget(error: e));
+      return Center(
+        child: NotificationPanelWidget(
+          message: e,
+          type: NotificationPanelType.error,
+        ),
+      );
     }
   }
 
@@ -405,7 +410,10 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
       return _typeGuiProviders[qFieldType.type.name]
           .createEditor(editorContext);
     } catch (e) {
-      return ErrorPanelWidget(error: e);
+      return NotificationPanelWidget(
+        message: e,
+        type: NotificationPanelType.error,
+      );
     }
   }
 }
