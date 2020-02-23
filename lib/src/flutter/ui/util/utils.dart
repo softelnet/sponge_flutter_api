@@ -152,7 +152,7 @@ Color getFloatingButtonBackgroudColor(BuildContext context) =>
 Color getSecondaryColor(BuildContext context) => Colors.orange[300];
 
 Color getTextColor(BuildContext context) =>
-    Theme.of(context).primaryTextTheme.body1.color;
+    Theme.of(context).primaryTextTheme.bodyText2.color;
 
 Color getThemedBackgroundColor(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark

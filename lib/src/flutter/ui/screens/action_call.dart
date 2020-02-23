@@ -76,7 +76,9 @@ class _ActionCallPageState extends State<ActionCallPage>
     _presenter ??=
         ActionCallPresenter(ActionCallViewModel(widget.actionData.copy()), this)
           ..setService(service)
-          ..init();
+          ..init(
+            verifyIsActive: widget.verifyIsActive,
+          );
 
     _presenter.ensureRunning();
 

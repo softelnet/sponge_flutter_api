@@ -144,6 +144,7 @@ class ActionCallPresenter
 
   dynamic error;
 
+  bool _verifyIsActive = true;
   bool _isActive;
 
   List<QualifiedDataType> _getQualifiedTypes() {
@@ -154,7 +155,9 @@ class ActionCallPresenter
     return qualifiedTypes;
   }
 
-  void init() {
+  void init({bool verifyIsActive = true}) {
+    _verifyIsActive = verifyIsActive;
+
     _prepareArgs();
     _initEventSubscription();
   }
@@ -169,19 +172,19 @@ class ActionCallPresenter
       _eventSubscription =
           service.spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
-        if (_isRunningAndActive) {
+        if (await _isRunningAndActive()) {
           await view.refreshArgs(modal: false);
         }
-      }, onError: (e) {
-        if (_isRunningAndActive) {
+      }, onError: (e) async {
+        if (await _isRunningAndActive()) {
           _logger.severe('Event subscription error', e);
         }
       });
     }
   }
 
-  bool get _isRunningAndActive =>
-      _running && (!actionMeta.activatable || (_isActive ?? false));
+  Future<bool> _isRunningAndActive() async =>
+      _running && await isActionActive();
 
   void ensureRunning() {
     _ensureEventSubscription();
@@ -547,7 +550,9 @@ class ActionCallPresenter
 
   Future<bool> isActionActive() async {
     // Cache the value.
-    _isActive ??= await service.spongeService.isActionActive(actionMeta.name);
+    _isActive ??= (!_verifyIsActive || !actionMeta.activatable)
+        ? true
+        : await service.spongeService.isActionActive(actionMeta.name);
 
     return _isActive;
   }
