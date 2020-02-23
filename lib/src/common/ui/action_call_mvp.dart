@@ -32,7 +32,7 @@ class ActionCallViewModel extends BaseViewModel {
 
 abstract class ActionCallView extends BaseView {
   void refresh();
-  Future<void> refreshArgs({bool modal});
+  Future<void> refreshArgs({bool modal, bool showDialogOnError});
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
   Future<void> onAfterSubActionCall(ActionCallState state);
@@ -173,7 +173,11 @@ class ActionCallPresenter
           service.spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
         if (await _isRunningAndActive()) {
-          await view.refreshArgs(modal: false);
+          await view.refreshArgs(
+            modal: false,
+            // TODO Is preventing error dialog in an event subscription OK? Maybe a snackbar should be shown.
+            showDialogOnError: false,
+          );
         }
       }, onError: (e) async {
         if (await _isRunningAndActive()) {
