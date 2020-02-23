@@ -108,14 +108,18 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   }
 
   Widget _buildRow(BuildContext context, SpongeConnection connection) {
+    var active = _presenter.isConnectionActive(connection.name);
     return Dismissible(
       key: Key(connection.name),
       child: Card(
         child: ListTile(
-          leading: _presenter.isConnectionActive(connection.name)
-              ? Icon(
-                  Icons.check,
-                  color: getIconColor(context),
+          leading: active
+              ? InkResponse(
+                  child: Icon(
+                    Icons.check,
+                    color: getIconColor(context),
+                  ),
+                  onTap: () => _onConnectionTap(connection),
                 )
               : null,
           trailing: InkResponse(
@@ -123,11 +127,13 @@ class _ConnectionsPageState extends State<ConnectionsPage>
             onTap: () => _editConnection(context, connection)
                 .catchError((e) => handleError(context, e)),
           ),
-          title: Text(connection.name),
+          title: InkResponse(
+            child: Text(connection.name),
+            onTap: () => _onConnectionTap(connection),
+          ),
           subtitle:
               connection.network != null ? Text(connection.network) : null,
-          onTap: () => _toggleActiveConnection(connection)
-              .catchError((e) => handleError(context, e)),
+          selected: active,
         ),
       ),
       confirmDismiss: (_) async {
@@ -137,6 +143,11 @@ class _ConnectionsPageState extends State<ConnectionsPage>
       onDismissed: (direction) => _removeConnection(context, connection.name)
           .catchError((e) => handleError(context, e)),
     );
+  }
+
+  void _onConnectionTap(SpongeConnection connection) {
+    _toggleActiveConnection(connection)
+        .catchError((e) => handleError(context, e));
   }
 
   List<Widget> _buildMenu(BuildContext context) {
