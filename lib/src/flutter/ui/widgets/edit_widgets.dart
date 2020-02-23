@@ -880,6 +880,14 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   String _createFeatureKey() => widget.uiContext.callbacks
       .getKey(widget.uiContext.features[Features.KEY]);
 
+  PageStorageKey _createListKey() {
+    var featureKey = _createFeatureKey();
+
+    // Both list implementations must have diffrent keys.
+    return PageStorageKey(
+        '${widget.uiContext.name}-${widget.uiContext.qualifiedType.path}-${widget.useScrollableIndexedList ? "indexed" : "standard"}-${featureKey != null ? "-" + featureKey : ""}');
+  }
+
   @override
   Widget build(BuildContext context) {
     var data = _getData();
@@ -974,10 +982,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     const listPadding = EdgeInsets.only(bottom: 5);
 
     var isListScroll = hasListTypeScroll(widget.uiContext.qualifiedType.type);
-    var featureKey = _createFeatureKey();
-
-    var listKey = PageStorageKey(
-        '${widget.uiContext.name}-${widget.uiContext.qualifiedType.path}${featureKey != null ? "-" + featureKey : ""}');
 
     var itemBuilder = (BuildContext context, int index) {
       if (index == data.length) {
@@ -1020,7 +1024,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                   child: PageStorageConsumer(
                     child: widget.useScrollableIndexedList
                         ? ScrollablePositionedList.separated(
-                            key: listKey,
+                            key: _createListKey(),
                             itemScrollController:
                                 isPageable ? _itemScrollController : null,
                             itemPositionsListener:
@@ -1031,7 +1035,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                             padding: EdgeInsets.zero,
                           )
                         : ListView.separated(
-                            key: listKey,
+                            key: _createListKey(),
                             controller: isPageable ? _scrollController : null,
                             //shrinkWrap: true,
                             itemCount: data.length + 1,
