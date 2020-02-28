@@ -93,12 +93,16 @@ abstract class UiContext {
     @required bool markNullable,
     @required bool showLabel,
     @required List<String> loading,
+    @required bool enabled,
   })  : this.features = features != null ? Map.from(features) : {},
         this.markNullable = markNullable ?? true {
     this.typeLabel = typeLabel ?? qualifiedType.type.label;
     this.typeDescription = typeDescription ?? qualifiedType.type.description;
     this.showLabel = showLabel ?? true;
     this.loading = loading ?? [];
+    this.enabled = enabled;
+
+    setupContext(this);
   }
 
   final String name;
@@ -116,7 +120,9 @@ abstract class UiContext {
   bool showLabel;
   List<String> loading;
 
-  bool get enabled;
+  bool enabled;
+
+  bool _isSetUp = false;
 
   TypeGuiProvider get typeGuiProvider =>
       ApplicationProvider.of(context).service.typeGuiProvider;
@@ -133,6 +139,42 @@ abstract class UiContext {
     return markNullable
         ? (label + (qualifiedType.type.nullable ? '' : ' *'))
         : label;
+  }
+
+  static void setupContext<C extends UiContext>(C uiContext) {
+    if (uiContext._isSetUp) {
+      return;
+    }
+
+    var type = uiContext.qualifiedType.type;
+
+    uiContext.features = type.features != null ? Map.from(type.features) : {};
+
+    // Applying annotated properties.
+    if (type.annotated && uiContext.value is AnnotatedValue) {
+      AnnotatedValue annotatedValue = uiContext.value as AnnotatedValue;
+      if (annotatedValue != null) {
+        uiContext.value = annotatedValue.value;
+        uiContext.valueLabel = annotatedValue.valueLabel;
+        uiContext.valueDescription = annotatedValue.valueDescription;
+        uiContext.features.addAll(annotatedValue.features ?? {});
+
+        if (annotatedValue.typeLabel != null) {
+          uiContext.typeLabel = annotatedValue.typeLabel;
+        }
+
+        if (annotatedValue.typeDescription != null) {
+          uiContext.typeDescription = annotatedValue.typeDescription;
+        }
+      }
+    }
+
+    if (uiContext is TypeEditorContext) {
+      uiContext.enabled =
+          uiContext.enabled && (uiContext.features[Features.ENABLED] ?? true);
+    }
+
+    uiContext._isSetUp = true;
   }
 }
 
@@ -171,16 +213,14 @@ class TypeEditorContext extends UiContext {
           markNullable: markNullable,
           showLabel: showLabel,
           loading: loading,
-        ) {
-    this.enabled = enabled ?? true;
-  }
+          enabled: enabled ?? true,
+        );
 
   String hintText;
   ValueChanged onSave;
   ValueChanged onUpdate;
   TypeEditorValidatorCallback validator;
   bool readOnly;
-  bool enabled;
 
   TypeEditorContext copy() => TypeEditorContext(
         name,
@@ -250,9 +290,8 @@ class TypeViewerContext extends UiContext {
           markNullable: markNullable,
           showLabel: showLabel,
           loading: loading,
+          enabled: false,
         );
-
-  bool get enabled => false;
 
   TypeViewerContext copy() => TypeViewerContext(
         name,

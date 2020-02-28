@@ -25,38 +25,6 @@ class TypeGuiProviderUtils {
   static const double PADDING = 10.0;
   static const int LABEL_MAX_LENGTH = 200;
 
-  static C setupContext<T extends DataType, C extends UiContext>(
-      UnitTypeGuiProvider<T> provider, C uiContext) {
-    uiContext.features =
-        provider.type.features != null ? Map.from(provider.type.features) : {};
-
-    // Applying annotated properties.
-    if (provider.type.annotated && uiContext.value is AnnotatedValue) {
-      AnnotatedValue annotatedValue = uiContext.value as AnnotatedValue;
-      if (annotatedValue != null) {
-        uiContext.value = annotatedValue.value;
-        uiContext.valueLabel = annotatedValue.valueLabel;
-        uiContext.valueDescription = annotatedValue.valueDescription;
-        uiContext.features.addAll(annotatedValue.features ?? {});
-
-        if (annotatedValue.typeLabel != null) {
-          uiContext.typeLabel = annotatedValue.typeLabel;
-        }
-
-        if (annotatedValue.typeDescription != null) {
-          uiContext.typeDescription = annotatedValue.typeDescription;
-        }
-      }
-    }
-
-    if (uiContext is TypeEditorContext) {
-      uiContext.enabled =
-          uiContext.enabled && (uiContext.features[Features.ENABLED] ?? true);
-    }
-
-    return uiContext;
-  }
-
   static String getFormat<T extends DataType>(
     UnitTypeGuiProvider<T> provider,
     UiContext uiContext,

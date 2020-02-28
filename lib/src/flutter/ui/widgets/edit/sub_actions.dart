@@ -6,7 +6,9 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
@@ -28,6 +30,31 @@ class SubActionsWidget extends StatefulWidget {
   final dynamic value;
   final int index;
   final BeforeSelectedSubActionCallback beforeSelectedSubAction;
+
+  factory SubActionsWidget.ofUiContext(
+      UiContext uiContext, SpongeService spongeService) {
+    var controller = SubActionsController.ofUiContext(uiContext, spongeService);
+
+    if (uiContext.enabled && controller.hasSubActions(uiContext.value)) {
+      return SubActionsWidget(
+        controller: controller,
+        value: uiContext.value,
+        beforeSelectedSubAction: (ActionData subActionData,
+            SubActionType subActionType, dynamic contextValue) async {
+          if (subActionData.needsRunConfirmation) {
+            if (!(await showConfirmationDialog(uiContext.context,
+                'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+      );
+    } else {
+      return null;
+    }
+  }
 
   @override
   _SubActionsWidgetState createState() => _SubActionsWidgetState();
@@ -162,6 +189,41 @@ class SubActionsController extends BaseActionsController {
   final AsyncCallback onBeforeInstantCall;
   final AfterSubActionCallCallback onAfterCall;
   final bool propagateContextActions;
+
+  factory SubActionsController.ofUiContext(
+      UiContext uiContext, SpongeService spongeService) {
+    var recordType = uiContext.qualifiedType.type as RecordType;
+
+    return SubActionsController(
+      spongeService: spongeService,
+      parentFeatures: uiContext.features,
+      elementType: recordType,
+      onBeforeInstantCall: () async {
+        await uiContext.callbacks.onBeforeSubActionCall();
+      },
+      onAfterCall: (subActionSpec, state, index) async {
+        // Handle sub-action result substitution.
+        if (subActionSpec.resultSubstitution != null &&
+            state is ActionCallStateEnded &&
+            state.resultInfo != null &&
+            state.resultInfo.isSuccess) {
+          var parentType = subActionSpec.resultSubstitution ==
+                  DataTypeUtils.THIS
+              ? uiContext.qualifiedType
+              : uiContext.qualifiedType.createChild(
+                  recordType.getFieldType(subActionSpec.resultSubstitution));
+
+          var value = state.resultInfo.result;
+          if (subActionSpec.resultSubstitution != DataTypeUtils.THIS ||
+              !DataTypeUtils.isNull(value)) {
+            uiContext.callbacks.onSave(parentType, value);
+          }
+        }
+
+        await uiContext.callbacks.onAfterSubActionCall(state);
+      },
+    );
+  }
 
   bool hasSubActions(dynamic element) =>
       isReadEnabled(element) ||

@@ -25,6 +25,7 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.d
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit_widgets.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -89,13 +90,19 @@ class _ActionCallPageState extends State<ActionCallPage>
     // _typeGuiProvidersCache ??= List.generate(_presenter.argTypes?.length ?? 0,
     //     (index) => service.getTypeGuiProvider(_presenter.argTypes[index].type));
 
+    var subActionsWidget = _resolveSubActionsWidget(context);
+
     return WillPopScope(
       child: SwipeDetector(
         onSwipe: service.settings.actionSwipeToClose
             ? (context) => _onCancel(context)
             : null,
         child: Scaffold(
-          appBar: AppBar(title: Text('${_presenter.actionLabel}')),
+          appBar: AppBar(
+            title: Text('${_presenter.actionLabel}'),
+            actions:
+                subActionsWidget != null ? <Widget>[subActionsWidget] : null,
+          ),
           body: SafeArea(
             child: ModalProgressHUD(
               child: _buildIsActiveWidget(context),
@@ -254,22 +261,26 @@ class _ActionCallPageState extends State<ActionCallPage>
   Widget _buildActionArgumentsWidget(
       BuildContext context, ProvideActionArgsState state) {
     var argWidget = OptionalScrollContainer(
-      child: _mainArgsGuiProvider.createEditor(
-        TypeEditorContext(
-          '${_presenter.connectionName}-${widget.actionData.actionMeta.name}-args',
-          context,
-          _presenter,
-          QualifiedDataType(null, _mainArgsGuiProvider.type),
-          _presenter.actionData.argsAsRecord,
-          readOnly: widget.readOnly,
-          enabled: true,
-          loading: state.loading,
-        ),
-      ),
+      child: _mainArgsGuiProvider
+          .createEditor(_createEditorContext(context, state: state)),
       scrollable: _presenter.isScrollable(),
     );
 
     return _presenter.isScrollable() ? argWidget : Expanded(child: argWidget);
+  }
+
+  TypeEditorContext _createEditorContext(BuildContext context,
+      {ProvideActionArgsState state}) {
+    return TypeEditorContext(
+      '${_presenter.connectionName}-${widget.actionData.actionMeta.name}-args',
+      context,
+      _presenter,
+      QualifiedDataType(null, _mainArgsGuiProvider.type),
+      _presenter.actionData.argsAsRecord,
+      readOnly: widget.readOnly,
+      enabled: true,
+      loading: state != null ? state.loading : [],
+    );
   }
 
   void _onCancel(BuildContext context) {
@@ -394,6 +405,13 @@ class _ActionCallPageState extends State<ActionCallPage>
         _presenter.busy = false;
       });
     }
+  }
+
+  Widget _resolveSubActionsWidget(BuildContext context) {
+    return SubActionsWidget.ofUiContext(
+      _createEditorContext(context),
+      _presenter.service.spongeService,
+    );
   }
 }
 

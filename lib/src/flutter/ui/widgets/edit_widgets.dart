@@ -82,7 +82,6 @@ class RecordTypeWidget extends StatefulWidget {
 
 class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   Map<String, UnitTypeGuiProvider> _typeGuiProviders;
-  SubActionsController _contextActionsController;
   bool _isExpanded;
 
   bool get isRecordReadOnly =>
@@ -90,10 +89,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
           (widget.uiContext as TypeEditorContext).readOnly) ||
       (widget.uiContext.qualifiedType.type.provided?.readOnly ?? false);
 
-  bool get isRecordEnabled =>
-      widget.uiContext is TypeEditorContext &&
-          (widget.uiContext as TypeEditorContext).enabled ||
-      !(widget.uiContext is TypeEditorContext);
+  bool get isRecordEnabled => widget.uiContext.enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -206,53 +202,27 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     List<Widget> widgets = [];
 
-    _contextActionsController = SubActionsController(
-      spongeService: service.spongeService,
-      parentFeatures: widget.uiContext.features,
-      elementType: recordType,
-      onBeforeInstantCall: () async {
-        await widget.uiContext.callbacks.onBeforeSubActionCall();
-      },
-      onAfterCall: (subActionSpec, state, index) async {
-        // Handle sub-action result substitution.
-        if (subActionSpec.resultSubstitution != null &&
-            state is ActionCallStateEnded &&
-            state.resultInfo != null &&
-            state.resultInfo.isSuccess) {
-          var parentType = subActionSpec.resultSubstitution ==
-                  DataTypeUtils.THIS
-              ? widget.uiContext.qualifiedType
-              : widget.uiContext.qualifiedType.createChild(
-                  recordType.getFieldType(subActionSpec.resultSubstitution));
+    // Show context actions only for normal records (i.e. not for a logical record
+    // that represents the action args).
+    if (!widget.uiContext.qualifiedType.isRoot) {
+      var subActionsWidget = SubActionsWidget.ofUiContext(
+        widget.uiContext,
+        service.spongeService,
+      );
 
-          var value = state.resultInfo.result;
-          if (subActionSpec.resultSubstitution != DataTypeUtils.THIS ||
-              !DataTypeUtils.isNull(value)) {
-            _onSave(parentType, value);
-          }
-        }
-
-        await widget.uiContext.callbacks.onAfterSubActionCall(state);
-      },
-    );
-
-    if (isRecordEnabled &&
-        _contextActionsController.hasSubActions(widget.uiContext.value)) {
-      widgets.add(Align(
-        child: Container(
-          child: SubActionsWidget(
-            controller: _contextActionsController,
-            value: widget.uiContext.value,
-            beforeSelectedSubAction: _beforeContextAction,
+      if (subActionsWidget != null) {
+        widgets.add(Align(
+          child: Container(
+            child: subActionsWidget,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).dividerColor,
+            ),
+            margin: EdgeInsets.only(right: 5),
           ),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).dividerColor,
-          ),
-          margin: EdgeInsets.only(right: 5),
-        ),
-        alignment: Alignment.centerRight,
-      ));
+          alignment: Alignment.centerRight,
+        ));
+      }
     }
 
     var groups = _createFieldGroups(recordType);
@@ -265,18 +235,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     });
 
     return widgets;
-  }
-
-  Future<bool> _beforeContextAction(ActionData subActionData,
-      SubActionType subActionType, dynamic contextValue) async {
-    if (subActionData.needsRunConfirmation) {
-      if (!(await showConfirmationDialog(context,
-          'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   List<List<DataType>> _createFieldGroups(RecordType recordType) {

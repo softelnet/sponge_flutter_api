@@ -147,7 +147,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
 
   @override
   void setupContext(UiContext uiContext) =>
-      TypeGuiProviderUtils.setupContext(this, uiContext);
+      UiContext.setupContext(uiContext);
 }
 
 class AnyTypeGuiProvider extends BaseUnitTypeGuiProvider<AnyType> {
