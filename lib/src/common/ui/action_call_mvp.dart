@@ -549,7 +549,7 @@ class ActionCallPresenter
   }
 
   bool isScrollable() {
-    return !actionMeta.args.any((arg) => hasListTypeScroll(arg));
+    return !actionMeta.args.any((arg) => hasListTypeScroll(arg) || hasListTypeGeoMap(arg));
   }
 
   Future<bool> isActionActive() async {

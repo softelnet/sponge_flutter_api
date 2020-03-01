@@ -47,27 +47,39 @@ DataType getActionArgByIntent(ActionMeta actionMeta, String intentValue) =>
             arg.name == intentValue,
         orElse: () => null);
 
-bool hasListTypeScroll(DataType type, {bool recursively = false}) {
-  var check = (DataType t) =>
+bool hasType(DataType type, bool Function(DataType) predicate,
+    {bool recursively = false}) {
+  if (recursively) {
+    bool result = false;
+
+    DataTypeUtils.traverseDataType(QualifiedDataType(null, type),
+        (QualifiedDataType qType) {
+      if (predicate(qType.type)) {
+        result = true;
+      }
+    }, namedOnly: false, traverseCollections: true);
+
+    return result;
+  } else {
+    return predicate(type);
+  }
+}
+
+bool hasListTypeScroll(DataType type) {
+  var predicate = (DataType t) =>
       t is ListType &&
       (Features.getOptional(t.features, Features.SCROLL, () => false) ||
           Features.getOptional(
               t.features, Features.PROVIDE_VALUE_PAGEABLE, () => false));
+  return hasType(type, predicate);
+}
 
-  if (recursively) {
-    bool hasScroll = false;
-
-    DataTypeUtils.traverseDataType(QualifiedDataType(null, type),
-        (QualifiedDataType qType) {
-      if (check(qType.type)) {
-        hasScroll = true;
-      }
-    }, namedOnly: false, traverseCollections: true);
-
-    return hasScroll;
-  } else {
-    return check(type);
-  }
+bool hasListTypeGeoMap(DataType type) {
+  var predicate = (DataType t) =>
+      t is ListType &&
+      Features.getOptional<Map>(t.features, Features.GEO_MAP, () => null) !=
+          null;
+  return hasType(type, predicate);
 }
 
 PageRoute<T> createPageRoute<T>(
@@ -154,7 +166,9 @@ class IconTextPopupMenuItemWidget extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           child: Icon(
             icon,
-            color: (isOn ?? true) ? getSecondaryColor(context) : getThemedBackgroundColor(context),
+            color: (isOn ?? true)
+                ? getSecondaryColor(context)
+                : getThemedBackgroundColor(context),
           ),
         ),
         Expanded(
