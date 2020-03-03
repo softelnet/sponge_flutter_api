@@ -131,8 +131,12 @@ class _ConnectionsPageState extends State<ConnectionsPage>
             child: Text(connection.name),
             onTap: () => _onConnectionTap(connection),
           ),
-          subtitle:
-              connection.network != null ? Text(connection.network) : null,
+          subtitle: connection.network != null
+              ? InkResponse(
+                  child: Text(connection.network),
+                  onTap: () => _onConnectionTap(connection),
+                )
+              : null,
           selected: active,
         ),
       ),

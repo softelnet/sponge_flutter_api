@@ -286,11 +286,11 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
           context, 'Information', Text('The connection is OK.'));
     } else {
       await showModalDialog(
-          context,
-          'Warning',
-          Text(
-              'The connection is OK but the Sponge server version $version doesn\'t match '
-              'the supported major.minor version ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.'));
+        context,
+        'Warning',
+        Text("The Sponge server version $version is incompatible "
+            "with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*"),
+      );
     }
   }
 }

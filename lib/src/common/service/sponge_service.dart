@@ -74,6 +74,14 @@ class SpongeService<AD extends ActionData> {
     );
 
     Map<String, dynamic> features = await _client.getFeatures();
+    String version =
+        features[SpongeClientConstants.REMOTE_API_FEATURE_VERSION] ?? null;
+    if (version == null || !SpongeUtils.isServerVersionCompatible(version)) {
+      throw SpongeException(
+          "The Sponge server version $version is incompatible "
+          "with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*");
+    }
+
     if (features[SpongeClientConstants.REMOTE_API_FEATURE_GRPC_ENABLED] ??
         false) {
       _grpcClient = createSpongeGrpcClient(_client, _connection);
