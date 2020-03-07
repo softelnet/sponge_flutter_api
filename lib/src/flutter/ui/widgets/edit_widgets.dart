@@ -116,6 +116,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     var label = widget.uiContext.getDecorationLabel();
 
+    var margin = EdgeInsets.only(bottom: 5);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -151,18 +153,33 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
           ),
         if (_isExpanded)
           OptionalExpanded(
-            child: Card(
-              margin: EdgeInsets.only(bottom: 5),
-              elevation: 1,
-              shape: BeveledRectangleBorder(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: _buildFieldsWidgets(context),
-              ),
-              color: Theme.of(widget.uiContext.context).scaffoldBackgroundColor,
-              //shape: StadiumBorder(side: BorderSide(width: 2.0)),
-              //margin: EdgeInsets.all(5),
-            ),
+            child: widget.uiContext.qualifiedType.isRoot
+                ? Container(
+                    margin: margin,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _buildFieldsWidgets(context),
+                    ),
+                  )
+                : Card(
+                    margin: margin,
+                    elevation: 0,
+                    //shape: BeveledRectangleBorder(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _buildFieldsWidgets(context),
+                    ),
+                    color: Theme.of(widget.uiContext.context)
+                        .scaffoldBackgroundColor,
+                    shape: ContinuousRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        color: Theme.of(widget.uiContext.context)
+                            .dividerColor
+                            .withAlpha(8),
+                      ),
+                    ),
+                  ),
           ),
       ],
     );
@@ -230,7 +247,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
       widgets.add(_buildFieldGroupWidget(context, group));
 
       if (i < groups.length - 1) {
-        widgets.add(Divider());
+        widgets.add(Divider(
+          height: 10,
+        ));
       }
     });
 
