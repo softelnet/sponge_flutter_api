@@ -146,8 +146,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
       throw Exception('Unsupported conversion from String to ${type.kind}');
 
   @override
-  void setupContext(UiContext uiContext) =>
-      UiContext.setupContext(uiContext);
+  void setupContext(UiContext uiContext) => UiContext.setupContext(uiContext);
 }
 
 class AnyTypeGuiProvider extends BaseUnitTypeGuiProvider<AnyType> {

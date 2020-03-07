@@ -50,7 +50,14 @@ class _DrawingPageState extends State<DrawingPage> {
     return WillPopScope(
       child: Scaffold(
         appBar: MediaQuery.of(context).orientation == Orientation.portrait
-            ? AppBar(title: Text('Draw: ${widget.name ?? ''}'))
+            ? AppBar(
+                title: widget.name != null
+                    ? Tooltip(
+                        message: widget.name,
+                        child: Text('Draw: ${widget.name}'),
+                      )
+                    : Text('Drawing'),
+              )
             : null,
         body: SafeArea(
           child: Center(

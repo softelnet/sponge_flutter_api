@@ -99,7 +99,10 @@ class _ActionCallPageState extends State<ActionCallPage>
             : null,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('${_presenter.actionLabel}'),
+            title: Tooltip(
+              message: _presenter.actionLabel,
+              child: Text('${_presenter.actionLabel}'),
+            ),
             actions:
                 subActionsWidget != null ? <Widget>[subActionsWidget] : null,
           ),
