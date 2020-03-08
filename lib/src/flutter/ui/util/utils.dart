@@ -356,3 +356,26 @@ String normalizeString(String value) {
 
   return value;
 }
+
+IconData getPopupMenuIconData(BuildContext context) {
+  var platform = Theme.of(context).platform;
+
+  assert(platform != null);
+  switch (platform) {
+    case TargetPlatform.android:
+    case TargetPlatform.fuchsia:
+      return Icons.more_vert;
+    case TargetPlatform.iOS:
+    case TargetPlatform.macOS:
+      return Icons.more_horiz;
+      break;
+    default:
+      return Icons.more_vert;
+  }
+}
+
+Icon getPopupMenuIcon(BuildContext context) {
+  var iconData = getPopupMenuIconData(context);
+
+  return iconData != null ? Icon(iconData) : null;
+}
