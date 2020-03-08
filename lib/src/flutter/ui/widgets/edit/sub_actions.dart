@@ -24,6 +24,9 @@ class SubActionsWidget extends StatefulWidget {
     @required this.value,
     @required this.beforeSelectedSubAction,
     this.index,
+    this.menuIcon,
+    this.menuWidget,
+    this.tooltip,
   }) : super(key: key);
 
   final SubActionsController controller;
@@ -31,9 +34,18 @@ class SubActionsWidget extends StatefulWidget {
   final int index;
   final BeforeSelectedSubActionCallback beforeSelectedSubAction;
 
-  factory SubActionsWidget.ofUiContext(
-      UiContext uiContext, SpongeService spongeService) {
-    var controller = SubActionsController.ofUiContext(uiContext, spongeService);
+  final Widget menuIcon;
+  final Widget menuWidget;
+  final String tooltip;
+
+  factory SubActionsWidget.forRecord(
+    UiContext uiContext,
+    SpongeService spongeService, {
+    Widget menuIcon,
+    Widget menuWidget,
+    String tooltip,
+  }) {
+    var controller = SubActionsController.forRecord(uiContext, spongeService);
 
     if (uiContext.enabled && controller.hasSubActions(uiContext.value)) {
       return SubActionsWidget(
@@ -50,10 +62,55 @@ class SubActionsWidget extends StatefulWidget {
 
           return true;
         },
+        menuIcon: menuIcon,
+        menuWidget: menuWidget,
+        tooltip: tooltip,
       );
     } else {
       return null;
     }
+  }
+
+  factory SubActionsWidget.forListElement(
+    UiContext uiContext,
+    SpongeService spongeService, {
+    @required SubActionsController controller,
+    @required dynamic element,
+    @required int index,
+    Widget menuIcon,
+    Widget menuWidget,
+    String tooltip,
+  }) {
+    return SubActionsWidget(
+      key: Key('sub-actions'),
+      controller: controller,
+      value: element,
+      index: index,
+      beforeSelectedSubAction: (ActionData subActionData,
+          SubActionType subActionType, dynamic contextValue) async {
+        if (subActionData.needsRunConfirmation) {
+          String contextValueLabel =
+              contextValue is AnnotatedValue ? contextValue.valueLabel : null;
+          var confirmationQuestion;
+          if (subActionType == SubActionType.delete) {
+            confirmationQuestion =
+                'Do you want to remove ${contextValueLabel ?? " the element"}?';
+          } else {
+            confirmationQuestion =
+                'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?';
+          }
+          if (!(await showConfirmationDialog(
+              uiContext.context, confirmationQuestion))) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+      menuIcon: menuIcon,
+      menuWidget: menuWidget,
+      tooltip: tooltip,
+    );
   }
 
   @override
@@ -73,6 +130,9 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
         itemBuilder: (BuildContext context) =>
             _buildSubActionsMenuItems(context),
         onSelected: _onSelectedSubAction,
+        icon: widget.menuIcon,
+        child: widget.menuWidget,
+        tooltip: widget.tooltip,
       ),
     );
   }
@@ -190,7 +250,7 @@ class SubActionsController extends BaseActionsController {
   final AfterSubActionCallCallback onAfterCall;
   final bool propagateContextActions;
 
-  factory SubActionsController.ofUiContext(
+  factory SubActionsController.forRecord(
       UiContext uiContext, SpongeService spongeService) {
     var recordType = uiContext.qualifiedType.type as RecordType;
 
@@ -223,6 +283,41 @@ class SubActionsController extends BaseActionsController {
         await uiContext.callbacks.onAfterSubActionCall(state);
       },
     );
+  }
+
+  factory SubActionsController.forList(
+      UiContext uiContext, SpongeService spongeService) {
+    var elementType = (uiContext.qualifiedType.type as ListType).elementType;
+
+    return SubActionsController(
+        spongeService: spongeService,
+        parentFeatures: uiContext.features,
+        elementType: elementType,
+        onBeforeInstantCall: () async {
+          await uiContext.callbacks.onBeforeSubActionCall();
+        },
+        onAfterCall: (subActionSpec, state, index) async {
+          if (subActionSpec.resultSubstitution != null &&
+              state is ActionCallStateEnded &&
+              state.resultInfo != null &&
+              state.resultInfo.isSuccess) {
+            Validate.isTrue(
+                subActionSpec.resultSubstitution == DataTypeUtils.THIS,
+                'Only result substitution to \'this\' is supported for a list element');
+            Validate.notNull(index, 'The list element index cannot be null');
+
+            var value = state.resultInfo.result;
+            if (!DataTypeUtils.isNull(value)) {
+              // TODO This logic shouldn't be in a view.
+              (uiContext.value as List)[index] = value;
+              // Save all list.
+              uiContext.callbacks
+                  .onSave(uiContext.qualifiedType, uiContext.value);
+            }
+          }
+
+          await uiContext.callbacks.onAfterSubActionCall(state);
+        });
   }
 
   bool hasSubActions(dynamic element) =>

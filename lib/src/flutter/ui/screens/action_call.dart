@@ -411,7 +411,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   Widget _resolveSubActionsWidget(BuildContext context) {
-    return SubActionsWidget.ofUiContext(
+    return SubActionsWidget.forRecord(
       _createEditorContext(context),
       _presenter.service.spongeService,
     );
