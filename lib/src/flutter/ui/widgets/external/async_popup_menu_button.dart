@@ -24,6 +24,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 typedef AsyncPopupMenuItemBuilder<T> = FutureOr<List<PopupMenuEntry<T>>>
     Function(BuildContext context);
@@ -189,20 +190,6 @@ class _AsyncPopupMenuButton<T> extends State<AsyncPopupMenuButton<T>> {
     }
   }
 
-  Icon _getIcon(TargetPlatform platform) {
-    assert(platform != null);
-    switch (platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        return const Icon(Icons.more_vert);
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        return const Icon(Icons.more_horiz);
-        break;
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterialLocalizations(context));
@@ -220,7 +207,7 @@ class _AsyncPopupMenuButton<T> extends State<AsyncPopupMenuButton<T>> {
     }
 
     return IconButton(
-      icon: widget.icon ?? _getIcon(Theme.of(context).platform),
+      icon: widget.icon ?? getPopupMenuIcon(context),
       padding: widget.padding,
       tooltip:
           widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
