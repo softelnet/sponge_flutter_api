@@ -101,6 +101,7 @@ class _PainterState extends State<Painter> {
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
+          onTapUp: _onTapUp,
         ),
       );
     } else {
@@ -126,6 +127,20 @@ class _PainterState extends State<Painter> {
       width: double.infinity,
       height: double.infinity,
     );
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    Offset pos = (context.findRenderObject() as RenderBox)
+        .globalToLocal(details.globalPosition);
+    widget.painterController._pathHistory.add(pos);
+    widget.painterController._pathHistory.updateCurrent(pos);
+
+    widget.painterController._pathHistory.endCurrent();
+    widget.painterController._notifyListeners();
+
+    if (widget.onStrokeEnd != null) {
+      widget.onStrokeEnd();
+    }
   }
 
   void _onPanStart(DragStartDetails start) {
