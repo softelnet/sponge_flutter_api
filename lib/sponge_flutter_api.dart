@@ -36,6 +36,7 @@ export 'src/flutter/configuration/preferences_configuration.dart';
 export 'src/flutter/flutter_model.dart';
 export 'src/flutter/routes.dart';
 export 'src/flutter/service/flutter_application_service.dart';
+export 'src/flutter/service/flutter_application_settings.dart';
 export 'src/flutter/ui/screens/action_call.dart';
 export 'src/flutter/ui/screens/action_list_item.dart';
 export 'src/flutter/ui/screens/action_result.dart';

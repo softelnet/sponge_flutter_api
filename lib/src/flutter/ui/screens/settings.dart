@@ -15,7 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
-import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -328,6 +328,47 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                   _buildGroup(
+                    name: 'map',
+                    title: 'Map',
+                    initiallyExpanded: false,
+                    children: [
+                      ListTile(
+                        title: Text('Cluster data markers'),
+                        trailing: Switch(
+                            value: settings.mapEnableClusterMarkers,
+                            onChanged: (value) =>
+                                _toggleMapEnableClusterMarkers()),
+                        onTap: () => _toggleMapEnableClusterMarkers(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Show current location'),
+                        trailing: Switch(
+                            value: settings.mapEnableCurrentLocation,
+                            onChanged: (value) =>
+                                _toggleMapEnableCurrentLocation()),
+                        onTap: () => _toggleMapEnableCurrentLocation(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Follow current location'),
+                        trailing: Switch(
+                            value: settings.mapFollowCurrentLocation,
+                            onChanged: (value) =>
+                                _toggleMapFollowCurrentLocation()),
+                        onTap: () => _toggleMapFollowCurrentLocation(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
+                        title: Text('Full screen'),
+                        trailing: Switch(
+                            value: settings.mapFullScreen,
+                            onChanged: (value) => _toggleMapFullScreen()),
+                        onTap: () => _toggleMapFullScreen(),
+                      ),
+                    ],
+                  ),
+                  _buildGroup(
                     name: 'connections',
                     title: 'Connections',
                     initiallyExpanded: false,
@@ -455,6 +496,29 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _toggleShowNewEventNotification() async {
     await settings
         .setShowNewEventNotification(!settings.showNewEventNotification);
+    setState(() {});
+  }
+
+  Future<void> _toggleMapEnableClusterMarkers() async {
+    await settings
+        .setMapEnableClusterMarkers(!settings.mapEnableClusterMarkers);
+    setState(() {});
+  }
+
+  Future<void> _toggleMapEnableCurrentLocation() async {
+    await settings
+        .setMapEnableCurrentLocation(!settings.mapEnableCurrentLocation);
+    setState(() {});
+  }
+
+  Future<void> _toggleMapFollowCurrentLocation() async {
+    await settings
+        .setMapFollowCurrentLocation(!settings.mapFollowCurrentLocation);
+    setState(() {});
+  }
+
+  Future<void> _toggleMapFullScreen() async {
+    await settings.setMapFullScreen(!settings.mapFullScreen);
     setState(() {});
   }
 

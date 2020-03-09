@@ -39,13 +39,13 @@ abstract class ApplicationSettings {
   Future<void> clear();
 }
 
-abstract class ApplicationService<S extends SpongeService> {
+abstract class ApplicationService<S extends SpongeService, T extends ApplicationSettings> {
   static final Logger _logger = Logger('ApplicationService');
 
   ConnectionsConfiguration _connectionsConfiguration;
   S _spongeService;
   TypeConverter _typeConverter;
-  ApplicationSettings settings;
+  T settings;
 
   final connectionBloc = ForwardingBloc<SpongeConnectionState>(
       initialValue: SpongeConnectionStateNotConnected());
