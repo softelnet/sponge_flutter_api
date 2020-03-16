@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
 abstract class UiContextCallbacks {
@@ -33,6 +34,10 @@ abstract class UiContextCallbacks {
   PageableList getPageableList(QualifiedDataType qType);
   Future<void> fetchPageableListPage(QualifiedDataType qType);
   String getKey(String code);
+
+  void setAdditionalData(
+      QualifiedDataType qType, String additionalDataKey, dynamic value);
+  dynamic getAdditionalData(QualifiedDataType qType, String additionalDataKey);
 }
 
 class NoOpUiContextCallbacks implements UiContextCallbacks {
@@ -74,6 +79,15 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
 
   @override
   String getKey(String code) => null;
+
+  @override
+  dynamic getAdditionalData(
+          QualifiedDataType qType, String additionalDataKey) =>
+      null;
+
+  @override
+  void setAdditionalData(
+      QualifiedDataType qType, String additionalDataKey, value) {}
 }
 
 typedef String TypeEditorValidatorCallback(String value);
@@ -124,8 +138,11 @@ abstract class UiContext {
 
   bool _isSetUp = false;
 
-  TypeGuiProvider get typeGuiProvider =>
-      ApplicationProvider.of(context).service.typeGuiProvider;
+  // TODO Use this.
+  FlutterApplicationService get service =>
+      ApplicationProvider.of(context).service;
+
+  TypeGuiProvider get typeGuiProvider => service.typeGuiProvider;
 
   String get safeTypeLabel => typeLabel ?? qualifiedType.type.name;
 

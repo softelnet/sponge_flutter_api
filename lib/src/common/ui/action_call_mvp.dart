@@ -16,6 +16,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -549,7 +550,8 @@ class ActionCallPresenter
   }
 
   bool isScrollable() {
-    return !actionMeta.args.any((arg) => hasListTypeScroll(arg) || hasListTypeGeoMap(arg));
+    return !actionMeta.args
+        .any((arg) => hasListTypeScroll(arg) || hasListTypeGeoMap(arg));
   }
 
   Future<bool> isActionActive() async {
@@ -665,5 +667,18 @@ class ActionCallPresenter
       _logger.severe('getKey error for \'$code\'', e);
       return null;
     }
+  }
+
+  @override
+  dynamic getAdditionalData(
+          QualifiedDataType qType, String additionalDataKey) =>
+      (actionData as FlutterActionData)
+          .getAdditionalArgData(qType.path, additionalDataKey);
+
+  @override
+  void setAdditionalData(
+      QualifiedDataType qType, String additionalDataKey, dynamic value) {
+    (actionData as FlutterActionData)
+        .setAdditionalArgData(qType.path, additionalDataKey, value);
   }
 }
