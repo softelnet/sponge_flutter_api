@@ -143,6 +143,8 @@ Color getContrastColor(Color color) {
 
 Color getPrimaryColor(BuildContext context) => Theme.of(context).accentColor;
 
+Color getPrimaryDarkerColor(BuildContext context) => Theme.of(context).colorScheme.primary;
+
 Color getIconColor(BuildContext context) =>
     Theme.of(context).accentColor.withAlpha(200);
 
