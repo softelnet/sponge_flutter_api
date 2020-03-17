@@ -342,6 +342,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildDivider(),
                       ListTile(
+                        title: Text('Show marker badges'),
+                        trailing: Switch(
+                            value: settings.mapEnableMarkerBadges,
+                            onChanged: (value) =>
+                                _toggleMapEnableMarkerBadges()),
+                        onTap: () => _toggleMapEnableMarkerBadges(),
+                      ),
+                      _buildDivider(),
+                      ListTile(
                         title: Text('Show current location'),
                         trailing: Switch(
                             value: settings.mapEnableCurrentLocation,
@@ -502,6 +511,11 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _toggleMapEnableClusterMarkers() async {
     await settings
         .setMapEnableClusterMarkers(!settings.mapEnableClusterMarkers);
+    setState(() {});
+  }
+
+  Future<void> _toggleMapEnableMarkerBadges() async {
+    await settings.setMapEnableMarkerBadges(!settings.mapEnableMarkerBadges);
     setState(() {});
   }
 

@@ -58,6 +58,8 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   static const String PREF_MAP_ENABLE_CLUSTER_MARKERS =
       '$_PREF_PREFIX.mapEnableClusterMarkers';
+  static const String PREF_MAP_ENABLE_MARKER_BADGES =
+      '$_PREF_PREFIX.mapEnableMarkerBadges';
   static const String PREF_MAP_ENABLE_CURRENT_LOCATION =
       '$_PREF_PREFIX.mapEnableCurrentLocation';
   static const String PREF_MAP_FOLLOW_CURRENT_LOCATION =
@@ -220,6 +222,12 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   Future<bool> setMapEnableClusterMarkers(bool value) async =>
       await _prefs.setBool(PREF_MAP_ENABLE_CLUSTER_MARKERS, value);
+
+  bool get mapEnableMarkerBadges =>
+      _prefs.getBool(PREF_MAP_ENABLE_MARKER_BADGES) ?? false;
+
+  Future<bool> setMapEnableMarkerBadges(bool value) async =>
+      await _prefs.setBool(PREF_MAP_ENABLE_MARKER_BADGES, value);
 
   bool get mapEnableCurrentLocation =>
       _prefs.getBool(PREF_MAP_ENABLE_CURRENT_LOCATION) ?? true;
