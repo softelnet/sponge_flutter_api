@@ -26,6 +26,7 @@ class SubActionsWidget extends StatefulWidget {
     this.index,
     this.menuIcon,
     this.menuWidget,
+    this.header,
     this.tooltip,
   }) : super(key: key);
 
@@ -36,6 +37,7 @@ class SubActionsWidget extends StatefulWidget {
 
   final Widget menuIcon;
   final Widget menuWidget;
+  final Widget header;
   final String tooltip;
 
   factory SubActionsWidget.forRecord(
@@ -43,6 +45,7 @@ class SubActionsWidget extends StatefulWidget {
     SpongeService spongeService, {
     Widget menuIcon,
     Widget menuWidget,
+    Widget header,
     String tooltip,
   }) {
     var controller = SubActionsController.forRecord(uiContext, spongeService);
@@ -64,6 +67,7 @@ class SubActionsWidget extends StatefulWidget {
         },
         menuIcon: menuIcon,
         menuWidget: menuWidget,
+        header: header,
         tooltip: tooltip,
       );
     } else {
@@ -79,6 +83,7 @@ class SubActionsWidget extends StatefulWidget {
     @required int index,
     Widget menuIcon,
     Widget menuWidget,
+    Widget header,
     String tooltip,
   }) {
     return SubActionsWidget(
@@ -109,6 +114,7 @@ class SubActionsWidget extends StatefulWidget {
       },
       menuIcon: menuIcon,
       menuWidget: menuWidget,
+      header: header,
       tooltip: tooltip,
     );
   }
@@ -162,11 +168,21 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       BuildContext context) async {
     List<SubActionRuntimeSpec> runtimeSpecs =
         await widget.controller.getSubActionsRuntimeSpecs(widget.value);
-    return runtimeSpecs
+    var items = runtimeSpecs
         .map((runtimeSpec) => runtimeSpec != null
             ? _createSubActionMenuItem(context, runtimeSpec)
             : PopupMenuDivider())
         .toList();
+    if (widget.header != null) {
+      items.insert(
+          0,
+          PopupMenuItem<SubActionSpec>(
+            child: widget.header,
+            enabled: false,
+          ));
+    }
+
+    return items;
   }
 
   PopupMenuEntry<SubActionSpec> _createSubActionMenuItem(
