@@ -21,14 +21,12 @@ import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -91,10 +89,22 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
   bool get isRecordEnabled => widget.uiContext.enabled;
 
+  bool _hasRootRecordSingleLeadingField() {
+    var thisLeadingFieldPath = DataTypeGuiUtils.getRootRecordSingleLeadingFieldPath(
+        widget.uiContext.qualifiedType, widget.uiContext.value as Map);
+
+    return widget.uiContext.rootRecordSingleLeadingField != null &&
+        widget.uiContext.rootRecordSingleLeadingField == thisLeadingFieldPath;
+  }
+
   @override
   Widget build(BuildContext context) {
     try {
-      return _build(context);
+      if (_hasRootRecordSingleLeadingField()) {
+        return _buildFieldsWidgets(context)[0];
+      } else {
+        return _build(context);
+      }
     } catch (e) {
       return Center(
         child: NotificationPanelWidget(
@@ -305,7 +315,10 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     }
 
     groupWidget = Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
+      padding: widget.uiContext.rootRecordSingleLeadingField != null &&
+              widget.uiContext.qualifiedType.isRoot
+          ? const EdgeInsets.all(0)
+          : const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
       child: Align(
         child: groupWidget,
         alignment: Alignment.centerLeft,
@@ -314,7 +327,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     return
         // Expanded only if any in a group field shoud have a scroll.
-        fieldGroup.any((fieldType) => hasListTypeScroll(fieldType))
+        fieldGroup.any((fieldType) => DataTypeGuiUtils.hasListTypeScroll(fieldType))
             ? OptionalExpanded(child: groupWidget)
             : groupWidget;
   }
@@ -327,36 +340,46 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     widget.uiContext.callbacks.onUpdate(qType, value);
   }
 
+  TypeEditorContext _createEditorContext(
+      QualifiedDataType qFieldType, Map record) {
+    var qRecordType = widget.uiContext.qualifiedType;
+
+    Validate.notNull(
+        record, 'The record ${qRecordType.type.name} must not be null');
+    var fieldValue = record[qFieldType.type.name];
+    var onSave = (value) => setState(() {
+          _onSave(qFieldType, value);
+        });
+    var onUpdate = (value) => setState(() {
+          _onUpdate(qFieldType, value);
+        });
+
+    // TODO Move to TypeEditorContext.
+    return TypeEditorContext(
+      widget.uiContext.name,
+      context,
+      widget.uiContext.callbacks,
+      qFieldType,
+      fieldValue,
+      hintText: qFieldType.type.description,
+      onSave: onSave,
+      onUpdate: onUpdate,
+      readOnly: //widget.editorContext.readOnly || // TODO Rename to enabled
+          !widget.uiContext.callbacks.shouldBeEnabled(qFieldType) ||
+              widget.uiContext is TypeEditorContext &&
+                  !(widget.uiContext as TypeEditorContext).enabled,
+      enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
+          isRecordEnabled, // && ifFieldEnabled,
+      loading: widget.uiContext.loading,
+      rootRecordSingleLeadingField:
+          widget.uiContext.rootRecordSingleLeadingField,
+    );
+  }
+
   Widget _buildFieldWidget(BuildContext context, QualifiedDataType recordType,
       QualifiedDataType qFieldType, Map record) {
     try {
-      Validate.notNull(
-          record, 'The record ${recordType.type.name} must not be null');
-      var fieldValue = record[qFieldType.type.name];
-      var onSave = (value) => setState(() {
-            _onSave(qFieldType, value);
-          });
-      var onUpdate = (value) => setState(() {
-            _onUpdate(qFieldType, value);
-          });
-
-      var editorContext = TypeEditorContext(
-        widget.uiContext.name,
-        context,
-        widget.uiContext.callbacks,
-        qFieldType,
-        fieldValue,
-        hintText: qFieldType.type.description,
-        onSave: onSave,
-        onUpdate: onUpdate,
-        readOnly: //widget.editorContext.readOnly || // TODO Rename to enabled
-            !widget.uiContext.callbacks.shouldBeEnabled(qFieldType) ||
-                widget.uiContext is TypeEditorContext &&
-                    !(widget.uiContext as TypeEditorContext).enabled,
-        enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
-            isRecordEnabled, // && ifFieldEnabled,
-        loading: widget.uiContext.loading,
-      );
+      var editorContext = _createEditorContext(qFieldType, record);
 
       if (qFieldType.type.provided?.hasValueSet ?? false) {
         return AbsorbPointer(
@@ -364,9 +387,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
             editorContext.getDecorationLabel(),
             qFieldType,
             qFieldType.type.provided.valueSet,
-            fieldValue,
+            editorContext.value, // fieldValue,
             widget.uiContext.callbacks.onGetProvidedArg,
-            onSave,
+            editorContext.onSave,
           ),
           absorbing: qFieldType.type.provided.readOnly || !isRecordEnabled,
         );
@@ -931,7 +954,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     const listPadding = EdgeInsets.only(bottom: 5);
 
-    var isListScroll = hasListTypeScroll(widget.uiContext.qualifiedType.type);
+    var isListScroll = DataTypeGuiUtils.hasListTypeScroll(widget.uiContext.qualifiedType.type);
 
     var itemBuilder = (BuildContext context, int index) {
       if (index == data.length) {

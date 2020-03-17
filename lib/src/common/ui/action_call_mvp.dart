@@ -17,6 +17,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
@@ -502,23 +503,13 @@ class ActionCallPresenter
   void validateArgs() => service.spongeService.client
       .validateCallArgs(actionMeta, actionData.args);
 
-  bool get showCall => Features.getOptional(
-      actionMeta.features, Features.ACTION_CALL_SHOW_CALL, () => true);
+  bool get showCall => DataTypeGuiUtils.showCall(actionMeta);
 
-  bool get showRefresh => Features.getOptional(
-      actionMeta.features,
-      Features.ACTION_CALL_SHOW_REFRESH,
-      () => actionMeta.features[Features.ACTION_CALL_REFRESH_LABEL] != null);
+  bool get showRefresh => DataTypeGuiUtils.showRefresh(actionMeta);
 
-  bool get showClear => Features.getOptional(
-      actionMeta.features,
-      Features.ACTION_CALL_SHOW_CLEAR,
-      () => actionMeta.features[Features.ACTION_CALL_CLEAR_LABEL] != null);
+  bool get showClear => DataTypeGuiUtils.showClear(actionMeta);
 
-  bool get showCancel => Features.getOptional(
-      actionMeta.features,
-      Features.ACTION_CALL_SHOW_CANCEL,
-      () => actionMeta.features[Features.ACTION_CALL_CANCEL_LABEL] != null);
+  bool get showCancel => DataTypeGuiUtils.showCancel(actionMeta);
 
   String get callLabel => Features.getOptional(
       actionMeta.features, Features.ACTION_CALL_CALL_LABEL, () => 'RUN');
@@ -551,8 +542,13 @@ class ActionCallPresenter
 
   bool isScrollable() {
     return !actionMeta.args
-        .any((arg) => hasListTypeScroll(arg) || hasListTypeGeoMap(arg));
+        .any((arg) => DataTypeGuiUtils.hasListTypeScroll(arg));
   }
+
+  bool hasRootRecordSingleLeadingField() =>
+      DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(
+          actionData) !=
+      null;
 
   Future<bool> isActionActive() async {
     // Cache the value.
@@ -681,4 +677,7 @@ class ActionCallPresenter
     (actionData as FlutterActionData)
         .setAdditionalArgData(qType.path, additionalDataKey, value);
   }
+
+  @override
+  FlutterApplicationService get service => super.service;
 }

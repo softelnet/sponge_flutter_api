@@ -105,7 +105,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
           '${widget.actionData.actionMeta.name}-result',
           context,
           NoOpUiContextCallbacks(),
-          QualifiedDataType(null, widget.actionData.actionMeta.result),
+          QualifiedDataType(widget.actionData.actionMeta.result),
           result,
           typeLabel: resultLabel,
           markNullable: false,

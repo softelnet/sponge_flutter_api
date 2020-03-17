@@ -426,8 +426,10 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
 
   QualifiedDataType _createTargetQualifiedDataType(UiContext uiContext) =>
       QualifiedDataType(
-          uiContext.qualifiedType.path, (uiContext.value as DynamicValue)?.type,
-          isRoot: uiContext.qualifiedType.isRoot);
+        (uiContext.value as DynamicValue)?.type,
+        path: uiContext.qualifiedType.path,
+        isRoot: uiContext.qualifiedType.isRoot,
+      );
 
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     if (viewerContext.value == null) {
@@ -760,9 +762,11 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
   }
 
   QualifiedDataType _createTargetQualifiedDataType(UiContext uiContext) =>
-      QualifiedDataType(uiContext.qualifiedType.path,
-          (uiContext.qualifiedType.type as ObjectType).companionType,
-          isRoot: uiContext.qualifiedType.isRoot);
+      QualifiedDataType(
+        (uiContext.qualifiedType.type as ObjectType).companionType,
+        path: uiContext.qualifiedType.path,
+        isRoot: uiContext.qualifiedType.isRoot,
+      );
 
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     var objectType = _getObjectType(viewerContext);

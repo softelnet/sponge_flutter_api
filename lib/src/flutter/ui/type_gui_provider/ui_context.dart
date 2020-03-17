@@ -38,6 +38,8 @@ abstract class UiContextCallbacks {
   void setAdditionalData(
       QualifiedDataType qType, String additionalDataKey, dynamic value);
   dynamic getAdditionalData(QualifiedDataType qType, String additionalDataKey);
+
+  FlutterApplicationService get service;
 }
 
 class NoOpUiContextCallbacks implements UiContextCallbacks {
@@ -88,6 +90,8 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
   @override
   void setAdditionalData(
       QualifiedDataType qType, String additionalDataKey, value) {}
+
+  FlutterApplicationService get service => null;
 }
 
 typedef String TypeEditorValidatorCallback(String value);
@@ -108,6 +112,7 @@ abstract class UiContext {
     @required bool showLabel,
     @required List<String> loading,
     @required bool enabled,
+    @required this.rootRecordSingleLeadingField,
   })  : this.features = features != null ? Map.from(features) : {},
         this.markNullable = markNullable ?? true {
     this.typeLabel = typeLabel ?? qualifiedType.type.label;
@@ -135,12 +140,12 @@ abstract class UiContext {
   List<String> loading;
 
   bool enabled;
+  String rootRecordSingleLeadingField;
 
   bool _isSetUp = false;
 
   // TODO Use this.
-  FlutterApplicationService get service =>
-      ApplicationProvider.of(context).service;
+  FlutterApplicationService get service => callbacks.service;
 
   TypeGuiProvider get typeGuiProvider => service.typeGuiProvider;
 
@@ -165,26 +170,23 @@ abstract class UiContext {
 
     var type = uiContext.qualifiedType.type;
 
-    uiContext.features = type.features != null ? Map.from(type.features) : {};
-
     // Applying annotated properties.
     if (type.annotated && uiContext.value is AnnotatedValue) {
       AnnotatedValue annotatedValue = uiContext.value as AnnotatedValue;
-      if (annotatedValue != null) {
-        uiContext.value = annotatedValue.value;
-        uiContext.valueLabel = annotatedValue.valueLabel;
-        uiContext.valueDescription = annotatedValue.valueDescription;
-        uiContext.features.addAll(annotatedValue.features ?? {});
+      uiContext.value = annotatedValue.value;
+      uiContext.valueLabel = annotatedValue.valueLabel;
+      uiContext.valueDescription = annotatedValue.valueDescription;
 
-        if (annotatedValue.typeLabel != null) {
-          uiContext.typeLabel = annotatedValue.typeLabel;
-        }
+      if (annotatedValue.typeLabel != null) {
+        uiContext.typeLabel = annotatedValue.typeLabel;
+      }
 
-        if (annotatedValue.typeDescription != null) {
-          uiContext.typeDescription = annotatedValue.typeDescription;
-        }
+      if (annotatedValue.typeDescription != null) {
+        uiContext.typeDescription = annotatedValue.typeDescription;
       }
     }
+
+    uiContext.features = DataTypeUtils.mergeFeatures(type, uiContext.value);
 
     if (uiContext is TypeEditorContext) {
       uiContext.enabled =
@@ -216,6 +218,7 @@ class TypeEditorContext extends UiContext {
     @required bool enabled,
     bool showLabel,
     @required List<String> loading,
+    String rootRecordSingleLeadingField,
   }) : super(
           name,
           context,
@@ -231,6 +234,7 @@ class TypeEditorContext extends UiContext {
           showLabel: showLabel,
           loading: loading,
           enabled: enabled ?? true,
+          rootRecordSingleLeadingField: rootRecordSingleLeadingField,
         );
 
   String hintText;
@@ -259,6 +263,7 @@ class TypeEditorContext extends UiContext {
         enabled: enabled,
         showLabel: showLabel,
         loading: loading,
+        rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
 
   TypeViewerContext copyAsViewer() => TypeViewerContext(
@@ -275,7 +280,11 @@ class TypeEditorContext extends UiContext {
         markNullable: markNullable,
         showLabel: showLabel,
         loading: loading,
+        rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
+
+  bool get hasRootRecordSingleLeadingField =>
+      rootRecordSingleLeadingField != null;
 }
 
 class TypeViewerContext extends UiContext {
@@ -293,6 +302,7 @@ class TypeViewerContext extends UiContext {
     bool markNullable,
     bool showLabel,
     @required List<String> loading,
+    String rootRecordSingleLeadingField,
   }) : super(
           name,
           context,
@@ -308,6 +318,7 @@ class TypeViewerContext extends UiContext {
           showLabel: showLabel,
           loading: loading,
           enabled: false,
+          rootRecordSingleLeadingField: rootRecordSingleLeadingField,
         );
 
   TypeViewerContext copy() => TypeViewerContext(
@@ -324,6 +335,7 @@ class TypeViewerContext extends UiContext {
         markNullable: markNullable,
         showLabel: showLabel,
         loading: loading,
+        rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
 
   TypeEditorContext copyAsEditor() => TypeEditorContext(
@@ -341,5 +353,6 @@ class TypeViewerContext extends UiContext {
         showLabel: showLabel,
         enabled: true,
         loading: loading,
+        rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
 }

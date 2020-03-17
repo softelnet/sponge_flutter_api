@@ -47,39 +47,93 @@ DataType getActionArgByIntent(ActionMeta actionMeta, String intentValue) =>
             arg.name == intentValue,
         orElse: () => null);
 
-bool hasType(DataType type, bool Function(DataType) predicate,
-    {bool recursively = false}) {
-  if (recursively) {
-    bool result = false;
+class DataTypeGuiUtils {
+  static bool hasType(DataType type, bool Function(DataType) predicate,
+      {bool recursively = false}) {
+    if (recursively) {
+      bool result = false;
 
-    DataTypeUtils.traverseDataType(QualifiedDataType(null, type),
-        (QualifiedDataType qType) {
-      if (predicate(qType.type)) {
-        result = true;
-      }
-    }, namedOnly: false, traverseCollections: true);
+      DataTypeUtils.traverseDataType(QualifiedDataType(type),
+          (QualifiedDataType qType) {
+        if (predicate(qType.type)) {
+          result = true;
+        }
+      }, namedOnly: false, traverseCollections: true);
 
-    return result;
-  } else {
-    return predicate(type);
+      return result;
+    } else {
+      return predicate(type);
+    }
   }
-}
 
-bool hasListTypeScroll(DataType type) {
-  var predicate = (DataType t) =>
-      t is ListType &&
-      (Features.getOptional(t.features, Features.SCROLL, () => false) ||
-          Features.getOptional(
-              t.features, Features.PROVIDE_VALUE_PAGEABLE, () => false));
-  return hasType(type, predicate);
-}
+  static bool hasListTypeScroll(DataType type) {
+    var predicate = (DataType t) =>
+        t is ListType &&
+        (Features.getOptional(t.features, Features.SCROLL, () => false) ||
+            Features.getOptional(
+                t.features, Features.PROVIDE_VALUE_PAGEABLE, () => false));
+    return hasType(type, predicate);
+  }
 
-bool hasListTypeGeoMap(DataType type) {
-  var predicate = (DataType t) =>
-      t is ListType &&
-      Features.getOptional<Map>(t.features, Features.GEO_MAP, () => null) !=
-          null;
-  return hasType(type, predicate);
+  static String getRootRecordSingleLeadingFieldPathByAction(
+      ActionData actionData) {
+    var recordType = actionData.argsAsRecordType;
+    var path = getRootRecordSingleLeadingFieldPath(
+        QualifiedDataType(recordType), actionData.argsAsRecord);
+
+    if (path != null) {
+      // If the action has buttons, it cannot have the record single leading field.
+      var actionMeta = actionData.actionMeta;
+      if (actionMeta.callable && showCall(actionMeta) ||
+          showRefresh(actionMeta) ||
+          showClear(actionMeta) ||
+          showCancel(actionMeta)) {
+        return null;
+      }
+    }
+
+    return path;
+  }
+
+  static String getRootRecordSingleLeadingFieldPath(
+      QualifiedDataType qualifiedRecordType, Map recordValue) {
+    if (!(qualifiedRecordType.type is RecordType)) {
+      return null;
+    }
+
+    var recordType = qualifiedRecordType.type as RecordType;
+
+    if (qualifiedRecordType.isRoot && recordType.fields.length == 1) {
+      var fieldType = recordType.fields[0];
+      var fieldFeatures =
+          DataTypeUtils.mergeFeatures(fieldType, recordValue[fieldType.name]);
+
+      // TODO Better check.
+      if (fieldFeatures[Features.GEO_MAP] != null) {
+        return qualifiedRecordType.createChild(fieldType).path;
+      }
+    }
+
+    return null;
+  }
+
+  static bool showCall(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features, Features.ACTION_CALL_SHOW_CALL, () => true);
+
+  static bool showRefresh(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_REFRESH,
+      () => actionMeta.features[Features.ACTION_CALL_REFRESH_LABEL] != null);
+
+  static bool showClear(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_CLEAR,
+      () => actionMeta.features[Features.ACTION_CALL_CLEAR_LABEL] != null);
+
+  static bool showCancel(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_CANCEL,
+      () => actionMeta.features[Features.ACTION_CALL_CANCEL_LABEL] != null);
 }
 
 PageRoute<T> createPageRoute<T>(

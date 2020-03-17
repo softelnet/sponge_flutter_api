@@ -189,35 +189,43 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   Widget _buildActionCallWidget(
       BuildContext context, ProvideActionArgsState state) {
-    var children = [
-      if (widget.header != null)
-        Card(
-          child: Padding(
-            child: Text(
-              widget.header,
-              textAlign: TextAlign.left,
+    var child;
+
+    if (_presenter.hasRootRecordSingleLeadingField()) {
+      child = _buildActionArgumentsWidget(context, state);
+    } else {
+      var children = [
+        if (widget.header != null)
+          Card(
+            child: Padding(
+              child: Text(
+                widget.header,
+                textAlign: TextAlign.left,
+              ),
+              padding: EdgeInsets.all(10),
             ),
-            padding: EdgeInsets.all(10),
+            shape: BeveledRectangleBorder(),
           ),
-          shape: BeveledRectangleBorder(),
-        ),
-      _buildActionArgumentsWidget(context, state),
-      _buildButtonBar(context),
-    ];
+        _buildActionArgumentsWidget(context, state),
+        _buildButtonBar(context),
+      ];
+
+      child = _presenter.isScrollable()
+          ? ListView(
+              shrinkWrap: true,
+              children: children,
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: children,
+            );
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Form(
         key: _formKey,
-        child: _presenter.isScrollable()
-            ? ListView(
-                shrinkWrap: true,
-                children: children,
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: children,
-              ),
+        child: child,
       ),
     );
   }
@@ -263,13 +271,18 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   Widget _buildActionArgumentsWidget(
       BuildContext context, ProvideActionArgsState state) {
+    var editor = _mainArgsGuiProvider
+        .createEditor(_createEditorContext(context, state: state));
+
     var argWidget = OptionalScrollContainer(
-      child: _mainArgsGuiProvider
-          .createEditor(_createEditorContext(context, state: state)),
+      child: editor,
       scrollable: _presenter.isScrollable(),
     );
 
-    return _presenter.isScrollable() ? argWidget : Expanded(child: argWidget);
+    return _presenter.isScrollable() ||
+            _presenter.hasRootRecordSingleLeadingField()
+        ? argWidget
+        : Expanded(child: argWidget);
   }
 
   TypeEditorContext _createEditorContext(BuildContext context,
@@ -278,11 +291,13 @@ class _ActionCallPageState extends State<ActionCallPage>
       '${_presenter.connectionName}-${widget.actionData.actionMeta.name}-args',
       context,
       _presenter,
-      QualifiedDataType(null, _mainArgsGuiProvider.type),
+      QualifiedDataType(_mainArgsGuiProvider.type),
       _presenter.actionData.argsAsRecord,
       readOnly: widget.readOnly,
       enabled: true,
       loading: state != null ? state.loading : [],
+      rootRecordSingleLeadingField:
+          DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(_presenter.actionData),
     );
   }
 
