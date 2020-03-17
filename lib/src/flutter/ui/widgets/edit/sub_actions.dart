@@ -168,21 +168,19 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       BuildContext context) async {
     List<SubActionRuntimeSpec> runtimeSpecs =
         await widget.controller.getSubActionsRuntimeSpecs(widget.value);
-    var items = runtimeSpecs
-        .map((runtimeSpec) => runtimeSpec != null
-            ? _createSubActionMenuItem(context, runtimeSpec)
-            : PopupMenuDivider())
-        .toList();
-    if (widget.header != null) {
-      items.insert(
-          0,
-          PopupMenuItem<SubActionSpec>(
-            child: widget.header,
-            enabled: false,
-          ));
-    }
-
-    return items;
+    return [
+      if (widget.header != null)
+        PopupMenuItem<SubActionSpec>(
+          child: widget.header,
+          enabled: false,
+        ),
+      if (widget.header != null && runtimeSpecs.isNotEmpty) PopupMenuDivider(),
+      ...runtimeSpecs
+          .map((runtimeSpec) => runtimeSpec != null
+              ? _createSubActionMenuItem(context, runtimeSpec)
+              : PopupMenuDivider())
+          .toList(),
+    ];
   }
 
   PopupMenuEntry<SubActionSpec> _createSubActionMenuItem(

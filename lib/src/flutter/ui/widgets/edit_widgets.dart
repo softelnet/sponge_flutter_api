@@ -877,8 +877,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     var elementType = widget.guiProvider.type.elementType;
 
-    _subActionsController = SubActionsController.forList(
-        widget.uiContext, service.spongeService);
+    _subActionsController =
+        SubActionsController.forList(widget.uiContext, service.spongeService);
 
     List<Widget> buttons = [];
 
@@ -1095,6 +1095,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                 controller: _subActionsController,
                 element: element,
                 index: index,
+                header: subUiContext.valueLabel != null
+                    ? Text(subUiContext.valueLabel)
+                    : null,
               )
             : null,
 
