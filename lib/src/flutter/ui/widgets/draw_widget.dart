@@ -44,8 +44,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
     _controller ??= PainterController()
       ..strokeUpdateDeltaThresholdRatio =
-          service.settings.drawingStrokeUpdateDeltaThresholdRatio
-      ..isAntiAlias = service.settings.drawAntiAliasing;
+          service.settings.drawingStrokeUpdateDeltaThresholdRatio;
 
     return WillPopScope(
       child: Scaffold(

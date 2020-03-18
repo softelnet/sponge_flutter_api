@@ -42,8 +42,7 @@ Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,
   var painterController = PainterController()
     ..drawColor = convertFromColor(binaryValue.color)
     ..backgroundColor = convertFromColor(binaryValue.background)
-    ..addStrokes(convertFromStrokes(binaryValue.strokes))
-    ..isAntiAlias = true;
+    ..addStrokes(convertFromStrokes(binaryValue.strokes));
 
   painterController.globalThickness = binaryValue.strokeDisplayWidth;
 

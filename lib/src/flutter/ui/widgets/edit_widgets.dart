@@ -90,8 +90,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   bool get isRecordEnabled => widget.uiContext.enabled;
 
   bool _hasRootRecordSingleLeadingField() {
-    var thisLeadingFieldPath = DataTypeGuiUtils.getRootRecordSingleLeadingFieldPath(
-        widget.uiContext.qualifiedType, widget.uiContext.value as Map);
+    var thisLeadingFieldPath =
+        DataTypeGuiUtils.getRootRecordSingleLeadingFieldPath(
+            widget.uiContext.qualifiedType, widget.uiContext.value as Map);
 
     return widget.uiContext.rootRecordSingleLeadingField != null &&
         widget.uiContext.rootRecordSingleLeadingField == thisLeadingFieldPath;
@@ -327,7 +328,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     return
         // Expanded only if any in a group field shoud have a scroll.
-        fieldGroup.any((fieldType) => DataTypeGuiUtils.hasListTypeScroll(fieldType))
+        fieldGroup.any(
+                (fieldType) => DataTypeGuiUtils.hasListTypeScroll(fieldType))
             ? OptionalExpanded(child: groupWidget)
             : groupWidget;
   }
@@ -954,7 +956,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
     const listPadding = EdgeInsets.only(bottom: 5);
 
-    var isListScroll = DataTypeGuiUtils.hasListTypeScroll(widget.uiContext.qualifiedType.type);
+    var isListScroll =
+        DataTypeGuiUtils.hasListTypeScroll(widget.uiContext.qualifiedType.type);
 
     var itemBuilder = (BuildContext context, int index) {
       if (index == data.length) {

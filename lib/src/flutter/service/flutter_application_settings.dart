@@ -30,9 +30,6 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   static const String PREF_ACTIONS_ORDER = '$_PREF_PREFIX.actionsOrder';
 
-  // TODO Remove drawAntiAliasing.
-  //static const String PREF_DRAW_ANTI_ALIASING = '$PREF_PREFIX.drawAntiAliasing';
-
   static const String PREF_AUTO_USE_AUTH_TOKEN =
       '$_PREF_PREFIX.autoUseAuthToken';
 
@@ -153,13 +150,6 @@ class FlutterApplicationSettings extends ApplicationSettings {
         AnnotatedValue(ActionsOrder.defaultOrder, valueLabel: 'Default'),
         AnnotatedValue(ActionsOrder.alphabetical, valueLabel: 'Alphabetical'),
       ];
-
-  // TODO Remove drawAntiAliasing.
-  bool get drawAntiAliasing =>
-      true; //_prefs.getBool(PREF_DRAW_ANTI_ALIASING) ?? false;
-
-  // Future<bool> setDrawAntiAliasing(bool value) async =>
-  //     await _prefs.setBool(PREF_DRAW_ANTI_ALIASING, value);
 
   bool get autoUseAuthToken => _prefs.getBool(PREF_AUTO_USE_AUTH_TOKEN) ?? true;
 

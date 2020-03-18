@@ -31,8 +31,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
   static final Logger _logger = Logger('BaseUnitTypeGuiProvider');
 
   Widget _wrapIfLoading(WidgetBuilder builder, UiContext uiContext) {
-    bool isLoading = uiContext.qualifiedType.path != null &&
-        uiContext.loading.contains(uiContext.qualifiedType.path);
+    bool isLoading = uiContext.isThisValueLoading;
 
     if (DataTypeUtils.isValueNotSet(uiContext.value) && isLoading) {
       return TypeGuiProviderUtils.createWaitingViewer(uiContext);
@@ -75,6 +74,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
+  @protected
   Widget doCreateEditor(TypeEditorContext editorContext) => null;
 
   @override
@@ -100,6 +100,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
+  @protected
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) => null;
 
   @override
@@ -117,6 +118,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
+  @protected
   Widget doCreateViewer(TypeViewerContext viewerContext) => null;
 
   @override
@@ -131,6 +133,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     }
   }
 
+  @protected
   Widget doCreateExtendedViewer(TypeViewerContext viewerContext) => null;
 
   @override
@@ -142,6 +145,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
     return doGetValueFromString(s);
   }
 
+  @protected
   dynamic doGetValueFromString(String s) =>
       throw Exception('Unsupported conversion from String to ${type.kind}');
 

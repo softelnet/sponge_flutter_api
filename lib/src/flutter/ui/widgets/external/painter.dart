@@ -101,7 +101,6 @@ class _PainterState extends State<Painter> {
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
-          onTapUp: _onTapUp,
         ),
       );
     } else {
@@ -127,20 +126,6 @@ class _PainterState extends State<Painter> {
       width: double.infinity,
       height: double.infinity,
     );
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    Offset pos = (context.findRenderObject() as RenderBox)
-        .globalToLocal(details.globalPosition);
-    widget.painterController._pathHistory.add(pos);
-    widget.painterController._pathHistory.updateCurrent(pos);
-
-    widget.painterController._pathHistory.endCurrent();
-    widget.painterController._notifyListeners();
-
-    if (widget.onStrokeEnd != null) {
-      widget.onStrokeEnd();
-    }
   }
 
   void _onPanStart(DragStartDetails start) {
@@ -283,7 +268,14 @@ class _PathHistory {
 
     // Draw by using pahts or separate lines.
     if (usePaths) {
-      _paths.forEach((path) => canvas.drawPath(path.path, path.paint));
+      _paths.asMap().forEach((index, path) {
+        if (_strokes[index].length == 1) {
+          // Draw a single point as a point, not a path to mitigate some problems on some devices.
+          canvas.drawPoints(PointMode.points, _strokes[index], path.paint);
+        } else {
+          canvas.drawPath(path.path, path.paint);
+        }
+      });
     } else {
       _strokes.forEach((stroke) {
         for (int i = 0; i < stroke.length - 1; i++) {

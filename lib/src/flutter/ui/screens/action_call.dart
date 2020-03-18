@@ -191,8 +191,14 @@ class _ActionCallPageState extends State<ActionCallPage>
       BuildContext context, ProvideActionArgsState state) {
     var child;
 
-    if (_presenter.hasRootRecordSingleLeadingField()) {
-      child = _buildActionArgumentsWidget(context, state);
+    bool hasRootRecordSingleLeadingField =
+        _presenter.hasRootRecordSingleLeadingField();
+    var editorContext = _createEditorContext(context, state);
+
+    if (hasRootRecordSingleLeadingField) {
+      child = editorContext.isAnyValueLoading
+          ? Center(child: CircularProgressIndicator())
+          : _buildActionArgumentsWidget(editorContext);
     } else {
       var children = [
         if (widget.header != null)
@@ -206,7 +212,7 @@ class _ActionCallPageState extends State<ActionCallPage>
             ),
             shape: BeveledRectangleBorder(),
           ),
-        _buildActionArgumentsWidget(context, state),
+        _buildActionArgumentsWidget(editorContext),
         _buildButtonBar(context),
       ];
 
@@ -222,7 +228,7 @@ class _ActionCallPageState extends State<ActionCallPage>
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 10),
+      padding: EdgeInsets.only(top: hasRootRecordSingleLeadingField ? 0 : 10),
       child: Form(
         key: _formKey,
         child: child,
@@ -269,10 +275,8 @@ class _ActionCallPageState extends State<ActionCallPage>
     );
   }
 
-  Widget _buildActionArgumentsWidget(
-      BuildContext context, ProvideActionArgsState state) {
-    var editor = _mainArgsGuiProvider
-        .createEditor(_createEditorContext(context, state: state));
+  Widget _buildActionArgumentsWidget(TypeEditorContext editorContext) {
+    var editor = _mainArgsGuiProvider.createEditor(editorContext);
 
     var argWidget = OptionalScrollContainer(
       child: editor,
@@ -285,8 +289,8 @@ class _ActionCallPageState extends State<ActionCallPage>
         : Expanded(child: argWidget);
   }
 
-  TypeEditorContext _createEditorContext(BuildContext context,
-      {ProvideActionArgsState state}) {
+  TypeEditorContext _createEditorContext(
+      BuildContext context, ProvideActionArgsState state) {
     return TypeEditorContext(
       '${_presenter.connectionName}-${widget.actionData.actionMeta.name}-args',
       context,
@@ -297,7 +301,8 @@ class _ActionCallPageState extends State<ActionCallPage>
       enabled: true,
       loading: state != null ? state.loading : [],
       rootRecordSingleLeadingField:
-          DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(_presenter.actionData),
+          DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(
+              _presenter.actionData),
     );
   }
 
@@ -427,7 +432,7 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   Widget _resolveSubActionsWidget(BuildContext context) {
     return SubActionsWidget.forRecord(
-      _createEditorContext(context),
+      _createEditorContext(context, ProvideActionArgsStateNoInvocation()),
       _presenter.service.spongeService,
     );
   }

@@ -195,6 +195,11 @@ abstract class UiContext {
 
     uiContext._isSetUp = true;
   }
+
+  bool get isThisValueLoading =>
+      qualifiedType.path != null && loading.contains(qualifiedType.path);
+
+  bool get isAnyValueLoading => loading.isNotEmpty;
 }
 
 class TypeEditorContext extends UiContext {
