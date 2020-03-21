@@ -552,7 +552,7 @@ class SubActionsController extends BaseActionsController {
           await service.spongeService.getAction(subActionSpec.actionName);
       // Use a clone if there are argument substitutions.
       if (subActionSpec.hasArgSubstitutions) {
-        actionData = actionData.copy();
+        actionData = actionData.clone();
       }
 
       if (setupCallback != null) {

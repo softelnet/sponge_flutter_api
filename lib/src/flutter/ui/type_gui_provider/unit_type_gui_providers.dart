@@ -86,7 +86,7 @@ abstract class BaseUnitTypeGuiProvider<T extends DataType>
       if (viewerContext.valueLabel != null) {
         return _wrapIfLoading(
             (_) => TypeGuiProviderUtils.createTextBasedCompactViewer(
-                this, viewerContext.copy()..value = viewerContext.valueLabel),
+                this, viewerContext.clone()..value = viewerContext.valueLabel),
             viewerContext);
       }
 
@@ -270,7 +270,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     // TODO Binary viewer for images should have an option to be inline.
     return InkResponse(
-      onTap: () => navigateToExtendedViewer(viewerContext.copy()),
+      onTap: () => navigateToExtendedViewer(viewerContext.clone()),
       child: createCompactViewer(viewerContext),
     );
   }
@@ -369,7 +369,7 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
   @override
   Widget doCreateEditor(TypeEditorContext editorContext) {
     if (editorContext.readOnly) {
-      return createCompactViewer(editorContext.copyAsViewer());
+      return createCompactViewer(editorContext.cloneAsViewer());
     } else {
       return DateTimeEditWidget(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
@@ -393,12 +393,12 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
   @override
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(
-          this, viewerContext.copy()..value = _valueToString(viewerContext));
+          this, viewerContext.clone()..value = _valueToString(viewerContext));
 
   @override
   Widget doCreateViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedViewer(
-          this, viewerContext.copy()..value = _valueToString(viewerContext));
+          this, viewerContext.clone()..value = _valueToString(viewerContext));
 }
 
 class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
@@ -410,7 +410,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
 
     if (dynamicValue == null) {
       return TypeGuiProviderUtils.createTextBasedCompactViewer(
-          this, editorContext.copyAsViewer());
+          this, editorContext.cloneAsViewer());
     }
 
     Validate.notNull(dynamicValue.type, 'A dynamic type is not set');
@@ -419,11 +419,11 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
         _createTargetQualifiedDataType(editorContext);
 
     if (editorContext.readOnly) {
-      return doCreateViewer(editorContext.copyAsViewer());
+      return doCreateViewer(editorContext.cloneAsViewer());
     } else {
       return typeProviderRegistry
           .getProvider(dynamicValue.type)
-          .createEditor(editorContext.copy()
+          .createEditor(editorContext.clone()
             ..value = dynamicValue.value
             ..qualifiedType = qualifiedType);
     }
@@ -447,7 +447,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
 
     return typeProviderRegistry
         .getProvider(dynamicValue.type)
-        .createCompactViewer(viewerContext.copy()
+        .createCompactViewer(viewerContext.clone()
           ..value = dynamicValue.value
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
@@ -463,7 +463,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
 
     return typeProviderRegistry
         .getProvider(dynamicValue.type)
-        .createViewer(viewerContext.copy()
+        .createViewer(viewerContext.clone()
           ..value = dynamicValue.value
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
@@ -479,7 +479,7 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
 
     return typeProviderRegistry
         .getProvider(dynamicValue.type)
-        .createExtendedViewer(viewerContext.copy()
+        .createExtendedViewer(viewerContext.clone()
           ..value = dynamicValue.value
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
@@ -758,11 +758,11 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
         _createTargetQualifiedDataType(editorContext);
 
     if (editorContext.readOnly) {
-      return doCreateViewer(editorContext.copyAsViewer());
+      return doCreateViewer(editorContext.cloneAsViewer());
     } else {
       return typeProviderRegistry
           .getProvider(objectType.companionType)
-          .createEditor(editorContext.copy()..qualifiedType = qualifiedType);
+          .createEditor(editorContext.clone()..qualifiedType = qualifiedType);
     }
   }
 
@@ -782,7 +782,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
 
     return typeProviderRegistry
         .getProvider(objectType.companionType)
-        .createCompactViewer(viewerContext.copy()
+        .createCompactViewer(viewerContext.clone()
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
 
@@ -796,7 +796,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
 
     return typeProviderRegistry
         .getProvider(objectType.companionType)
-        .createViewer(viewerContext.copy()
+        .createViewer(viewerContext.clone()
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
 
@@ -814,7 +814,7 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
 
     return typeProviderRegistry
         .getProvider(objectType.companionType)
-        .createExtendedViewer(viewerContext.copy()
+        .createExtendedViewer(viewerContext.clone()
           ..qualifiedType = _createTargetQualifiedDataType(viewerContext));
   }
 }
@@ -859,7 +859,7 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     return RecordTypeWidget(
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
-      uiContext: viewerContext.copyAsEditor()..readOnly = true,
+      uiContext: viewerContext.cloneAsEditor()..readOnly = true,
     );
   }
 
@@ -1021,5 +1021,5 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
 
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) =>
       TypeGuiProviderUtils.createTextBasedCompactViewer(
-          this, viewerContext.copy()..value = 'Success');
+          this, viewerContext.clone()..value = 'Success');
 }

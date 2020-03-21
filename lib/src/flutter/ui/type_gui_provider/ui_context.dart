@@ -247,7 +247,7 @@ class TypeEditorContext extends UiContext {
   TypeEditorValidatorCallback validator;
   bool readOnly;
 
-  TypeEditorContext copy() => TypeEditorContext(
+  TypeEditorContext clone() => TypeEditorContext(
         name,
         context,
         callbacks,
@@ -270,7 +270,7 @@ class TypeEditorContext extends UiContext {
         rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
 
-  TypeViewerContext copyAsViewer() => TypeViewerContext(
+  TypeViewerContext cloneAsViewer() => TypeViewerContext(
         name,
         context,
         callbacks,
@@ -325,7 +325,7 @@ class TypeViewerContext extends UiContext {
           rootRecordSingleLeadingField: rootRecordSingleLeadingField,
         );
 
-  TypeViewerContext copy() => TypeViewerContext(
+  TypeViewerContext clone() => TypeViewerContext(
         name,
         context,
         callbacks,
@@ -342,7 +342,7 @@ class TypeViewerContext extends UiContext {
         rootRecordSingleLeadingField: rootRecordSingleLeadingField,
       );
 
-  TypeEditorContext copyAsEditor() => TypeEditorContext(
+  TypeEditorContext cloneAsEditor() => TypeEditorContext(
         name,
         context,
         callbacks,

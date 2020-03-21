@@ -75,7 +75,7 @@ class _ActionCallPageState extends State<ActionCallPage>
 
     // Use a copy of the action data.
     _presenter ??=
-        ActionCallPresenter(ActionCallViewModel(widget.actionData.copy()), this)
+        ActionCallPresenter(ActionCallViewModel(widget.actionData.clone()), this)
           ..setService(service)
           ..init(
             verifyIsActive: widget.verifyIsActive,

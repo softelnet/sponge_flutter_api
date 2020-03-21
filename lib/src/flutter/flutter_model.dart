@@ -57,8 +57,8 @@ class FlutterActionData extends ActionData {
   }
 
   @override
-  FlutterActionData copy({ActionData prototype}) =>
-      (super.copy(prototype: FlutterActionData(actionMeta, typeGuiProvider))
+  FlutterActionData clone({ActionData prototype}) =>
+      (super.clone(prototype: FlutterActionData(actionMeta, typeGuiProvider))
           as FlutterActionData)
         .._initProviders()
         .._additionalArgData = _additionalArgData;

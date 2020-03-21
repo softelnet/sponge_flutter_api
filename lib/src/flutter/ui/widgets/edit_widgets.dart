@@ -405,7 +405,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
         return Padding(
           padding: EdgeInsets.only(left: 0, right: 0, top: 5, bottom: 5),
           child: _typeGuiProviders[qFieldType.type.name]
-              .createViewer(editorContext.copyAsViewer()),
+              .createViewer(editorContext.cloneAsViewer()),
         );
       }
 
