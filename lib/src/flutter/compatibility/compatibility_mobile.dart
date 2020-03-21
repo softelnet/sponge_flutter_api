@@ -87,6 +87,9 @@ class MobileBinaryTypeUnitConverter
   }
 }
 
+FeatureConverter createFeatureConverter(ApplicationService service) =>
+    DefaultFeatureConverter();
+
 Offset convertFromOffset(GenericOffset offset) =>
     offset != null ? Offset(offset.x, offset.y) : null;
 GenericOffset convertToOffset(Offset offset) =>

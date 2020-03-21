@@ -189,14 +189,11 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
     var actionMeta = service.spongeService
         .getCachedAction(subActionRuntimeSpec.spec.actionName)
         .actionMeta;
-    var iconData = getActionIconData(service, actionMeta);
 
     return PopupMenuItem<SubActionSpec>(
       value: subActionRuntimeSpec.spec,
       child: ListTile(
-        leading: iconData != null
-            ? Icon(iconData, color: getIconColor(context))
-            : null,
+        leading: getActionIcon(context, service, actionMeta),
         title: Text(getActionMetaDisplayLabel(actionMeta)),
         enabled: subActionRuntimeSpec.active,
       ),

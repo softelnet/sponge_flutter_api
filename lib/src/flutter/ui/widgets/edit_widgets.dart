@@ -17,9 +17,9 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
@@ -628,7 +628,7 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
           child: ColorPicker(
             pickerColor: suggestedColor,
             onColorChanged: (color) => _currentPickerColor = color,
-            enableLabel: true,
+            showLabel: true,
             pickerAreaHeightPercent: 0.8,
             enableAlpha: false,
           ),
@@ -910,12 +910,15 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     if (_subActionsController.isCreateEnabled()) {
       buttons.add(FlatButton(
         key: Key('list-create'),
-        child: Icon(
-          getActionIconDataByActionName(
-                  service, _subActionsController.getCreateActionName()) ??
+        child: getActionIconByActionName(
+              context,
+              service,
+              _subActionsController.getCreateActionName(),
+            ) ??
+            Icon(
               Icons.add,
-          color: getIconColor(context),
-        ),
+              color: getIconColor(context),
+            ),
         padding: EdgeInsets.zero,
         onPressed: () => _subActionsController
             .onCreateElement(context)
@@ -1101,14 +1104,12 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     var elementTypeProvider = widget.guiProvider.elementTypeProvider
       ..setupContext(subUiContext);
 
-    var elementIcon = subUiContext.features[Features.ICON];
+    var elementIconInfo = Features.getIcon(subUiContext.features);
 
     return _createElementCard(
       ListTile(
         key: Key('list-element-$index'),
-        leading: elementIcon != null
-            ? Icon(getIconData(service, elementIcon))
-            : null,
+        leading: getIcon(service, elementIconInfo),
         title: elementTypeProvider.createCompactViewer(subUiContext),
         subtitle: subUiContext.valueDescription != null
             ? Text(subUiContext.valueDescription)

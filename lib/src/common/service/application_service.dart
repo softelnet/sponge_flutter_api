@@ -39,12 +39,14 @@ abstract class ApplicationSettings {
   Future<void> clear();
 }
 
-abstract class ApplicationService<S extends SpongeService, T extends ApplicationSettings> {
+abstract class ApplicationService<S extends SpongeService,
+    T extends ApplicationSettings> {
   static final Logger _logger = Logger('ApplicationService');
 
   ConnectionsConfiguration _connectionsConfiguration;
   S _spongeService;
   TypeConverter _typeConverter;
+  FeatureConverter _featureConverter;
   T settings;
 
   final connectionBloc = ForwardingBloc<SpongeConnectionState>(
@@ -62,11 +64,15 @@ abstract class ApplicationService<S extends SpongeService, T extends Application
   bool get logged =>
       connected && _spongeService.client.configuration.username != null;
 
-  Future<void> configure(ConnectionsConfiguration connectionsConfiguration,
-      TypeConverter typeConverter,
-      {bool connectSynchronously = true}) async {
+  Future<void> configure(
+    ConnectionsConfiguration connectionsConfiguration,
+    TypeConverter typeConverter,
+    FeatureConverter featureConverter, {
+    bool connectSynchronously = true,
+  }) async {
     _connectionsConfiguration = connectionsConfiguration;
     _typeConverter = typeConverter;
+    _featureConverter = featureConverter;
 
     await _connectionsConfiguration.init();
     await updateDefaultConnections();
@@ -101,8 +107,11 @@ abstract class ApplicationService<S extends SpongeService, T extends Application
     connectionBloc.add(SpongeConnectionStateConnecting());
 
     // Connect may be called concurrently.
-    var newSpongeService =
-        await createSpongeService(connection, _typeConverter);
+    var newSpongeService = await createSpongeService(
+      connection,
+      _typeConverter,
+      _featureConverter,
+    );
     var prevSpongeService = _spongeService;
     _spongeService = newSpongeService;
 
@@ -154,8 +163,15 @@ abstract class ApplicationService<S extends SpongeService, T extends Application
   }
 
   Future<S> createSpongeService(
-          SpongeConnection connection, TypeConverter typeConverter) async =>
-      SpongeService(connection, typeConverter: typeConverter) as S;
+    SpongeConnection connection,
+    TypeConverter typeConverter,
+    FeatureConverter featureConverter,
+  ) async =>
+      SpongeService(
+        connection,
+        typeConverter: typeConverter,
+        featureConverter: featureConverter,
+      ) as S;
 
   Future<void> configureSpongeService(S spongeService) async {
     spongeService.maxEventCount = settings.maxEventCount;

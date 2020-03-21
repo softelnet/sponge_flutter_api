@@ -143,7 +143,8 @@ Color getContrastColor(Color color) {
 
 Color getPrimaryColor(BuildContext context) => Theme.of(context).accentColor;
 
-Color getPrimaryDarkerColor(BuildContext context) => Theme.of(context).colorScheme.primary;
+Color getPrimaryDarkerColor(BuildContext context) =>
+    Theme.of(context).colorScheme.primary;
 
 Color getIconColor(BuildContext context) =>
     Theme.of(context).accentColor.withAlpha(200);
@@ -181,16 +182,46 @@ String getValueLabel(dynamic value) =>
 String getValueDescription(dynamic value) =>
     (value != null && value is AnnotatedValue) ? value.valueDescription : null;
 
-IconData getActionIconDataByActionName(
+Icon getActionIconByActionName(BuildContext context,
     FlutterApplicationService service, String actionName) {
   var actionMeta = service.spongeService.getCachedAction(actionName).actionMeta;
 
-  return getActionIconData(service, actionMeta);
+  return getActionIcon(context, service, actionMeta);
 }
 
-IconData getActionIconData(
-    FlutterApplicationService service, ActionMeta actionMeta) {
-  return getIconData(service, actionMeta.features[Features.ICON]);
+Icon getActionIcon(BuildContext context, FlutterApplicationService service,
+    ActionMeta actionMeta) {
+  var iconInfo = Features.getIcon(actionMeta.features);
+  var iconData = getIconData(service, iconInfo?.name);
+
+  if (iconData == null) {
+    return null;
+  }
+
+  return Icon(
+    iconData,
+    color: string2color(iconInfo?.color) ?? getIconColor(context),
+    size: iconInfo?.size,
+  );
+}
+
+Icon getIcon(
+  FlutterApplicationService service,
+  IconInfo iconInfo, {
+  IconData Function() defaultIconData,
+}) {
+  var iconData = getIconData(service, iconInfo?.name) ??
+      (defaultIconData != null ? defaultIconData() : null);
+
+  if (iconData == null) {
+    return null;
+  }
+
+  return Icon(
+    iconData,
+    color: string2color(iconInfo?.color),
+    size: iconInfo.size,
+  );
 }
 
 IconData getIconData(FlutterApplicationService service, String iconName) {

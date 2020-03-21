@@ -162,11 +162,9 @@ class _ActionListItemState extends State<ActionListItem>
 
     switch (service.settings.actionIconsView) {
       case ActionIconsView.custom:
-        var iconData = getActionIconData(
-            service, _presenter.viewModel.actionData.actionMeta);
-        return iconData != null
-            ? Icon(iconData, color: getIconColor(context))
-            : internalIconSupplier();
+        return getActionIcon(
+                context, service, _presenter.viewModel.actionData.actionMeta) ??
+            internalIconSupplier();
       case ActionIconsView.internal:
         return internalIconSupplier();
       case ActionIconsView.none:

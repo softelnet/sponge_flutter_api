@@ -283,7 +283,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
   Widget doCreateEditor(TypeEditorContext editorContext) {
     String widgetType = Features.getOptional(
         editorContext.features, Features.WIDGET, () => null);
-    String icon = editorContext.features[Features.ICON];
+    var iconInfo = Features.getIcon(editorContext.features);
 
     ValueChanged<bool> onChanged =
         editorContext.readOnly || !editorContext.enabled
@@ -314,12 +314,13 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         value: editorContext.value ?? (type.nullable ? null : false),
         onChanged: onChanged,
       ));
-    } else if (icon != null && !editorContext.qualifiedType.type.nullable) {
+    } else if (iconInfo?.name != null &&
+        !editorContext.qualifiedType.type.nullable) {
       var service = ApplicationProvider.of(editorContext.context).service;
 
       valueWidget = IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
-        icon: Icon(getIconData(service, icon)),
+        icon: getIcon(service, iconInfo),
         onPressed: onChanged != null
             ? () => onChanged(!(editorContext.value as bool))
             : null,
@@ -993,7 +994,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
 
   @override
   Widget doCreateEditor(TypeEditorContext editorContext) {
-    String icon = editorContext.features[Features.ICON];
+    var iconInfo = Features.getIcon(editorContext.features);
 
     var onTap = editorContext.enabled &&
             !editorContext.readOnly &&
@@ -1001,12 +1002,12 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
         ? () => editorContext.onSave(null)
         : null;
 
-    if (icon != null) {
+    if (iconInfo?.name != null) {
       var service = ApplicationProvider.of(editorContext.context).service;
 
       return IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
-        icon: Icon(getIconData(service, icon)),
+        icon: getIcon(service, iconInfo),
         onPressed: onTap,
       );
     }

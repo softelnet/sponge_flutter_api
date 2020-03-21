@@ -70,9 +70,12 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
     _initActionIntentHandlers();
 
-    await configure(SharedPreferencesConnectionsConfiguration(_prefs),
-        createTypeConverter(this),
-        connectSynchronously: false);
+    await configure(
+      SharedPreferencesConnectionsConfiguration(_prefs),
+      createTypeConverter(this),
+      createFeatureConverter(this),
+      connectSynchronously: false,
+    );
 
     _initialized = true;
   }
@@ -220,9 +223,16 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
   @override
   Future<S> createSpongeService(
-      SpongeConnection connection, TypeConverter typeConverter) async {
-    var service =
-        FlutterSpongeService(connection, typeConverter, typeGuiProvider);
+    SpongeConnection connection,
+    TypeConverter typeConverter,
+    FeatureConverter featureConverter,
+  ) async {
+    var service = FlutterSpongeService(
+      connection,
+      typeConverter,
+      featureConverter,
+      typeGuiProvider,
+    );
 
     return service;
   }
@@ -321,10 +331,12 @@ class FlutterSpongeService extends SpongeService<FlutterActionData> {
   FlutterSpongeService(
     SpongeConnection connection,
     TypeConverter typeConverter,
+    FeatureConverter featureConverter,
     this.typeGuiProvider, {
     Map<String, ActionIntentHandler> actionIntentHandlers,
   }) : super(connection,
             typeConverter: typeConverter,
+            featureConverter: featureConverter,
             actionIntentHandlers: actionIntentHandlers);
 
   final TypeGuiProvider typeGuiProvider;

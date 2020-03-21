@@ -28,12 +28,14 @@ class SpongeService<AD extends ActionData> {
   SpongeService(
     this._connection, {
     this.typeConverter,
+    this.featureConverter,
     this.actionIntentHandlers = const {},
   });
 
   static final Logger _logger = Logger('SpongeService');
 
   TypeConverter typeConverter;
+  FeatureConverter featureConverter;
   final SpongeConnection _connection;
   SpongeRestClient _client;
   SpongeRestClient get client => _client;
@@ -70,6 +72,7 @@ class SpongeService<AD extends ActionData> {
     _client = _createSpongeClient(
       _connection,
       typeConverter: typeConverter,
+      featureConverter: featureConverter,
       autoUseAuthToken: autoUseAuthToken,
     );
 
@@ -406,6 +409,7 @@ class SpongeService<AD extends ActionData> {
   static SpongeRestClient _createSpongeClient(
     SpongeConnection connection, {
     TypeConverter typeConverter,
+    FeatureConverter featureConverter,
     bool autoUseAuthToken = true,
   }) {
     if (!connection.anonymous &&
@@ -421,6 +425,7 @@ class SpongeService<AD extends ActionData> {
         autoUseAuthToken: autoUseAuthToken,
       ),
       typeConverter: typeConverter,
+      featureConverter: featureConverter,
     );
   }
 
