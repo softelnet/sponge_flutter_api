@@ -47,7 +47,7 @@ class ActionListItemPresenter
   String get qualifiedLabel => getQualifiedActionDisplayLabel(actionMeta);
 
   String get tooltip =>
-      actionMeta.description != null ? actionMeta.description : actionMeta.name;
+      actionMeta.description ?? actionMeta.label ?? actionMeta.name;
 
   bool get isInstantActionCallAllowed =>
       actionMeta.args != null &&

@@ -68,67 +68,68 @@ class _ActionListItemState extends State<ActionListItem>
         builder: (BuildContext context, ActionCallState state) {
           _presenter.state = state;
 
-          var resultWidget = showCallIcon
-              ? _buildResultWidget()
-              : _buildAdvancedSubtitle(context);
-
           // TODO Wrap in a widget to disable when the action is called/checked if it is active.
           return Card(
             child: Tooltip(
               message: _presenter.tooltip,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 0.0, horizontal: 8.0),
-                    leading: _getActionIcon(context, service),
-                    trailing: showCallIcon &&
-                            _presenter
-                                .isEffectivelyCallable /*&& callTapOnlyOnCallIcon*/
-                        ? Tooltip(
-                            message: _presenter.isInstantActionCallAllowed
-                                ? 'Run the action'
-                                : 'Set the arguments and run the action',
-                            child: InkResponse(
-                              child: _presenter.isInstantActionCallAllowed
-                                  ? Icon(Icons.play_arrow,
-                                      color: getCallIconColor(context))
-                                  : Icon(Icons.play_circle_outline,
-                                      color: getCallIconColor(context)),
-                              onTap: () => _onActionCall(context)
-                                  .catchError((e) => handleError(context, e)),
-                            ),
-                          )
-                        : null,
-                    title: Text(
-                      widget.showQualifiedName
-                          ? _presenter.qualifiedLabel
-                          : _presenter.label,
-                      style: _biggerFont,
-                    ),
-                    subtitle: _showResultAsSubtitle
-                        ? (showCallIcon
-                            ? _buildResultWidget()
-                            : _buildAdvancedSubtitle(context))
-                        : null,
-                    onTap: callTapOnlyOnCallIcon
-                        ? null
-                        : () => _onActionCall(context)
-                            .catchError((e) => handleError(context, e)),
-                  ),
-                  if (!_showResultAsSubtitle && resultWidget != null)
-                    Container(
-                      padding: const EdgeInsets.only(
-                          left: 10, right: 10, bottom: 10),
-                      alignment: Alignment.centerLeft,
-                      child: resultWidget,
-                    ),
-                ],
-              ),
+              child: _buildMainWidget(context),
             ),
           );
         });
+  }
+
+  Widget _buildMainWidget(BuildContext context) {
+    var resultWidget =
+        showCallIcon ? _buildResultWidget() : _buildAdvancedSubtitle(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+          leading: _getActionIcon(context, _presenter.service),
+          trailing: showCallIcon &&
+                  _presenter.isEffectivelyCallable /*&& callTapOnlyOnCallIcon*/
+              ? Tooltip(
+                  message: _presenter.isInstantActionCallAllowed
+                      ? 'Run the action'
+                      : 'Set the arguments and run the action',
+                  child: InkResponse(
+                    child: _presenter.isInstantActionCallAllowed
+                        ? Icon(Icons.play_arrow,
+                            color: getCallIconColor(context))
+                        : Icon(Icons.play_circle_outline,
+                            color: getCallIconColor(context)),
+                    onTap: () => _onActionCall(context)
+                        .catchError((e) => handleError(context, e)),
+                  ),
+                )
+              : null,
+          title: Text(
+            widget.showQualifiedName
+                ? _presenter.qualifiedLabel
+                : _presenter.label,
+            style: _biggerFont,
+          ),
+          subtitle: _showResultAsSubtitle
+              ? (showCallIcon
+                  ? _buildResultWidget()
+                  : _buildAdvancedSubtitle(context))
+              : null,
+          onTap: callTapOnlyOnCallIcon
+              ? null
+              : () => _onActionCall(context)
+                  .catchError((e) => handleError(context, e)),
+        ),
+        if (!_showResultAsSubtitle && resultWidget != null)
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+            alignment: Alignment.centerLeft,
+            child: resultWidget,
+          ),
+      ],
+    );
   }
 
   Widget _buildResultWidget() {
