@@ -313,18 +313,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           },
                         ),
                       ),
-
-                      // TODO Remove drawAntiAliasing.
-                      // _buildDivider(),
-                      // ListTile(
-                      //   title: Text(
-                      //       'Anti-aliasing in drawings (may cause issues on Android)'),
-                      //   trailing: Switch(
-                      //       value: settings.drawAntiAliasing,
-                      //       onChanged: (value) =>
-                      //           _toggleDrawAntiAliasing()),
-                      //   onTap: () => _toggleDrawAntiAliasing(),
-                      // ),
                     ],
                   ),
                   _buildGroup(
@@ -490,12 +478,6 @@ class _SettingsPageState extends State<SettingsPage> {
         .setUseScrollableIndexedList(!settings.useScrollableIndexedList);
     setState(() {});
   }
-
-  // TODO Remove drawAntiAliasing.
-  // Future<void> _toggleDrawAntiAliasing() async {
-  //   await settings.setDrawAntiAliasing(!settings.drawAntiAliasing);
-  //   setState(() {});
-  // }
 
   Future<void> _toggleAutoUseAuthToken() async {
     await settings.setAutoUseAuthToken(!settings.autoUseAuthToken);

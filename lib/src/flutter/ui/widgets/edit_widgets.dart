@@ -1193,7 +1193,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     if (data is PageableList &&
         data.indicatedIndex != null &&
         data.indicatedIndex < data.length) {
-      // TODO jumpTo resets the saved scroll position.
       _itemScrollController?.jumpTo(index: data.indicatedIndex);
     }
   }

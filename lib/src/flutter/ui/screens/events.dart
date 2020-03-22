@@ -103,12 +103,12 @@ class _EventsPageState extends State<EventsPage>
           child: Card(
             key: Key('event-$i'),
             child: ListTile(
-              // leading: // TODO event icon from type or default. _presenter.isConnectionActive(connection.name)
-              //     ? Icon(
-              //         Icons.check,
-              //         color: Theme.of(context).primaryColor,
-              //       )
-              //     : null,
+              leading: getIcon(_presenter.service,
+                      Features.getIcon(eventData.type?.features)) ??
+                  Icon(
+                    Icons.event,
+                    color: Theme.of(context).primaryColor,
+                  ),
               trailing: InkResponse(
                 child: Icon(Icons.delete_sweep),
                 onTap: () => _removeEvent(context, eventData.event.id),
