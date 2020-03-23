@@ -30,10 +30,10 @@ TypeConverter createTypeConverter(ApplicationService service) =>
         ObjectTypeUnitConverter()
           ..addMarshaler(
               SpongeClientConstants.REMOTE_EVENT_OBJECT_TYPE_CLASS_NAME,
-              _createRemoteEventMarshaller(service)),
+              _createRemoteEventMarshaler(service)),
       ]);
 
-ObjectTypeUnitConverterMapper _createRemoteEventMarshaller(
+ObjectTypeUnitConverterMapper _createRemoteEventMarshaler(
         ApplicationService service) =>
     (converter, value) async {
       RemoteEvent event = value as RemoteEvent;
