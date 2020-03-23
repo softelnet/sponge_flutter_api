@@ -320,7 +320,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
 
       valueWidget = IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
-        icon: getIcon(service, iconInfo),
+        icon: getIcon(editorContext.context, service, iconInfo),
         onPressed: onChanged != null
             ? () => onChanged(!(editorContext.value as bool))
             : null,
@@ -1007,7 +1007,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
 
       return IconButton(
         key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
-        icon: getIcon(service, iconInfo),
+        icon: getIcon(editorContext.context, service, iconInfo),
         onPressed: onTap,
       );
     }

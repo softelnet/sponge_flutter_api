@@ -206,6 +206,7 @@ Icon getActionIcon(BuildContext context, FlutterApplicationService service,
 }
 
 Icon getIcon(
+  BuildContext context,
   FlutterApplicationService service,
   IconInfo iconInfo, {
   IconData Function() defaultIconData,
@@ -219,7 +220,7 @@ Icon getIcon(
 
   return Icon(
     iconData,
-    color: string2color(iconInfo?.color),
+    color: string2color(iconInfo?.color) ?? getIconColor(context),
     size: iconInfo.size,
   );
 }

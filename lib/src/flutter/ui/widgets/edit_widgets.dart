@@ -1109,7 +1109,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return _createElementCard(
       ListTile(
         key: Key('list-element-$index'),
-        leading: getIcon(service, elementIconInfo),
+        leading: getIcon(context, service, elementIconInfo),
         title: elementTypeProvider.createCompactViewer(subUiContext),
         subtitle: subUiContext.valueDescription != null
             ? Text(subUiContext.valueDescription)

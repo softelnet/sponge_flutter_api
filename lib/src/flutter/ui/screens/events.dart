@@ -103,8 +103,11 @@ class _EventsPageState extends State<EventsPage>
           child: Card(
             key: Key('event-$i'),
             child: ListTile(
-              leading: getIcon(_presenter.service,
-                      Features.getIcon(eventData.type?.features)) ??
+              leading: getIcon(context,
+                    _presenter.service,
+                    Features.getIcon(eventData.event?.features) ??
+                        Features.getIcon(eventData.type?.features),
+                  ) ??
                   Icon(
                     Icons.event,
                     color: Theme.of(context).primaryColor,
