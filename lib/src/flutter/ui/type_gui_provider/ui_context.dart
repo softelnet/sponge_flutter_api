@@ -169,6 +169,9 @@ abstract class UiContext {
 
     var type = uiContext.qualifiedType.type;
 
+    // Merge features before unwrapping an annotated value.
+    uiContext.features = DataTypeUtils.mergeFeatures(type, uiContext.value);
+
     // Applying annotated properties.
     if (type.annotated && uiContext.value is AnnotatedValue) {
       AnnotatedValue annotatedValue = uiContext.value as AnnotatedValue;
@@ -184,8 +187,6 @@ abstract class UiContext {
         uiContext.typeDescription = annotatedValue.typeDescription;
       }
     }
-
-    uiContext.features = DataTypeUtils.mergeFeatures(type, uiContext.value);
 
     if (uiContext is TypeEditorContext) {
       uiContext.enabled =
