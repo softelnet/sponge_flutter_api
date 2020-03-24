@@ -27,23 +27,7 @@ TypeConverter createTypeConverter(ApplicationService service) =>
     DefaultTypeConverter()
       ..registerAll([
         MobileBinaryTypeUnitConverter(),
-        ObjectTypeUnitConverter()
-          ..addMarshaler(
-              SpongeClientConstants.REMOTE_EVENT_OBJECT_TYPE_CLASS_NAME,
-              _createRemoteEventMarshaler(service)),
       ]);
-
-ObjectTypeUnitConverterMapper _createRemoteEventMarshaler(
-        ApplicationService service) =>
-    (converter, value) async {
-      RemoteEvent event = value as RemoteEvent;
-
-      return await event.convertToJson(
-          Validate.notNull(
-              await service.spongeService.client.getEventType(event.name),
-              'Event type ${event.name} not found'),
-          converter);
-    };
 
 Future<String> marshallBinaryImageDrawing(
     DrawingBinaryValue binaryValue) async {
