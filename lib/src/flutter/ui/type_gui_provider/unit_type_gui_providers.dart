@@ -859,7 +859,7 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     return RecordTypeWidget(
       key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
-      uiContext: viewerContext.cloneAsEditor()..readOnly = true,
+      uiContext: viewerContext,
     );
   }
 

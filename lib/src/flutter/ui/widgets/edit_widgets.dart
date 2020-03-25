@@ -29,6 +29,7 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gu
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/view_widgets.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class OptionalScrollContainer extends InheritedWidget {
@@ -82,9 +83,11 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   Map<String, UnitTypeGuiProvider> _typeGuiProviders;
   bool _isExpanded;
 
+  bool get isRecordViewMode => widget.uiContext is TypeViewerContext;
+
   bool get isRecordReadOnly =>
-      (widget.uiContext is TypeEditorContext &&
-          (widget.uiContext as TypeEditorContext).readOnly) ||
+      widget.uiContext is! TypeEditorContext ||
+      (widget.uiContext as TypeEditorContext).readOnly ||
       (widget.uiContext.qualifiedType.type.provided?.readOnly ?? false);
 
   bool get isRecordEnabled => widget.uiContext.enabled;
@@ -128,6 +131,16 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     var label = widget.uiContext.getDecorationLabel();
 
     var margin = EdgeInsets.only(bottom: 5);
+
+    // Return widget for null record in the view mode.
+    if (isRecordViewMode &&
+        DataTypeUtils.isValueNotSet(widget.uiContext.value)) {
+      return TextViewWidget(
+        label: label,
+        text: null,
+        compact: true,
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1427,7 +1440,6 @@ class _TextEditWidgetState extends State<TextEditWidget> {
     var decoration = InputDecoration(
         border: InputBorder.none,
         labelText: editorContext.getDecorationLabel(),
-        labelStyle: getArgLabelTextStyle(editorContext.context),
         hintText: editorContext.hintText,
         suffixIcon: editorContext.enabled && !editorContext.readOnly
             ? InkResponse(

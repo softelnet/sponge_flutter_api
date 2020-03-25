@@ -23,16 +23,14 @@ abstract class BinaryValue {
 
 class DrawingBinaryValue extends BinaryValue {
   DrawingBinaryValue(BinaryType type) : super(type) {
-    expectedWidth =
-        int.tryParse(type.features[Features.BINARY_WIDTH]?.toString());
-    expectedHeight =
-        int.tryParse(type.features[Features.BINARY_HEIGHT]?.toString());
+    expectedWidth = (type.features[Features.BINARY_WIDTH] as num)?.toInt();
+    expectedHeight = (type.features[Features.BINARY_HEIGHT] as num)?.toInt();
 
     Validate.isTrue(expectedWidth != null && expectedHeight != null,
         "The image must have '${Features.BINARY_WIDTH}' and '${Features.BINARY_HEIGHT}' features set");
 
     var strokeWidth =
-        num.tryParse(type.features[Features.BINARY_STROKE_WIDTH]?.toString());
+        (type.features[Features.BINARY_STROKE_WIDTH] as num)?.toDouble();
     if (strokeWidth != null) {
       strokeWidthRatio = strokeWidth / expectedWidth;
     }

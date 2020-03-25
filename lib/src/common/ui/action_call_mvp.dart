@@ -324,7 +324,7 @@ class ActionCallPresenter
               dynamicTypes: dynamicTypes,
               features: features);
 
-      // _logger.fine('\t-> provided: ${newProvidedArgs.keys}');
+      // _logger.finer('\t-> provided: ${newProvidedArgs.keys}');
 
       var previousViewModelProvidedArgs = Map.from(viewModel.providedArgs);
       viewModel.providedArgs.addAll(newProvidedArgs);
@@ -342,8 +342,10 @@ class ActionCallPresenter
             _setArg(name, argValue.value,
                 preserveDependencies: preserveDependencies);
           } else {
-            _logger.warning(
-                'Unexpected provided values for ${actionMeta.name}/${argType.name}');
+            if (argType.provided.mode == ProvidedMode.EXPLICIT) {
+              _logger.warning(
+                  'Unexpected provided values for ${actionMeta.name}/${argType.name}');
+            }
           }
         }
       });
