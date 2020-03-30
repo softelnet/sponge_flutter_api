@@ -220,7 +220,7 @@ class FlutterApplicationSettings extends ApplicationSettings {
       await _prefs.setBool(PREF_MAP_ENABLE_MARKER_BADGES, value);
 
   bool get mapEnableCurrentLocation =>
-      _prefs.getBool(PREF_MAP_ENABLE_CURRENT_LOCATION) ?? true;
+      _prefs.getBool(PREF_MAP_ENABLE_CURRENT_LOCATION) ?? false;
 
   Future<bool> setMapEnableCurrentLocation(bool value) async =>
       await _prefs.setBool(PREF_MAP_ENABLE_CURRENT_LOCATION, value);

@@ -93,9 +93,10 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   bool get isRecordEnabled => widget.uiContext.enabled;
 
   bool _hasRootRecordSingleLeadingField() {
-    var thisLeadingFieldPath =
-        DataTypeGuiUtils.getRootRecordSingleLeadingFieldPath(
-            widget.uiContext.qualifiedType, widget.uiContext.value as Map);
+    var thisLeadingFieldPath = DataTypeGuiUtils.getRootRecordSingleLeadingField(
+            widget.uiContext.qualifiedType, widget.uiContext.value as Map)
+        ?.qType
+        ?.path;
 
     return widget.uiContext.rootRecordSingleLeadingField != null &&
         widget.uiContext.rootRecordSingleLeadingField == thisLeadingFieldPath;

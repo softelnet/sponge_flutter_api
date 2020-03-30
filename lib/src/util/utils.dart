@@ -75,13 +75,13 @@ class DataTypeGuiUtils {
     return hasType(type, predicate);
   }
 
-  static String getRootRecordSingleLeadingFieldPathByAction(
+  static RootRecordSingleLeadingField getRootRecordSingleLeadingFieldByAction(
       ActionData actionData) {
     var recordType = actionData.argsAsRecordType;
-    var path = getRootRecordSingleLeadingFieldPath(
+    var rootRecordSingleLeadingField = getRootRecordSingleLeadingField(
         QualifiedDataType(recordType), actionData.argsAsRecord);
 
-    if (path != null) {
+    if (rootRecordSingleLeadingField != null) {
       // If the action has buttons, it cannot have the record single leading field.
       var actionMeta = actionData.actionMeta;
       if (actionMeta.callable && showCall(actionMeta) ||
@@ -92,10 +92,10 @@ class DataTypeGuiUtils {
       }
     }
 
-    return path;
+    return rootRecordSingleLeadingField;
   }
 
-  static String getRootRecordSingleLeadingFieldPath(
+  static RootRecordSingleLeadingField getRootRecordSingleLeadingField(
       QualifiedDataType qualifiedRecordType, Map recordValue) {
     if (!(qualifiedRecordType.type is RecordType)) {
       return null;
@@ -105,12 +105,15 @@ class DataTypeGuiUtils {
 
     if (qualifiedRecordType.isRoot && recordType.fields.length == 1) {
       var fieldType = recordType.fields[0];
-      var fieldFeatures =
-          DataTypeUtils.mergeFeatures(fieldType, recordValue[fieldType.name]);
+      var fieldValue = recordValue[fieldType.name];
+      var fieldFeatures = DataTypeUtils.mergeFeatures(fieldType, fieldValue);
 
       // TODO Better check.
       if (fieldFeatures[Features.GEO_MAP] != null) {
-        return qualifiedRecordType.createChild(fieldType).path;
+        return RootRecordSingleLeadingField(
+            qualifiedRecordType.createChild(fieldType),
+            fieldValue,
+            fieldFeatures);
       }
     }
 
@@ -198,6 +201,14 @@ class DefaultDrawerHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+class RootRecordSingleLeadingField {
+  RootRecordSingleLeadingField(this.qType, this.fieldValue, this.features);
+
+  QualifiedDataType qType;
+  dynamic fieldValue;
+  Map<String, Object> features;
 }
 
 class IconTextPopupMenuItemWidget extends StatelessWidget {

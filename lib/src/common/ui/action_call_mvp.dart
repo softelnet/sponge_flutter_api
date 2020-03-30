@@ -547,9 +547,16 @@ class ActionCallPresenter
         .any((arg) => DataTypeGuiUtils.hasListTypeScroll(arg));
   }
 
+  bool get canSwipeToClose =>
+      // TODO Is checking the record single leading field for swipe to close ok? Swipe shpuld be disabled for maps.
+      service.settings.actionSwipeToClose &&
+      !(DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(actionData)
+              ?.features
+              ?.containsKey(Features.GEO_MAP) ??
+          false);
+
   bool hasRootRecordSingleLeadingField() =>
-      DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(
-          actionData) !=
+      DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(actionData) !=
       null;
 
   Future<bool> isActionActive() async {

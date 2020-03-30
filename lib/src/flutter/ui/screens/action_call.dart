@@ -94,7 +94,7 @@ class _ActionCallPageState extends State<ActionCallPage>
 
     return WillPopScope(
       child: SwipeDetector(
-        onSwipe: service.settings.actionSwipeToClose
+        onSwipe: _presenter.canSwipeToClose
             ? (context) => _onCancel(context)
             : null,
         child: Scaffold(
@@ -301,8 +301,8 @@ class _ActionCallPageState extends State<ActionCallPage>
       enabled: true,
       loading: state != null ? state.loading : [],
       rootRecordSingleLeadingField:
-          DataTypeGuiUtils.getRootRecordSingleLeadingFieldPathByAction(
-              _presenter.actionData),
+          DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(
+              _presenter.actionData)?.qType?.path,
     );
   }
 
