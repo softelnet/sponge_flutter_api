@@ -74,12 +74,12 @@ class _ActionCallPageState extends State<ActionCallPage>
     var service = ApplicationProvider.of(context).service;
 
     // Use a copy of the action data.
-    _presenter ??=
-        ActionCallPresenter(ActionCallViewModel(widget.actionData.clone()), this)
-          ..setService(service)
-          ..init(
-            verifyIsActive: widget.verifyIsActive,
-          );
+    _presenter ??= ActionCallPresenter(
+        ActionCallViewModel(widget.actionData.clone()), this)
+      ..setService(service)
+      ..init(
+        verifyIsActive: widget.verifyIsActive,
+      );
 
     _presenter.ensureRunning();
 
@@ -94,9 +94,8 @@ class _ActionCallPageState extends State<ActionCallPage>
 
     return WillPopScope(
       child: SwipeDetector(
-        onSwipe: _presenter.canSwipeToClose
-            ? (context) => _onCancel(context)
-            : null,
+        onSwipe:
+            _presenter.canSwipeToClose ? (context) => _onCancel(context) : null,
         child: Scaffold(
           appBar: AppBar(
             title: Tooltip(
@@ -302,7 +301,9 @@ class _ActionCallPageState extends State<ActionCallPage>
       loading: state != null ? state.loading : [],
       rootRecordSingleLeadingField:
           DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(
-              _presenter.actionData)?.qType?.path,
+                  _presenter.actionData)
+              ?.qType
+              ?.path,
     );
   }
 
@@ -434,6 +435,7 @@ class _ActionCallPageState extends State<ActionCallPage>
     return SubActionsWidget.forRecord(
       _createEditorContext(context, ProvideActionArgsStateNoInvocation()),
       _presenter.service.spongeService,
+      tooltip: 'Context actions',
     );
   }
 }

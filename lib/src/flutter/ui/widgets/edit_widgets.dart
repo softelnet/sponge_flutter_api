@@ -250,6 +250,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
       var subActionsWidget = SubActionsWidget.forRecord(
         widget.uiContext,
         service.spongeService,
+        tooltip: 'Context actions',
       );
 
       if (subActionsWidget != null) {
@@ -260,7 +261,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
               shape: BoxShape.circle,
               color: Theme.of(context).dividerColor,
             ),
-            margin: EdgeInsets.only(right: 5),
+            margin: EdgeInsets.only(top: 5, right: 5),
           ),
           alignment: Alignment.centerRight,
         ));
