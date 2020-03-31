@@ -339,7 +339,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Show current location'),
+                        title: Text('Show current location (experimental)'),
                         trailing: Switch(
                             value: settings.mapEnableCurrentLocation,
                             onChanged: (value) =>

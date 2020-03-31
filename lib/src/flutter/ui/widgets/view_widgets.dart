@@ -202,9 +202,7 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Center(
-            child: _buldScrollContainer(widget.textViewer),
-          ),
+          child: _buldScrollContainer(widget.textViewer),
         ),
       ),
     );
