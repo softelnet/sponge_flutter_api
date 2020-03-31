@@ -35,6 +35,7 @@ class _EventsPageState extends State<EventsPage>
     with SingleTickerProviderStateMixin
     implements EventsView {
   static const String DISMISS_ALL = 'dismissAll';
+  static const String CLEAR_SYSTEM_NOTIFICATIONS = 'clearSystemNotifications';
 
   EventsPresenter _presenter;
   AnimationController _controller;
@@ -92,8 +93,6 @@ class _EventsPageState extends State<EventsPage>
   Widget _buildEventList() {
     var events = _presenter.getEvents();
 
-    unawaited(_presenter.clearEventNotifications());
-
     return ListView.builder(
       key: Key('eventList'),
       itemBuilder: (context, i) {
@@ -103,7 +102,8 @@ class _EventsPageState extends State<EventsPage>
           child: Card(
             key: Key('event-$i'),
             child: ListTile(
-              leading: getIcon(context,
+              leading: getIcon(
+                    context,
                     _presenter.service,
                     Features.getIcon(eventData.event?.features) ??
                         Features.getIcon(eventData.type?.features),
@@ -176,6 +176,9 @@ class _EventsPageState extends State<EventsPage>
               _presenter.dismissAll();
               setState(() {});
               break;
+            case CLEAR_SYSTEM_NOTIFICATIONS:
+              unawaited(_presenter.clearEventNotifications());
+              break;
           }
         },
         itemBuilder: (BuildContext context) => [
@@ -184,6 +187,13 @@ class _EventsPageState extends State<EventsPage>
             child: IconTextPopupMenuItemWidget(
               icon: Icons.clear_all,
               text: 'Dismiss all events',
+            ),
+          ),
+          PopupMenuItem<String>(
+            value: CLEAR_SYSTEM_NOTIFICATIONS,
+            child: IconTextPopupMenuItemWidget(
+              icon: Icons.notifications_off,
+              text: 'Clear system notifications',
             ),
           ),
         ],
