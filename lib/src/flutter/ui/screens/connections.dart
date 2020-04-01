@@ -78,7 +78,6 @@ class _ConnectionsPageState extends State<ConnectionsPage>
             _addConnection().catchError((e) => handleError(context, e)),
         tooltip: 'Add',
         child: Icon(Icons.add),
-        backgroundColor: getFloatingButtonBackgroudColor(context),
       ),
     );
   }

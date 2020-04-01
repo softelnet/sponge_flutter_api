@@ -83,7 +83,6 @@ class _EventsPageState extends State<EventsPage>
         //   onPressed: () => setState(() {}),
         //   tooltip: 'Refresh events',
         //   child: Icon(Icons.refresh),
-        //   backgroundColor: UiUtils.getFloatingButtonBackgroudColor(context),
         // ),
       ),
       onWillPop: () async => await showAppExitConfirmationDialog(context),

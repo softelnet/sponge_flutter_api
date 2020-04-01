@@ -78,7 +78,6 @@ class _DrawingPageState extends State<DrawingPage> {
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.clear),
-          backgroundColor: getFloatingButtonBackgroudColor(context),
           onPressed: () => setState(() => _controller.clear()),
           tooltip: 'Clear drawing',
         ),

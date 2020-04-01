@@ -355,7 +355,6 @@ class _ActionsPageState extends State<ActionsPage>
             .catchError((e) => handleError(context, e)),
         tooltip: 'Refresh actions',
         child: Icon(Icons.refresh),
-        backgroundColor: getFloatingButtonBackgroudColor(context),
       );
 
   Future<void> _refreshActions(BuildContext context) async {
