@@ -199,9 +199,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
                     shape: ContinuousRectangleBorder(
                       side: BorderSide(
                         width: 1,
-                        color: Theme.of(widget.uiContext.context)
-                            .dividerColor
-                            .withAlpha(8),
+                        color: getBorderColor(widget.uiContext.context),
                       ),
                     ),
                   ),
@@ -492,7 +490,7 @@ class _ProvidedValueSetEditorWidgetState
 
       var dropdown = DropdownButtonHideUnderline(
         child: DropdownButton(
-          key: Key(createDataTypeKeyValue(widget.qType)),
+          key: createDataTypeKey(widget.qType),
           // TODO Is this condition required?
           value: hasItems
               ? widget.value /*widget.presenter.getArg(widget.index)*/ : null,
@@ -531,7 +529,7 @@ class _ProvidedValueSetEditorWidgetState
         children: <Widget>[
           Flexible(
             child: TextField(
-              key: Key(createDataTypeKeyValue(widget.qType)),
+              key: createDataTypeKey(widget.qType),
               decoration: widget.label != null
                   ? InputDecoration(
                       border: InputBorder.none, labelText: widget.label)
@@ -1460,7 +1458,7 @@ class _TextEditWidgetState extends State<TextEditWidget> {
         editorContext.features, Features.STRING_OBSCURE, () => false);
 
     return TextFormField(
-      key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+      key: createDataTypeKey(editorContext.qualifiedType),
       controller: _controller,
       keyboardType: inputType,
       decoration: decoration,
@@ -1504,6 +1502,11 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
     var label = widget.uiContext.getDecorationLabel();
     var valueMap = widget.uiContext.value as Map;
 
+    var keyLabel = type.keyType.label;
+    var valueLabel = type.valueType.label;
+
+    var margin = EdgeInsets.all(5);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -1515,43 +1518,64 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
             ),
             padding: EdgeInsets.symmetric(vertical: 10),
           ),
-        ListBody(
-          children: ListTile.divideTiles(
-                  tiles: valueMap.keys.map<Widget>((key) {
-                    var keyContext = TypeViewerContext(
-                      widget.uiContext.name + '-key',
-                      context,
-                      widget.uiContext.callbacks,
-                      widget.uiContext.qualifiedType.createChild(type.keyType),
-                      key,
-                      showLabel: false, // TODO Show label.
-                      loading: widget.uiContext.loading,
-                    );
+        Table(
+          border: TableBorder.all(
+            color: getBorderColor(widget.uiContext.context),
+          ),
+          columnWidths: {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
+          children: [
+            if (keyLabel != null && valueLabel != null)
+              TableRow(children: [
+                Container(
+                  margin: margin,
+                  child: Text(keyLabel),
+                ),
+                Container(
+                  margin: margin,
+                  child: Text(valueLabel),
+                ),
+              ]),
+            ...valueMap.keys.toList().asMap().entries.map<TableRow>((entry) {
+              var index = entry.key;
+              var key = entry.value;
+              var keyContext = TypeViewerContext(
+                '${widget.uiContext.name}-key-$index',
+                context,
+                widget.uiContext.callbacks,
+                widget.uiContext.qualifiedType.createChild(type.keyType),
+                key,
+                showLabel: false,
+                loading: widget.uiContext.loading,
+              );
 
-                    var valueContext = TypeViewerContext(
-                      widget.uiContext.name + '-value',
-                      context,
-                      widget.uiContext.callbacks,
-                      widget.uiContext.qualifiedType
-                          .createChild(type.valueType),
-                      valueMap[key],
-                      showLabel: false, // TODO Show label.
-                      loading: widget.uiContext.loading,
-                    );
+              var valueContext = TypeViewerContext(
+                '${widget.uiContext.name}-value-$index',
+                context,
+                widget.uiContext.callbacks,
+                widget.uiContext.qualifiedType.createChild(type.valueType),
+                valueMap[key],
+                showLabel: false,
+                loading: widget.uiContext.loading,
+              );
 
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: widget.uiContext.typeGuiProvider
-                          .getProvider(type.keyType)
-                          .createViewer(keyContext),
-                      subtitle: widget.uiContext.typeGuiProvider
-                          .getProvider(type.valueType)
-                          .createViewer(valueContext),
-                      dense: true,
-                    );
-                  }),
-                  context: context)
-              .toList(),
+              return TableRow(
+                children: [
+                  Container(
+                    margin: margin,
+                    child: widget.uiContext.typeGuiProvider
+                        .getProvider(type.keyType)
+                        .createViewer(keyContext),
+                  ),
+                  Container(
+                    margin: margin,
+                    child: widget.uiContext.typeGuiProvider
+                        .getProvider(type.valueType)
+                        .createViewer(valueContext),
+                  ),
+                ],
+              );
+            }),
+          ],
         ),
       ],
     );

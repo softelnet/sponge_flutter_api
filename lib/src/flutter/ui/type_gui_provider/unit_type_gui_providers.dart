@@ -310,7 +310,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
     if (widgetType == Features.WIDGET_SWITCH &&
         !editorContext.qualifiedType.type.nullable) {
       valueWidget = wrap(Switch(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         value: editorContext.value ?? (type.nullable ? null : false),
         onChanged: onChanged,
       ));
@@ -319,7 +319,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
       var service = ApplicationProvider.of(editorContext.context).service;
 
       valueWidget = IconButton(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         icon: getIcon(editorContext.context, service, iconInfo),
         onPressed: onChanged != null
             ? () => onChanged(!(editorContext.value as bool))
@@ -327,7 +327,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
       );
     } else {
       valueWidget = wrap(Checkbox(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         value: editorContext.value ?? (type.nullable ? null : false),
         onChanged: onChanged,
         tristate: type.nullable,
@@ -372,7 +372,7 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
       return createCompactViewer(editorContext.cloneAsViewer());
     } else {
       return DateTimeEditWidget(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         name: editorContext.getDecorationLabel(),
         initialValue: editorContext.value,
         onValueChanged: editorContext.onSave,
@@ -530,7 +530,7 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
                   )
                 : null,
             subtitle: SliderWidget(
-              key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+              key: createDataTypeKey(editorContext.qualifiedType),
               name: label,
               initialValue: editorContext.value,
               minValue: minValue,
@@ -608,7 +608,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
     if (hasElementValueSet) {
       return type.unique
           ? MultiChoiceListEditWidget(
-              key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+              key: createDataTypeKey(editorContext.qualifiedType),
               qType: editorContext.qualifiedType,
               labelText: editorContext.getDecorationLabel(),
               value: editorContext.value as List,
@@ -620,7 +620,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
     } else {
       // TODO type.unique not handled in GUI.
       return ListTypeWidget(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         uiContext: editorContext,
         guiProvider: this,
         useScrollableIndexedList: _useScrollableIndexedList(editorContext),
@@ -634,7 +634,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   @override
   Widget doCreateCompactViewer(TypeViewerContext viewerContext) {
     return ListTypeWidget(
-      key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
+      key: createDataTypeKey(viewerContext.qualifiedType),
       uiContext: viewerContext,
       guiProvider: this,
       useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
@@ -647,7 +647,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   @override
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     return ListTypeWidget(
-      key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
+      key: createDataTypeKey(viewerContext.qualifiedType),
       uiContext: viewerContext,
       guiProvider: this,
       useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
@@ -834,7 +834,7 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   @override
   Widget doCreateEditor(TypeEditorContext editorContext) {
     return RecordTypeWidget(
-      key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+      key: createDataTypeKey(editorContext.qualifiedType),
       uiContext: editorContext,
     );
   }
@@ -858,7 +858,7 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   @override
   Widget doCreateViewer(TypeViewerContext viewerContext) {
     return RecordTypeWidget(
-      key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
+      key: createDataTypeKey(viewerContext.qualifiedType),
       uiContext: viewerContext,
     );
   }
@@ -909,7 +909,7 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
             children: [
               Expanded(
                 child: ColorEditWidget(
-                  key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+                  key: createDataTypeKey(editorContext.qualifiedType),
                   name:
                       'PICK ${editorContext.typeLabel?.toUpperCase() ?? "COLOR"}',
                   initialColor: string2color(editorContext.value),
@@ -1006,7 +1006,7 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
       var service = ApplicationProvider.of(editorContext.context).service;
 
       return IconButton(
-        key: Key(createDataTypeKeyValue(editorContext.qualifiedType)),
+        key: createDataTypeKey(editorContext.qualifiedType),
         icon: getIcon(editorContext.context, service, iconInfo),
         onPressed: onTap,
       );

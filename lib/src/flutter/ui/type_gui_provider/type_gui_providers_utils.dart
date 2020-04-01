@@ -107,7 +107,7 @@ class TypeGuiProviderUtils {
     var label = viewerContext.getDecorationLabel();
 
     return TextViewWidget(
-      key: Key(createDataTypeKeyValue(viewerContext.qualifiedType)),
+      key: createDataTypeKey(viewerContext.qualifiedType),
       label: label,
       text: stringValue,
       format: getFormat(provider, viewerContext),

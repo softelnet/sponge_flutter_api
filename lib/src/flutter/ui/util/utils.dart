@@ -162,6 +162,9 @@ Color getThemedBackgroundColor(BuildContext context) =>
         ? Theme.of(context).canvasColor
         : Theme.of(context).primaryColorDark.withAlpha(100);
 
+Color getBorderColor(BuildContext context) =>
+    Theme.of(context).dividerColor.withAlpha(15);
+
 Color getCallIconColor(BuildContext context) =>
     Theme.of(context).accentColor.withAlpha(120);
 
@@ -367,7 +370,25 @@ Future<void> showEventHandlerAction(
   }
 }
 
-String createDataTypeKeyValue(QualifiedDataType qType) => 'value-${qType.path}';
+String createDataTypeKeyValue(
+  QualifiedDataType qType, {
+  String qualifier,
+}) =>
+    qType?.path != null
+        ? 'value-${qType.path}${qualifier != null ? "-" + qualifier : ""}'
+        : null;
+
+Key createDataTypeKey(
+  QualifiedDataType qType, {
+  String qualifier,
+}) {
+  var value = createDataTypeKeyValue(
+    qType,
+    qualifier: qualifier,
+  );
+
+  return value != null ? Key(value) : null;
+}
 
 bool shouldConnectionBeFiltered(
     SpongeConnection connection, NetworkStatus networkStatus) {

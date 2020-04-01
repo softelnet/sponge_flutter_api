@@ -42,6 +42,10 @@ abstract class UiContextCallbacks {
 }
 
 class NoOpUiContextCallbacks implements UiContextCallbacks {
+  NoOpUiContextCallbacks(this.service);
+
+  final FlutterApplicationService service;
+
   @override
   void onSave(QualifiedDataType qType, dynamic value) {}
 
@@ -89,8 +93,6 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
   @override
   void setAdditionalData(
       QualifiedDataType qType, String additionalDataKey, value) {}
-
-  FlutterApplicationService get service => null;
 }
 
 typedef String TypeEditorValidatorCallback(String value);

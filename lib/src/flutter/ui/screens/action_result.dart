@@ -104,7 +104,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
     var createViewerContext = () => TypeViewerContext(
           '${widget.actionData.actionMeta.name}-result',
           context,
-          NoOpUiContextCallbacks(),
+          NoOpUiContextCallbacks(ApplicationProvider.of(context).service),
           QualifiedDataType(widget.actionData.actionMeta.result),
           result,
           typeLabel: resultLabel,
