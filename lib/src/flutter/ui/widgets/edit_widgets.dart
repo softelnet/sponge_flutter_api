@@ -1535,7 +1535,12 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
                   child: Text(valueLabel),
                 ),
               ]),
-            ...valueMap.keys.toList().asMap().entries.map<TableRow>((entry) {
+            ...(valueMap ?? {})
+                .keys
+                .toList()
+                .asMap()
+                .entries
+                .map<TableRow>((entry) {
               var index = entry.key;
               var key = entry.value;
               var keyContext = TypeViewerContext(
