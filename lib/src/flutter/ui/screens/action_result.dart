@@ -86,7 +86,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
   String get resultLabel =>
       widget.actionData.actionMeta.result?.label ?? 'Result';
 
-  static UnitTypeGuiProvider getActionResultProvider(
+  static TypeGuiProvider getActionResultProvider(
       BuildContext context, ActionData actionData) {
     if (actionData is FlutterActionData) {
       return actionData.resultProvider;
@@ -94,12 +94,12 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
 
     return ApplicationProvider.of(context)
         .service
-        .typeGuiProvider
+        .typeGuiProviderRegistry
         .getProvider(actionData.actionMeta.result);
   }
 
   Widget _buildActualResultWidget(BuildContext context, dynamic result) {
-    UnitTypeGuiProvider provider =
+    TypeGuiProvider provider =
         getActionResultProvider(context, widget.actionData);
     var createViewerContext = () => TypeViewerContext(
           '${widget.actionData.actionMeta.name}-result',

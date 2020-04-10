@@ -26,19 +26,22 @@ class TypeGuiProviderUtils {
   static const int LABEL_MAX_LENGTH = 200;
 
   static String getFormat<T extends DataType>(
-    UnitTypeGuiProvider<T> provider,
     UiContext uiContext,
   ) =>
-      DataTypeUtils.getFeatureOrProperty(provider.type, uiContext.value,
-          DataType.FEATURE_FORMAT, () => provider.type.format);
+      DataTypeUtils.getFeatureOrProperty(
+        uiContext.qualifiedType.type,
+        uiContext.value,
+        DataType.FEATURE_FORMAT,
+        () => uiContext.qualifiedType.type.format,
+      );
 
-  static Widget createUnsupportedTypeEditor<T extends DataType>(
-    UnitTypeGuiProvider<T> provider, {
+  static Widget createUnsupportedTypeEditor(
+    DataType type, {
     @required String labelText,
     @required String hintText,
     String message,
   }) {
-    message = message ?? 'Unsupported type ${provider.type.kindValue}';
+    message = message ?? 'Unsupported type ${type.kindValue}';
     return Tooltip(
       message: message,
       child: TextFormField(
@@ -61,12 +64,10 @@ class TypeGuiProviderUtils {
 
   static String obscure(String text) => text?.replaceAll(RegExp(r'.'), '*');
 
-  static Widget createTextBasedCompactViewer<T extends DataType>(
-    UnitTypeGuiProvider<T> provider,
+  static Widget createTextBasedCompactViewer(
     TypeViewerContext viewerContext,
   ) {
     return createTextBasedViewer(
-      provider,
       viewerContext,
       maxLength: LABEL_MAX_LENGTH,
       compact: true,
@@ -74,8 +75,7 @@ class TypeGuiProviderUtils {
     );
   }
 
-  static Widget createTextBasedExtendedViewer<T extends DataType>(
-    UnitTypeGuiProvider<T> provider,
+  static Widget createTextBasedExtendedViewer(
     TypeViewerContext viewerContext,
   ) {
     String stringValue =
@@ -87,11 +87,10 @@ class TypeGuiProviderUtils {
 
     return ExtendedTextViewWidget(
         textViewer:
-            createTextBasedViewer(provider, viewerContext, showLabel: false));
+            createTextBasedViewer(viewerContext, showLabel: false));
   }
 
   static Widget createTextBasedViewer<T extends DataType>(
-    UnitTypeGuiProvider<T> provider,
     TypeViewerContext viewerContext, {
     int maxLength = -1,
     bool compact = false,
@@ -110,7 +109,7 @@ class TypeGuiProviderUtils {
       key: createDataTypeKey(viewerContext.qualifiedType),
       label: label,
       text: stringValue,
-      format: getFormat(provider, viewerContext),
+      format: getFormat(viewerContext),
       maxLength: maxLength,
       compact: compact,
       showLabel: showLabel && label != null,
@@ -118,7 +117,7 @@ class TypeGuiProviderUtils {
   }
 
   static Widget createUnsupportedTypeViewer<T extends DataType>(
-    UnitTypeGuiProvider<T> provider, {
+    TypeGuiProvider<T> provider, {
     @required String labelText,
     String message,
   }) {

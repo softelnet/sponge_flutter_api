@@ -21,8 +21,8 @@ import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dar
 import 'package:sponge_flutter_api/src/common/ui/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
@@ -61,7 +61,7 @@ class _ActionCallPageState extends State<ActionCallPage>
     implements ActionCallView {
   ActionCallPresenter _presenter;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  RecordTypeGuiProvider _mainArgsGuiProvider;
+  TypeGuiProvider _mainArgsGuiProvider;
 
   @override
   void dispose() {

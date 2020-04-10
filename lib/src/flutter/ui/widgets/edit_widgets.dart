@@ -80,7 +80,7 @@ class RecordTypeWidget extends StatefulWidget {
 }
 
 class _RecordTypeWidgetState extends State<RecordTypeWidget> {
-  Map<String, UnitTypeGuiProvider> _typeGuiProviders;
+  Map<String, TypeGuiProvider> _typeGuiProviders;
   bool _isExpanded;
 
   bool get isRecordViewMode => widget.uiContext is TypeViewerContext;
@@ -1372,18 +1372,18 @@ class _SliderWidgetState extends State<SliderWidget> {
 class TextEditWidget extends StatefulWidget {
   TextEditWidget({
     Key key,
-    @required this.provider,
     @required this.editorContext,
     @required this.inputType,
     this.validator,
     this.maxLines,
+    @required this.onGetValueFromString,
   }) : super(key: key);
 
-  final UnitTypeGuiProvider provider;
   final TypeEditorContext editorContext;
   final TextInputType inputType;
   final TypeEditorValidatorCallback validator;
   final int maxLines;
+  final dynamic Function(String) onGetValueFromString;
 
   @override
   _TextEditWidgetState createState() => _TextEditWidgetState();
@@ -1401,7 +1401,7 @@ class _TextEditWidgetState extends State<TextEditWidget> {
     _controller = TextEditingController(text: _sourceValue)
       ..addListener(() {
         widget.editorContext
-            .onUpdate(widget.provider.getValueFromString(_controller.text));
+            .onUpdate(widget.onGetValueFromString(_controller.text));
       });
   }
 
@@ -1424,14 +1424,12 @@ class _TextEditWidgetState extends State<TextEditWidget> {
   @override
   Widget build(BuildContext context) {
     return _createTextEditWidget(
-      widget.provider,
       widget.editorContext,
       inputType: widget.inputType,
     );
   }
 
   Widget _createTextEditWidget<T extends DataType>(
-    UnitTypeGuiProvider<T> provider,
     TypeEditorContext editorContext, {
     @required TextInputType inputType,
     TypeEditorValidatorCallback validator,
@@ -1463,19 +1461,19 @@ class _TextEditWidgetState extends State<TextEditWidget> {
       keyboardType: inputType,
       decoration: decoration,
       onFieldSubmitted: (String value) {
-        editorContext.onSave(provider.getValueFromString(value));
+        editorContext.onSave(widget.onGetValueFromString(value));
       },
       // TODO Are both onFieldSubmitted and onSaved necessary?
       onSaved: (String value) {
-        editorContext.onSave(provider.getValueFromString(value));
+        editorContext.onSave(widget.onGetValueFromString(value));
       },
       validator: (value) {
-        if (!provider.type.nullable && value.isEmpty) {
+        if (!editorContext.qualifiedType.type.nullable && value.isEmpty) {
           return '${editorContext.qualifiedType.type.label ?? "Value"} is required';
         }
 
         return validator != null
-            ? validator(provider.getValueFromString(value))
+            ? validator(widget.onGetValueFromString(value))
             : null;
       },
       maxLines: obscure ? 1 : maxLines,
@@ -1567,13 +1565,13 @@ class _MapTypeWidgetState extends State<MapTypeWidget> {
                 children: [
                   Container(
                     margin: margin,
-                    child: widget.uiContext.typeGuiProvider
+                    child: widget.uiContext.typeGuiProviderRegistry
                         .getProvider(type.keyType)
                         .createViewer(keyContext),
                   ),
                   Container(
                     margin: margin,
-                    child: widget.uiContext.typeGuiProvider
+                    child: widget.uiContext.typeGuiProviderRegistry
                         .getProvider(type.valueType)
                         .createViewer(valueContext),
                   ),

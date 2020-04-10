@@ -16,8 +16,8 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 
-class DefaultTypeGuiProvider extends TypeGuiProvider {
-  DefaultTypeGuiProvider() {
+class DefaultTypeGuiProviderRegistry extends TypeGuiProviderRegistry {
+  DefaultTypeGuiProviderRegistry() {
     // Register default GUI providers.
     registerAll({
       DataTypeKind.ANY: (type) => AnyTypeGuiProvider(type),

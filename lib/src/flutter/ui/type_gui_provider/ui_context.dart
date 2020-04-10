@@ -148,7 +148,7 @@ abstract class UiContext {
   // TODO Use this.
   FlutterApplicationService get service => callbacks.service;
 
-  TypeGuiProvider get typeGuiProvider => service.typeGuiProvider;
+  TypeGuiProviderRegistry get typeGuiProviderRegistry => service.typeGuiProviderRegistry;
 
   String get safeTypeLabel => typeLabel ?? qualifiedType.type.name;
 
@@ -202,6 +202,10 @@ abstract class UiContext {
       qualifiedType.path != null && loading.contains(qualifiedType.path);
 
   bool get isAnyValueLoading => loading.isNotEmpty;
+
+  bool get isThisRootRecordSingleLeadingField =>
+      rootRecordSingleLeadingField != null &&
+      rootRecordSingleLeadingField == qualifiedType.path;
 }
 
 class TypeEditorContext extends UiContext {

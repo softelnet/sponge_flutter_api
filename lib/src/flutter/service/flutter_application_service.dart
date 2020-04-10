@@ -46,7 +46,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     T extends FlutterApplicationSettings> extends ApplicationService<S, T> {
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
-  DefaultTypeGuiProvider typeGuiProvider = DefaultTypeGuiProvider();
+  DefaultTypeGuiProviderRegistry typeGuiProviderRegistry = DefaultTypeGuiProviderRegistry();
   final icons = MdiIcons();
   BuildContext _mainBuildContext;
   final Map<String, ActionIntentHandler> _actionIntentHandlers = {};
@@ -218,8 +218,8 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
   BuildContext get mainBuildContext => _mainBuildContext;
 
-  UnitTypeGuiProvider getTypeGuiProvider(DataType type) =>
-      typeGuiProvider.getProvider(type);
+  TypeGuiProvider getTypeGuiProvider(DataType type) =>
+      typeGuiProviderRegistry.getProvider(type);
 
   @override
   Future<S> createSpongeService(
@@ -231,7 +231,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
       connection,
       typeConverter,
       featureConverter,
-      typeGuiProvider,
+      typeGuiProviderRegistry,
     );
 
     return service;
@@ -332,18 +332,18 @@ class FlutterSpongeService extends SpongeService<FlutterActionData> {
     SpongeConnection connection,
     TypeConverter typeConverter,
     FeatureConverter featureConverter,
-    this.typeGuiProvider, {
+    this.typeGuiProviderRegistry, {
     Map<String, ActionIntentHandler> actionIntentHandlers,
   }) : super(connection,
             typeConverter: typeConverter,
             featureConverter: featureConverter,
             actionIntentHandlers: actionIntentHandlers);
 
-  final TypeGuiProvider typeGuiProvider;
+  final TypeGuiProviderRegistry typeGuiProviderRegistry;
 
   @override
   FlutterActionData createActionData(ActionMeta actionMeta) =>
-      FlutterActionData(actionMeta, typeGuiProvider);
+      FlutterActionData(actionMeta, typeGuiProviderRegistry);
 }
 
 class EventNotificationState with ChangeNotifier {

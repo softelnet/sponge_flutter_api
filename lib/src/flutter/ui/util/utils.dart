@@ -399,17 +399,9 @@ bool shouldConnectionBeFiltered(
 }
 
 String normalizeString(String value) {
-  if (value == null) {
-    return null;
-  }
+  value = value?.trim();
 
-  value = value.trim();
-
-  if (value.isEmpty) {
-    return null;
-  }
-
-  return value;
+  return (value?.isEmpty ?? true) ? null : value;
 }
 
 IconData getPopupMenuIconData(BuildContext context) {

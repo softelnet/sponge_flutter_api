@@ -16,16 +16,16 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
 class FlutterActionData extends ActionData {
-  FlutterActionData(ActionMeta actionMeta, this.typeGuiProvider)
+  FlutterActionData(ActionMeta actionMeta, this.typeGuiProviderRegistry)
       : super(actionMeta) {
     _initProviders();
   }
 
-  final TypeGuiProvider typeGuiProvider;
-  Map<String, UnitTypeGuiProvider> _argProviders;
-  Map<String, UnitTypeGuiProvider> get argProviders => _argProviders;
-  UnitTypeGuiProvider _resultProvider;
-  UnitTypeGuiProvider get resultProvider => _resultProvider;
+  final TypeGuiProviderRegistry typeGuiProviderRegistry;
+  Map<String, TypeGuiProvider> _argProviders;
+  Map<String, TypeGuiProvider> get argProviders => _argProviders;
+  TypeGuiProvider _resultProvider;
+  TypeGuiProvider get resultProvider => _resultProvider;
 
   Map<String, Map<String, dynamic>> _additionalArgData = {};
 
@@ -44,11 +44,11 @@ class FlutterActionData extends ActionData {
   void _initArgProviders() {
     _argProviders = Map.fromIterable(actionMeta.args,
         key: (argType) => argType.name,
-        value: (argType) => typeGuiProvider.getProvider(argType));
+        value: (argType) => typeGuiProviderRegistry.getProvider(argType));
   }
 
   void _initResultProvider() {
-    _resultProvider = typeGuiProvider.getProvider(actionMeta.result);
+    _resultProvider = typeGuiProviderRegistry.getProvider(actionMeta.result);
   }
 
   void _initProviders() {
@@ -58,7 +58,7 @@ class FlutterActionData extends ActionData {
 
   @override
   FlutterActionData clone({ActionData prototype}) =>
-      (super.clone(prototype: FlutterActionData(actionMeta, typeGuiProvider))
+      (super.clone(prototype: FlutterActionData(actionMeta, typeGuiProviderRegistry))
           as FlutterActionData)
         .._initProviders()
         .._additionalArgData = _additionalArgData;
