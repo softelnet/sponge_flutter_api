@@ -12,22 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/util/utils.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
+
+typedef ProvideArgsFilterCallback = bool Function(QualifiedDataType qType);
+typedef OnEventReceivedCallback = FutureOr<void> Function(RemoteEvent event);
 
 class ActionCallSession {
   ActionCallSession(
     this.spongeService,
     this.actionData, {
-    this.onEventReceived,
+    OnEventReceivedCallback onEventReceived,
+    VoidFutureOrCallback onEventError,
+    VoidFutureOrCallback onEventSubscriptionRenew,
     int defaultPageableListPageSize,
     bool verifyIsActive,
-  })  : _defaultPageableListPageSize = defaultPageableListPageSize ?? 20,
+  })  : _onEventReceived = onEventReceived,
+        _onEventError = onEventError,
+        _onEventSubscriptionRenew = onEventSubscriptionRenew,
+        _defaultPageableListPageSize = defaultPageableListPageSize ?? 20,
         _verifyIsActive = verifyIsActive ?? true;
 
   static final Logger _logger = Logger('ActionCallSession');
@@ -51,11 +63,15 @@ class ActionCallSession {
   bool _anyArgSavedOrUpdated = false;
   bool get anyArgSavedOrUpdated => _anyArgSavedOrUpdated;
 
-  Future<void> Function(RemoteEvent event) onEventReceived;
+  final OnEventReceivedCallback _onEventReceived;
+  final VoidFutureOrCallback _onEventError;
+  final VoidFutureOrCallback _onEventSubscriptionRenew;
   List<String> _refreshEvents;
   ClientSubscription _eventSubscription;
 
   int _defaultPageableListPageSize;
+
+  bool _isRefreshAllowedProvidedArgsPending = false;
 
   ActionMeta get actionMeta => actionData.actionMeta;
 
@@ -92,7 +108,7 @@ class ActionCallSession {
   }
 
   Stream<ProvideActionArgsState> _provideArgs(
-    bool Function(QualifiedDataType qType) filter, {
+    ProvideArgsFilterCallback filter, {
     Map<String, Map<String, Object>> features,
   }) async* {
     _dependencies ??= ActionArgDependencies(actionData);
@@ -128,6 +144,7 @@ class ActionCallSession {
         if (!emitted) {
           yield ProvideActionArgsStateNoInvocation();
         }
+
         return;
       }
 
@@ -225,13 +242,24 @@ class ActionCallSession {
     return currentNames;
   }
 
+  bool _isArgForRefreshAllowedProvidedArgs(QualifiedDataType qType) =>
+      qType.type.provided.readOnly || qType.type.provided.overwrite;
+
   Stream<ProvideActionArgsState> provideArgs() async* {
     yield* _provideArgs((qType) => !_providedArgs.containsKey(qType.path));
+
+    if (_isRefreshAllowedProvidedArgsPending) {
+      await refreshAllowedProvidedArgs();
+
+      yield ProvideActionArgsStateAfterInvocation();
+    }
   }
 
   Future<bool> refreshAllowedProvidedArgs() async {
-    await _provideArgs((qType) =>
-        qType.type.provided.readOnly || qType.type.provided.overwrite).drain();
+    _isRefreshAllowedProvidedArgsPending = false;
+
+    await _provideArgs((qType) => _isArgForRefreshAllowedProvidedArgs(qType))
+        .drain();
 
     return true;
   }
@@ -449,11 +477,12 @@ class ActionCallSession {
       _eventSubscription = spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
         if (await _isRunningAndActive()) {
-          onEventReceived?.call(event);
+          unawaited(_onEventReceived?.call(event));
         }
       }, onError: (e) async {
         if (await _isRunningAndActive()) {
           _logger.severe('Event subscription error', e);
+          unawaited(_onEventError?.call());
         }
       });
     }
@@ -470,6 +499,12 @@ class ActionCallSession {
     if (!_eventSubscription.subscribed) {
       // Renew a subscription if necessary in case of an error.
       _eventSubscription = null;
+
+      _isRefreshAllowedProvidedArgsPending = true;
+
+      // TODO Is this necessary?
+      _onEventSubscriptionRenew?.call();
+
       _initEventSubscription();
     }
   }

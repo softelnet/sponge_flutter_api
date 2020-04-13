@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
@@ -42,6 +43,13 @@ class ActionCallPresenter
   dynamic error;
 
   void init({bool verifyIsActive = true}) {
+    var postFrameRefreshCallback =
+        () => WidgetsBinding.instance.addPostFrameCallback(
+              (_) => view.refreshArgs(
+                modal: false,
+                showDialogOnError: false,
+              ),
+            );
     _session = ActionCallSession(
       service.spongeService,
       viewModel.actionData,
@@ -50,6 +58,8 @@ class ActionCallPresenter
         // TODO Is preventing error dialog in an event subscription OK? Maybe a snackbar should be shown.
         showDialogOnError: false,
       ),
+      onEventError: postFrameRefreshCallback,
+      onEventSubscriptionRenew: postFrameRefreshCallback,
       defaultPageableListPageSize: service.settings.defaultPageableListPageSize,
       verifyIsActive: verifyIsActive,
     );

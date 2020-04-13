@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:package_info/package_info.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
+
+typedef VoidFutureOrCallback = FutureOr<void> Function();
 
 String substring(String s, int maxLength) => s != null && s.length > maxLength
     ? s.substring(0, maxLength).trim() + '...'
