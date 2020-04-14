@@ -641,7 +641,7 @@ class SubActionsController extends BaseActionsController {
           await onAfterCall(subActionSpec, callState, index);
         }
 
-        bloc.close();
+        await bloc.close();
       }
     }
   }
