@@ -42,15 +42,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    _textViewerWidthSliderValue ??=
-        ApplicationProvider.of(context).service.settings.textViewerWidth ?? 0;
+    _textViewerWidthSliderValue ??= settings.textViewerWidth ?? 0;
     if (_textViewerWidthSliderValue > MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE) {
       _textViewerWidthSliderValue = MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE;
     }
 
     _maxEventCountSliderValue ??=
-        (ApplicationProvider.of(context).service.settings.maxEventCount ?? 0) ~/
-            MAX_EVENT_COUNT_RATIO;
+        (settings.maxEventCount ?? 0) ~/ MAX_EVENT_COUNT_RATIO;
     if (_maxEventCountSliderValue > MAX_MAX_EVENT_COUNT_SLIDER_VALUE) {
       _maxEventCountSliderValue = MAX_MAX_EVENT_COUNT_SLIDER_VALUE;
     }

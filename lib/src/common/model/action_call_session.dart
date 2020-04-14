@@ -166,7 +166,7 @@ class ActionCallSession {
       var actualArgsToSubmit = Map.of(_argsToSubmit);
       _argsToSubmit.clear();
 
-      // TODO predefined doesn't support Dynamic values.
+      // TODO The predefined doesn't support Dynamic values.
       var current =
           actionData.getArgMap(currentNames, predefined: actualArgsToSubmit);
       var dynamicTypes = actionData.getDynamicTypeNestedTypes(
@@ -353,6 +353,7 @@ class ActionCallSession {
       var argsThatDependOnThis = _dependencies.reverseDependencies[name];
 
       // TODO Dependencies for dynamic types are not implemented.
+
       // For a dynamic type argsThatDependOnThis can be null.
       argsThatDependOnThis?.forEach((dependentName) {
         if (!(preserveDependencies?.contains(dependentName) ?? false)) {
@@ -439,8 +440,14 @@ class ActionCallSession {
       value = normalizeString(value);
     }
 
-    // TODO What about a dynamic value?
+    // Normalize the annotated value.
+    if (value is AnnotatedValue && value.value is String) {
+      value.value = normalizeString(value.value);
+    }
 
+    // TODO Handle a dynamic type value.
+
+    // Wrap an annotated type value if not wrapped.
     return ((type?.annotated ?? false) && !(value is AnnotatedValue))
         ? AnnotatedValue(value)
         : value;
@@ -502,7 +509,6 @@ class ActionCallSession {
 
       _isRefreshAllowedProvidedArgsPending = true;
 
-      // TODO Is this necessary?
       _onEventSubscriptionRenew?.call();
 
       _initEventSubscription();

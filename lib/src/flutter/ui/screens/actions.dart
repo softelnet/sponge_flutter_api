@@ -113,19 +113,20 @@ class _ActionsPageState extends State<ActionsPage>
                 ),
               );
             } else {
-              return _buildMainWidget(context, service);
+              return _buildMainWidget(context);
             }
           }),
       onWillPop: () async => await showAppExitConfirmationDialog(context),
     );
   }
 
-  Widget _buildMainWidget(
-      BuildContext context, FlutterApplicationService service) {
+  Widget _buildMainWidget(BuildContext context) {
     return FutureBuilder<List<_ActionGroup>>(
       future: _busyNoConnection ? Future(() => []) : _getActionGroups(),
       builder: (context, snapshot) {
-        _useTabs = service.settings.tabsInActionList &&
+        _useTabs = FlutterApplicationService.of(_presenter.service)
+                .settings
+                .tabsInActionList &&
             _isDone(snapshot) &&
             snapshot.data.length > 1;
 
@@ -148,13 +149,15 @@ class _ActionsPageState extends State<ActionsPage>
                 // TODO Parametrize tabbar scroll in settings.
                 isScrollable: snapshot.data.length > 3,
                 tabs: snapshot.data
-                    .map((group) => Tab(
-                          key: Key('group-${group.name}'),
-                          child: Tooltip(
-                            child: Text(group.name.toUpperCase()),
-                            message: group.name,
-                          ),
-                        ))
+                    .map(
+                      (group) => Tab(
+                        key: Key('group-${group.name}'),
+                        child: Tooltip(
+                          child: Text(group.name.toUpperCase()),
+                          message: group.name,
+                        ),
+                      ),
+                    )
                     .toList(),
                 onTap: (index) => _initialTabIndex = index,
                 indicatorColor: getSecondaryColor(context),
@@ -244,16 +247,6 @@ class _ActionsPageState extends State<ActionsPage>
   }
 
   Widget _buildTitle(BuildContext context) {
-    // TODO Page title
-    // if (_presenter.connectionName != null) {
-    //   return ListTile(
-    //     trailing: Icon(Icons.directions_run, color: getSecondaryColor(context)),
-    //     title: Text(_presenter.connectionName),
-    //   );
-    // } else {
-    //   return Text('Actions');
-    // }
-
     return Tooltip(
       child: Text(
         _presenter.connectionName != null
@@ -300,7 +293,7 @@ class _ActionsPageState extends State<ActionsPage>
       return null;
     }
 
-    var service = _presenter.service as FlutterApplicationService;
+    var service = FlutterApplicationService.of(_presenter.service);
 
     return <Widget>[
       AsyncPopupMenuButton<String>(

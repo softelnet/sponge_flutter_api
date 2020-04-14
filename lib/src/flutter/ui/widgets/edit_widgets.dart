@@ -235,6 +235,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   List<Widget> _buildFieldsWidgets(BuildContext context) {
     var recordType = widget.uiContext.qualifiedType.type as RecordType;
 
+    // TODO Presenter.
     var service = ApplicationProvider.of(context).service;
     _typeGuiProviders ??= {
       for (var field in recordType.fields)
@@ -793,8 +794,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return _lastListWidgetHeight;
   }
 
-  FlutterApplicationService get service =>
-      ApplicationProvider.of(context).service;
+  FlutterApplicationService get service => widget.uiContext.service;
 
   bool get isPageable =>
       widget.uiContext.features[Features.PROVIDE_VALUE_PAGEABLE] ?? false;

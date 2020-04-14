@@ -20,7 +20,6 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/action_list_item_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
@@ -88,7 +87,7 @@ class _ActionListItemState extends State<ActionListItem>
         ListTile(
           contentPadding:
               const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-          leading: _getActionIcon(context, _presenter.service),
+          leading: _getActionIcon(context),
           trailing: showCallIcon &&
                   _presenter.isEffectivelyCallable /*&& callTapOnlyOnCallIcon*/
               ? Tooltip(
@@ -137,7 +136,6 @@ class _ActionListItemState extends State<ActionListItem>
       return null;
     }
 
-    // TODO Duplicated code.
     if (_presenter.state is ActionCallStateInitialize &&
             (_presenter.actionData.calling ||
                 _presenter.actionData.hasResponse) ||
@@ -151,8 +149,7 @@ class _ActionListItemState extends State<ActionListItem>
     }
   }
 
-  Widget _getActionIcon(
-      BuildContext context, FlutterApplicationService service) {
+  Widget _getActionIcon(BuildContext context) {
     var internalIconSupplier = () => Tooltip(
           message: 'The number of action arguments',
           child: Icon(
@@ -161,10 +158,10 @@ class _ActionListItemState extends State<ActionListItem>
           ),
         );
 
-    switch (service.settings.actionIconsView) {
+    switch (_presenter.service.settings.actionIconsView) {
       case ActionIconsView.custom:
-        return getActionIcon(
-                context, service, _presenter.viewModel.actionData.actionMeta) ??
+        return getActionIcon(context, _presenter.service,
+                _presenter.viewModel.actionData.actionMeta) ??
             internalIconSupplier();
       case ActionIconsView.internal:
         return internalIconSupplier();

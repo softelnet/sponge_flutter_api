@@ -44,6 +44,8 @@ class ApplicationStateNotifier extends ChangeNotifier {
 
 class FlutterApplicationService<S extends FlutterSpongeService,
     T extends FlutterApplicationSettings> extends ApplicationService<S, T> {
+  FlutterApplicationService();
+
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
   DefaultTypeGuiProviderRegistry typeGuiProviderRegistry =
@@ -58,6 +60,9 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
   bool _initialized = false;
   bool get initialized => _initialized;
+
+  factory FlutterApplicationService.of(ApplicationService service) =>
+      service as FlutterApplicationService;
 
   Future<void> init() async {
     if (_initialized) {
@@ -212,7 +217,6 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     return actionMeta.getArgIndex(subscribeType.name);
   }
 
-  // TODO BuildContext to service.
   void bindMainBuildContext(BuildContext mainBuildContext) {
     _mainBuildContext = mainBuildContext;
   }
@@ -228,14 +232,12 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     TypeConverter typeConverter,
     FeatureConverter featureConverter,
   ) async {
-    var service = FlutterSpongeService(
+    return FlutterSpongeService(
       connection,
       typeConverter,
       featureConverter,
       typeGuiProviderRegistry,
-    );
-
-    return service;
+    ) as S;
   }
 
   @override

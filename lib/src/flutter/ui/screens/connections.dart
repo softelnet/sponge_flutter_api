@@ -83,7 +83,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   }
 
   Widget _buildWidget() {
-    var service = _presenter.service as FlutterApplicationService;
+    var service = FlutterApplicationService.of(_presenter.service);
 
     return FutureBuilder<NetworkStatus>(
       future: widget.onGetNetworkStatus != null
@@ -157,7 +157,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     var customItems = Provider.of<SpongeWidgetsFactory>(context)
         .createConnectionsPageMenuItems(context);
 
-    var service = _presenter.service as FlutterApplicationService;
+    var service = FlutterApplicationService.of(_presenter.service);
 
     return <Widget>[
       PopupMenuButton<String>(

@@ -141,7 +141,7 @@ class ActionCallPresenter
   }
 
   bool get canSwipeToClose =>
-      // TODO Is checking the record single leading field for swipe to close ok? Swipe shpuld be disabled for maps.
+      // TODO Is checking the record single leading field for swipe to close ok? Swipe should be disabled for maps.
       service.settings.actionSwipeToClose &&
       !(DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(actionData)
               ?.features
@@ -231,7 +231,7 @@ class ActionCallPresenter
       return actionData.getArgValueByName(code,
           unwrapAnnotatedTarget: true, unwrapDynamicTarget: true);
     } catch (e) {
-      // TODO Handle the exception properly.
+      // Only log the exception.
       _logger.severe('getKey error for \'$code\'', e);
       return null;
     }

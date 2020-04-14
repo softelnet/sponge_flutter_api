@@ -201,11 +201,9 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
       ));
     } else if (iconInfo?.name != null &&
         !editorContext.qualifiedType.type.nullable) {
-      var service = ApplicationProvider.of(editorContext.context).service;
-
       valueWidget = IconButton(
         key: createDataTypeKey(editorContext.qualifiedType),
-        icon: getIcon(editorContext.context, service, iconInfo),
+        icon: getIcon(editorContext.context, editorContext.service, iconInfo),
         onPressed: onChanged != null
             ? () => onChanged(!(editorContext.value as bool))
             : null,
@@ -484,10 +482,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   }
 
   bool _useScrollableIndexedList(UiContext uiContext) =>
-      ApplicationProvider.of(uiContext.context)
-          .service
-          .settings
-          .useScrollableIndexedList;
+      uiContext.service.settings.useScrollableIndexedList;
 
   // TODO copy context
   @override
@@ -891,11 +886,9 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
         : null;
 
     if (iconInfo?.name != null) {
-      var service = ApplicationProvider.of(editorContext.context).service;
-
       return IconButton(
         key: createDataTypeKey(editorContext.qualifiedType),
-        icon: getIcon(editorContext.context, service, iconInfo),
+        icon: getIcon(editorContext.context, editorContext.service, iconInfo),
         onPressed: onTap,
       );
     }

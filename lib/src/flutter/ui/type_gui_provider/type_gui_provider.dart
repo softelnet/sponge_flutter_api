@@ -87,7 +87,7 @@ class TypeGuiProvider<T extends DataType> {
     setupContext(viewerContext);
 
     try {
-      // TODO createCompactViewer with valueLabel. Is this OK?
+      // Create a compact viewer with a valueLabel.
       if (viewerContext.valueLabel != null) {
         return _wrapIfLoading(
             (_) => TypeGuiProviderUtils.createTextBasedCompactViewer(

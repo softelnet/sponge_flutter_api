@@ -41,10 +41,11 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-        bloc: widget.bloc,
-        builder: (BuildContext context, ActionCallState state) {
-          return _buildResultWidget(context, state);
-        });
+      bloc: widget.bloc,
+      builder: (BuildContext context, ActionCallState state) {
+        return _buildResultWidget(context, state);
+      },
+    );
   }
 
   Widget _buildResultWidget(BuildContext context, ActionCallState state) {
@@ -92,6 +93,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
       return actionData.resultProvider;
     }
 
+    // TODO Refactor to the presenter - service.
     return ApplicationProvider.of(context)
         .service
         .typeGuiProviderRegistry
@@ -104,6 +106,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
     var createViewerContext = () => TypeViewerContext(
           '${widget.actionData.actionMeta.name}-result',
           context,
+          // TODO Refactor to the presenter - service.
           NoOpUiContextCallbacks(ApplicationProvider.of(context).service),
           QualifiedDataType(widget.actionData.actionMeta.result),
           result,

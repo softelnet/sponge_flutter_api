@@ -41,7 +41,6 @@ export 'src/flutter/ui/screens/action_call.dart';
 export 'src/flutter/ui/screens/action_list_item.dart';
 export 'src/flutter/ui/screens/action_result.dart';
 export 'src/flutter/ui/screens/actions.dart';
-export 'src/flutter/ui/screens/administration.dart';
 export 'src/flutter/ui/screens/connection_edit.dart';
 export 'src/flutter/ui/screens/connections.dart';
 export 'src/flutter/ui/screens/events.dart';

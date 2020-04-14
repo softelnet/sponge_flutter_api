@@ -131,7 +131,7 @@ class _EventsPageState extends State<EventsPage>
     return Tooltip(
       child: Text(
         _presenter.connectionName != null
-            ? '${_presenter.connectionName} - Events'
+            ? '${_presenter.connectionName} (Events)'
             : 'Events',
         softWrap: true,
         overflow: TextOverflow.visible,
@@ -146,7 +146,6 @@ class _EventsPageState extends State<EventsPage>
     var icon = Icon(Icons.explore);
 
     return <Widget>[
-      // TODO Create a new widget.
       _presenter.subscriptionBloc != null
           ? StreamBuilder<bool>(
               stream: _presenter.subscriptionBloc,

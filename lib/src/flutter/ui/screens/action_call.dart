@@ -49,7 +49,6 @@ class ActionCallPage extends StatefulWidget {
   final bool showResultDialog;
   final bool showResultDialogIfNoResult;
   final bool verifyIsActive;
-  // TODO Refactor to the presenter.
   final ActionCallBloc bloc;
   final String header;
 
@@ -85,10 +84,6 @@ class _ActionCallPageState extends State<ActionCallPage>
 
     _mainArgsGuiProvider ??=
         service.getTypeGuiProvider(widget.actionData.argsAsRecordType);
-
-    // // Populate the providers cache. The providers defined in the MobileAcionData are not used here.
-    // _typeGuiProvidersCache ??= List.generate(_presenter.argTypes?.length ?? 0,
-    //     (index) => service.getTypeGuiProvider(_presenter.argTypes[index].type));
 
     var subActionsWidget = _resolveSubActionsWidget(context);
 
@@ -329,7 +324,7 @@ class _ActionCallPageState extends State<ActionCallPage>
               showNoResultDialog: widget.showResultDialogIfNoResult,
             );
           }
-          // TODO Parametrize autoClose
+          // TODO Parametrize autoClose.
           Navigator.pop(context, _presenter.actionData);
         }
       } catch (e) {
