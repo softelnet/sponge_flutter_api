@@ -57,7 +57,7 @@ class _EventsPageState extends State<EventsPage>
   Widget build(BuildContext context) {
     var service = ApplicationProvider.of(context).service;
     _presenter ??= EventsPresenter(this);
-    this._presenter.setService(service);
+    _presenter.setService(service);
 
     service.bindMainBuildContext(context);
 
@@ -131,7 +131,7 @@ class _EventsPageState extends State<EventsPage>
     return Tooltip(
       child: Text(
         _presenter.connectionName != null
-            ? '${_presenter.connectionName}'
+            ? '${_presenter.connectionName} - Events'
             : 'Events',
         softWrap: true,
         overflow: TextOverflow.visible,

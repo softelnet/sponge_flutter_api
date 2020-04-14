@@ -288,8 +288,8 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
       await showModalDialog(
         context,
         'Warning',
-        Text("The Sponge server version $version is incompatible "
-            "with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*"),
+        Text('The Sponge server version $version is incompatible '
+            'with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*'),
       );
     }
   }

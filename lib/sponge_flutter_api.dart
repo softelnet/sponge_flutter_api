@@ -29,7 +29,6 @@ export 'src/common/ui/actions_mvp.dart';
 export 'src/common/ui/base_mvp.dart';
 export 'src/common/ui/connection_edit_mvp.dart';
 export 'src/common/ui/connections_mvp.dart';
-export 'src/common/ui/edit_widgets_mvp.dart';
 export 'src/common/ui/events_mvp.dart';
 export 'src/flutter/application_provider.dart';
 export 'src/flutter/compatibility/compatibility_mobile.dart';
