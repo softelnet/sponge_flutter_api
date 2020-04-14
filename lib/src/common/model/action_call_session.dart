@@ -56,7 +56,7 @@ class ActionCallSession {
   final bool _verifyIsActive;
   bool _isActive;
 
-  Map<String, ProvidedValue> _providedArgs = {};
+  Map<String, ProvidedValue> _providedArgs;
 
   final Map<String, dynamic> _argsToSubmit = {};
 
@@ -81,6 +81,8 @@ class ActionCallSession {
     }
 
     _prepareArgs();
+    _initArgsProvidedEarlier();
+
     _initEventSubscription();
 
     _running = true;
@@ -105,6 +107,26 @@ class ActionCallSession {
       spongeService.prepareActionByIntent(actionData);
       _actionPrepared = true;
     }
+  }
+
+  /// Init top level args that have been provided earlier.
+  void _initArgsProvidedEarlier() {
+    _providedArgs = {};
+
+    _getQualifiedTypes()
+        .where((qType) => qType.path != null && qType.type.provided != null)
+        .where((qType) =>
+            qType.type.provided.value && !qType.type.provided.overwrite)
+        .forEach((qType) {
+      var value = actionData.getArgValueByName(qType.path,
+          unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+      if (!DataTypeUtils.isValueNotSet(value)) {
+        _providedArgs[qType.path] = ProvidedValue(
+          value: value,
+          valuePresent: true,
+        );
+      }
+    });
   }
 
   Stream<ProvideActionArgsState> _provideArgs(
@@ -185,13 +207,15 @@ class ActionCallSession {
       _logger.finer(
           'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features, loading: $loading');
 
-      Map<String, ProvidedValue> newProvidedArgs = await spongeService.client
-          .provideActionArgs(actionData.actionMeta.name,
-              provide: namesToProvide,
-              submit: List.of(actualArgsToSubmit.keys),
-              current: current,
-              dynamicTypes: dynamicTypes,
-              features: features);
+      Map<String, ProvidedValue> newProvidedArgs =
+          await spongeService.client.provideActionArgs(
+        actionData.actionMeta.name,
+        provide: namesToProvide,
+        submit: List.of(actualArgsToSubmit.keys),
+        current: current,
+        dynamicTypes: dynamicTypes,
+        features: features,
+      );
 
       // _logger.finer('\t-> provided: ${newProvidedArgs.keys}');
 
@@ -282,8 +306,9 @@ class ActionCallSession {
   List<QualifiedDataType> _getQualifiedTypes() {
     var qualifiedTypes = <QualifiedDataType>[];
     actionData.traverseArguments(
-        (QualifiedDataType qType) => qualifiedTypes.add(qType),
-        namedOnly: false);
+      (QualifiedDataType qType) => qualifiedTypes.add(qType),
+      namedOnly: false,
+    );
     return qualifiedTypes;
   }
 

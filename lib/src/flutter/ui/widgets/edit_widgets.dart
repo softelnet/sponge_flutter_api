@@ -83,12 +83,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   Map<String, TypeGuiProvider> _typeGuiProviders;
   bool _isExpanded;
 
-  bool get isRecordViewMode => widget.uiContext is TypeViewerContext;
-
-  bool get isRecordReadOnly =>
-      widget.uiContext is! TypeEditorContext ||
-      (widget.uiContext as TypeEditorContext).readOnly ||
-      (widget.uiContext.qualifiedType.type.provided?.readOnly ?? false);
+  bool get isRecordReadOnly => widget.uiContext.readOnly;
 
   bool get isRecordEnabled => widget.uiContext.enabled;
 
@@ -133,8 +128,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     var margin = EdgeInsets.only(bottom: 5);
 
-    // Return widget for null record in the view mode.
-    if (isRecordViewMode &&
+    // Return widget for null record in the read only mode.
+    if (isRecordReadOnly &&
         DataTypeUtils.isValueNotSet(widget.uiContext.value)) {
       return TextViewWidget(
         label: label,
@@ -176,6 +171,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
           Container(
             height: 5,
           ),
+        if (_isExpanded) ..._buildSubActionsWidget(context),
         if (_isExpanded)
           OptionalExpanded(
             child: widget.uiContext.qualifiedType.isRoot
@@ -232,17 +228,11 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     _onSave(widget.uiContext.qualifiedType, widget.uiContext.value);
   }
 
-  List<Widget> _buildFieldsWidgets(BuildContext context) {
-    var recordType = widget.uiContext.qualifiedType.type as RecordType;
+  List<Widget> _buildSubActionsWidget(BuildContext context) {
+    var widgets = <Widget>[];
 
     // TODO Presenter.
     var service = ApplicationProvider.of(context).service;
-    _typeGuiProviders ??= {
-      for (var field in recordType.fields)
-        field.name: service.getTypeGuiProvider(field)
-    };
-
-    var widgets = <Widget>[];
 
     // Show context actions only for normal records (i.e. not for a logical record
     // that represents the action args).
@@ -261,21 +251,34 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
               shape: BoxShape.circle,
               color: Theme.of(context).dividerColor,
             ),
-            margin: EdgeInsets.only(top: 5, right: 5),
+            margin: EdgeInsets.only(bottom: 5, right: 5),
           ),
           alignment: Alignment.centerRight,
         ));
       }
     }
 
+    return widgets;
+  }
+
+  List<Widget> _buildFieldsWidgets(BuildContext context) {
+    var recordType = widget.uiContext.qualifiedType.type as RecordType;
+
+    // TODO Presenter.
+    var service = ApplicationProvider.of(context).service;
+    _typeGuiProviders ??= {
+      for (var field in recordType.fields)
+        field.name: service.getTypeGuiProvider(field)
+    };
+
+    var widgets = <Widget>[];
+
     var groups = _createFieldGroups(recordType);
     groups.asMap().forEach((i, group) {
       widgets.add(_buildFieldGroupWidget(context, group));
 
       if (i < groups.length - 1) {
-        widgets.add(Divider(
-          height: 10,
-        ));
+        widgets.add(Divider(height: 10));
       }
     });
 
@@ -371,7 +374,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
           _onUpdate(qFieldType, value);
         });
 
-    // TODO Move to TypeEditorContext.
+    var shouldFieldBeEnabled =
+        widget.uiContext.callbacks.shouldBeEnabled(qFieldType);
+
     return TypeEditorContext(
       widget.uiContext.name,
       context,
@@ -381,12 +386,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
       hintText: qFieldType.type.description,
       onSave: onSave,
       onUpdate: onUpdate,
-      readOnly: //widget.editorContext.readOnly || // TODO Rename to enabled
-          !widget.uiContext.callbacks.shouldBeEnabled(qFieldType) ||
-              widget.uiContext is TypeEditorContext &&
-                  !(widget.uiContext as TypeEditorContext).enabled,
-      enabled: widget.uiContext.callbacks.shouldBeEnabled(qFieldType) &&
-          isRecordEnabled, // && ifFieldEnabled,
+      readOnly: isRecordReadOnly || !shouldFieldBeEnabled || !isRecordEnabled,
+      enabled: isRecordEnabled && shouldFieldBeEnabled,
       loading: widget.uiContext.loading,
       rootRecordSingleLeadingField:
           widget.uiContext.rootRecordSingleLeadingField,
@@ -404,7 +405,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
             editorContext.getDecorationLabel(),
             qFieldType,
             qFieldType.type.provided.valueSet,
-            editorContext.value, // fieldValue,
+            editorContext.value,
             widget.uiContext.callbacks.onGetProvidedArg,
             editorContext.onSave,
           ),
@@ -413,7 +414,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
       }
 
       var isFieldReadOnly = qFieldType.type.provided?.readOnly ?? false;
-      //var isFieldEnabled = qFieldType.type.provided?.readOnly ?? false;
 
       // Switch to a viewer for a record field if necessary.
       if (isRecordReadOnly || isFieldReadOnly || !isRecordEnabled) {
@@ -438,8 +438,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 typedef GetProvidedArgCallback = ProvidedValue Function(
     QualifiedDataType qType);
 
-// TODO Handle readOnly providedValueSet
-// TODO Handle value set in GuiProviders - typed
+// TODO Handle readOnly providedValueSet.
+// TODO Handle value set in GuiProviders - typed.
 class ProvidedValueSetEditorWidget extends StatefulWidget {
   ProvidedValueSetEditorWidget(
     this.label,

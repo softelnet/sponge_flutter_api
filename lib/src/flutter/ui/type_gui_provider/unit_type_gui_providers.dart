@@ -173,7 +173,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         editorContext.features, Features.WIDGET, () => null);
     var iconInfo = Features.getIcon(editorContext.features);
 
-    var onChanged = editorContext.readOnly || !editorContext.enabled
+    var onChanged = (editorContext.readOnly || !editorContext.enabled)
         ? null
         : (bool value) => editorContext.onSave(value);
 

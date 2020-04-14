@@ -114,6 +114,7 @@ abstract class UiContext {
     @required bool showLabel,
     @required List<String> loading,
     @required bool enabled,
+    @required bool readOnly,
     @required this.rootRecordSingleLeadingField,
   })  : features = features != null ? Map.from(features) : {},
         markNullable = markNullable ?? true {
@@ -122,6 +123,7 @@ abstract class UiContext {
     this.showLabel = showLabel ?? true;
     this.loading = loading ?? [];
     this.enabled = enabled;
+    this.readOnly = readOnly;
 
     setupContext(this);
   }
@@ -142,6 +144,7 @@ abstract class UiContext {
   List<String> loading;
 
   bool enabled;
+  bool readOnly;
   String rootRecordSingleLeadingField;
 
   bool _isSetUp = false;
@@ -193,6 +196,8 @@ abstract class UiContext {
     if (uiContext is TypeEditorContext) {
       uiContext.enabled =
           uiContext.enabled && (uiContext.features[Features.ENABLED] ?? true);
+      uiContext.readOnly = uiContext.readOnly ||
+          (uiContext.qualifiedType.type.provided?.readOnly ?? false);
     }
 
     uiContext._isSetUp = true;
@@ -225,7 +230,7 @@ class TypeEditorContext extends UiContext {
     this.onSave,
     this.onUpdate,
     this.validator,
-    this.readOnly = false,
+    bool readOnly,
     @required bool enabled,
     bool showLabel,
     @required List<String> loading,
@@ -245,6 +250,7 @@ class TypeEditorContext extends UiContext {
           showLabel: showLabel,
           loading: loading,
           enabled: enabled ?? true,
+          readOnly: readOnly ?? false,
           rootRecordSingleLeadingField: rootRecordSingleLeadingField,
         );
 
@@ -252,7 +258,6 @@ class TypeEditorContext extends UiContext {
   ValueChanged onSave;
   ValueChanged onUpdate;
   TypeEditorValidatorCallback validator;
-  bool readOnly;
 
   TypeEditorContext clone() => TypeEditorContext(
         name,
@@ -329,6 +334,7 @@ class TypeViewerContext extends UiContext {
           showLabel: showLabel,
           loading: loading,
           enabled: false,
+          readOnly: true,
           rootRecordSingleLeadingField: rootRecordSingleLeadingField,
         );
 
