@@ -146,7 +146,6 @@ abstract class UiContext {
 
   bool _isSetUp = false;
 
-  // TODO Use this.
   FlutterApplicationService get service => callbacks.service;
 
   TypeGuiProviderRegistry get typeGuiProviderRegistry =>
@@ -155,7 +154,6 @@ abstract class UiContext {
   String get safeTypeLabel => typeLabel ?? qualifiedType.type.name;
 
   String getDecorationLabel({String customLabel}) {
-    // TODO Apply features.
     var label = customLabel ?? (showLabel ? typeLabel : null);
     if (label == null) {
       return null;

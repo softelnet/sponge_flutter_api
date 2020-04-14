@@ -79,9 +79,11 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
                         DrawingBinaryValue binaryValue = await Navigator.push(
                           editorContext.context,
                           MaterialPageRoute<DrawingBinaryValue>(
-                              builder: (context) => DrawingPage(
-                                  name: editorContext.typeLabel,
-                                  drawingBinary: oldValue)),
+                            builder: (context) => DrawingPage(
+                              name: editorContext.typeLabel,
+                              drawingBinary: oldValue,
+                            ),
+                          ),
                         );
                         editorContext.onSave(binaryValue);
                       }
@@ -484,7 +486,6 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   bool _useScrollableIndexedList(UiContext uiContext) =>
       uiContext.service.settings.useScrollableIndexedList;
 
-  // TODO copy context
   @override
   Widget createEditor(TypeEditorContext editorContext) {
     var hasElementValueSet = type.provided?.elementValueSet ?? false;
@@ -501,7 +502,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
             )
           : null;
     } else {
-      // TODO type.unique not handled in GUI.
+      // TODO The type.unique is not handled in GUI.
       return ListTypeWidget(
         key: createDataTypeKey(editorContext.qualifiedType),
         uiContext: editorContext,
@@ -510,9 +511,6 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       );
     }
   }
-
-  // String _createListString(TypeViewerContext viewerContext) =>
-  //     viewerContext.value?.toString();
 
   @override
   Widget createCompactViewer(TypeViewerContext viewerContext) {
@@ -535,16 +533,7 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       guiProvider: this,
       useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
     );
-    // return TypeGuiProviderUtils.createTextBasedViewer(
-    //     this, viewerContext.copy()..value ??= _createListString(viewerContext));
   }
-
-  // TODO Simple list viewer. Compact viewer hack.
-  // @override
-  // Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
-  //   return TypeGuiProviderUtils.createTextBasedExtendedViewer(
-  //       this, viewerContext.copy()..value ??= _createListString(viewerContext));
-  // }
 }
 
 class MapTypeGuiProvider extends BaseUnitTypeGuiProvider<MapType> {
@@ -749,20 +738,6 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
       uiContext: viewerContext,
     );
   }
-
-  // TODO Simple record viewer. Record viewer hack.
-  // @override
-  // Widget _doCreateExtendedViewer(TypeViewerContext viewerContext) {
-  //   return _createTextBasedExtendedViewer(
-  //       viewerContext.copy()..value = _createRecordString(viewerContext));
-  // }
-
-  // TODO Do not use editor with readOnly.
-  // @override
-  // Widget _doCreateViewer(TypeViewerContext viewerContext) => AbsorbPointer(
-  //       child: _doCreateEditor(viewerContext.copyAsEditor()..readOnly = true),
-  //       absorbing: true,
-  //     );
 }
 
 class StreamTypeGuiProvider extends BaseUnitTypeGuiProvider<StreamType> {

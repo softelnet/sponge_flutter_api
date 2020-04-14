@@ -21,7 +21,6 @@ import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawing_painter.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
 import 'package:sponge_flutter_api/src/type/type_value.dart';
 
-// TODO Move to edit_widgets
 class DrawingPage extends StatefulWidget {
   DrawingPage({
     Key key,
@@ -96,11 +95,12 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   void _close() {
-    // TODO Changing the main reference and then returning it.
-    widget.drawingBinary
-      ..displaySize = convertToSize(_controller.size)
-      ..strokes = convertToStrokes(_controller.strokes);
-
-    Navigator.pop(context, widget.drawingBinary);
+    Navigator.pop(
+        context,
+        DrawingBinaryValue.copyWith(
+          widget.drawingBinary,
+          displaySize: convertToSize(_controller.size),
+          strokes: convertToStrokes(_controller.strokes),
+        ));
   }
 }
