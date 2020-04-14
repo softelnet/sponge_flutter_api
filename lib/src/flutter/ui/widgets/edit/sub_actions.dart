@@ -375,8 +375,8 @@ class SubActionsController extends BaseActionsController {
         .toList();
     var active = await spongeService.client.isActionActive(entries);
 
-    List<SubActionRuntimeSpec> result = [];
-    for (int i = 0; i < specs.length; i++) {
+    var result = <SubActionRuntimeSpec>[];
+    for (var i = 0; i < specs.length; i++) {
       result.add(SubActionRuntimeSpec(specs[i], active: active[i]));
     }
 
@@ -672,7 +672,7 @@ class SubActionsController extends BaseActionsController {
         }
       }
     } else {
-      for (int i = 0; i < subActionData.args.length; i++) {
+      for (var i = 0; i < subActionData.args.length; i++) {
         var subArgType = subActionMeta.args[i];
 
         var subActionArgSpec = subActionSpec.argSubstitutions.firstWhere(
@@ -693,7 +693,7 @@ class SubActionsController extends BaseActionsController {
     }
 
     if (!bestEffort) {
-      for (int i = 0; i < subActionData.args.length; i++) {
+      for (var i = 0; i < subActionData.args.length; i++) {
         var subArgType = subActionMeta.args[i];
 
         var subActionArgSpec = subActionSpec.argSubstitutions?.firstWhere(
@@ -731,7 +731,7 @@ class SubActionsController extends BaseActionsController {
 
   Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(
       dynamic value) async {
-    List<SubActionRuntimeSpec> specs = [];
+    var specs = <SubActionRuntimeSpec>[];
 
     var readAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_READ_ACTION],

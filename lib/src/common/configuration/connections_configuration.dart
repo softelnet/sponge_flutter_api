@@ -37,7 +37,7 @@ abstract class ConnectionsConfiguration {
 }
 
 class BaseConnectionsConfiguration implements ConnectionsConfiguration {
-  final Map<String, SpongeConnection> _connections = Map();
+  final Map<String, SpongeConnection> _connections = {};
   String _activeConnectionName;
 
   @override
@@ -48,6 +48,7 @@ class BaseConnectionsConfiguration implements ConnectionsConfiguration {
     _connections[connection.name] = connection;
   }
 
+  @override
   Future<void> updateConnection(SpongeConnection connection) async {
     _connections[connection.name].setFrom(connection);
   }

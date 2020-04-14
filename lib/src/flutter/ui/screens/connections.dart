@@ -35,7 +35,7 @@ class ConnectionsPage extends StatefulWidget {
   final AsyncValueGetter<NetworkStatus> onGetNetworkStatus;
 
   @override
-  createState() => _ConnectionsPageState();
+  _ConnectionsPageState createState() => _ConnectionsPageState();
 }
 
 class _ConnectionsPageState extends State<ConnectionsPage>
@@ -239,7 +239,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     ];
   }
 
-  _toggleActiveConnection(SpongeConnection connection) async {
+  Future<void> _toggleActiveConnection(SpongeConnection connection) async {
     setState(() {
       _presenter.busy = true;
     });
@@ -256,7 +256,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     }
   }
 
-  _addConnection() async {
+  Future<void> _addConnection() async {
     setState(() {
       _presenter.busy = true;
     });
@@ -270,7 +270,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     }
   }
 
-  _editConnection(
+  Future<void> _editConnection(
       BuildContext context, SpongeConnection editedConnection) async {
     SpongeConnection newConnection;
 
@@ -287,7 +287,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     }
   }
 
-  _removeConnection(BuildContext context, String name) async {
+  Future<void> _removeConnection(BuildContext context, String name) async {
     try {
       await _presenter.removeConnection(name);
     } finally {
@@ -295,6 +295,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
     }
   }
 
+  @override
   Future<SpongeConnection> addConnection() async => await Navigator.push(
         context,
         MaterialPageRoute<SpongeConnection>(
@@ -302,6 +303,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
         ),
       );
 
+  @override
   Future<SpongeConnection> editConnection(SpongeConnection connection) async {
     return await Navigator.push(
       context,

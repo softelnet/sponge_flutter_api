@@ -18,7 +18,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-typedef Future<void> OnActionCall(ActionData actionData);
+typedef OnActionCall = Future<void> Function(ActionData actionData);
 
 class ActionListItemViewModel extends BaseViewModel {
   ActionListItemViewModel(this.actionData, this.onActionCall);

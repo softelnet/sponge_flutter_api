@@ -213,7 +213,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
 
     if (_isExpanded) {
       if (widget.uiContext.value == null) {
-        Map<String, dynamic> newValue = {};
+        var newValue = <String, dynamic>{};
         var defaultValue = DataTypeUtils.unwrapAnnotatedValue(
             widget.uiContext.qualifiedType.type.defaultValue);
 
@@ -233,14 +233,15 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   }
 
   List<Widget> _buildFieldsWidgets(BuildContext context) {
-    RecordType recordType = widget.uiContext.qualifiedType.type as RecordType;
+    var recordType = widget.uiContext.qualifiedType.type as RecordType;
 
     var service = ApplicationProvider.of(context).service;
-    _typeGuiProviders ??= Map.fromIterable(recordType.fields,
-        key: (field) => field.name,
-        value: (field) => service.getTypeGuiProvider(field));
+    _typeGuiProviders ??= {
+      for (var field in recordType.fields)
+        field.name: service.getTypeGuiProvider(field)
+    };
 
-    List<Widget> widgets = [];
+    var widgets = <Widget>[];
 
     // Show context actions only for normal records (i.e. not for a logical record
     // that represents the action args).
@@ -281,7 +282,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   }
 
   List<List<DataType>> _createFieldGroups(RecordType recordType) {
-    List<List<DataType>> groups = [];
+    var groups = <List<DataType>>[];
     String lastGroupName;
     int lastGroupIndex = -1;
 
@@ -433,7 +434,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
   }
 }
 
-typedef ProvidedValue GetProvidedArgCallback(QualifiedDataType qType);
+typedef GetProvidedArgCallback = ProvidedValue Function(
+    QualifiedDataType qType);
 
 // TODO Handle readOnly providedValueSet
 // TODO Handle value set in GuiProviders - typed
@@ -633,7 +635,7 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
 
   Future<void> showColorPicker(
       BuildContext context, Color suggestedColor) async {
-    Color choosenColor = await showDialog(
+    Color choosenColor = await showDialog<Color>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text('Pick a color'),
@@ -736,10 +738,7 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
       initialTime: initialTime,
     );
     if (picked != null) {
-      var newValue = widget.initialValue;
-      if (newValue == null) {
-        newValue = DateTime.now();
-      }
+      var newValue = widget.initialValue ?? DateTime.now();
       newValue = DateTime(
           newValue.year,
           newValue.month,
@@ -918,7 +917,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     _subActionsController =
         SubActionsController.forList(widget.uiContext, service.spongeService);
 
-    List<Widget> buttons = [];
+    var buttons = <Widget>[];
 
     if (_subActionsController.isCreateEnabled()) {
       buttons.add(FlatButton(
@@ -1103,7 +1102,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   Widget _createElementWidget(
       int index, QualifiedDataType qElementType, dynamic element,
       {double verticalMargin}) {
-    TypeViewerContext subUiContext = TypeViewerContext(
+    var subUiContext = TypeViewerContext(
       widget.uiContext.name,
       context,
       widget.uiContext.callbacks,
@@ -1241,7 +1240,7 @@ class _MultiChoiceListEditWidgetState extends State<MultiChoiceListEditWidget> {
     var elementValueSetAsValues =
         elementValueSet.map((annotatedValue) => annotatedValue.value).toList();
 
-    Set currentValueAsSet = widget.value?.toSet() ?? Set();
+    var currentValueAsSet = widget.value?.toSet() ?? {};
 
     return Center(
       child: Column(
@@ -1249,7 +1248,7 @@ class _MultiChoiceListEditWidgetState extends State<MultiChoiceListEditWidget> {
           Row(
             children: <Widget>[
               Text(
-                widget.labelText != null ? widget.labelText : '',
+                widget.labelText ?? '',
                 style: getArgLabelTextStyle(context),
               ),
             ],

@@ -24,7 +24,7 @@ class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
 
   @override
-  createState() => _SettingsPageState();
+  _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {

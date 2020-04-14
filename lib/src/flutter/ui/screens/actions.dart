@@ -64,7 +64,7 @@ class _ActionsPageState extends State<ActionsPage>
   Future<List<_ActionGroup>> _getActionGroups() async {
     var allActions = await _presenter.getActions();
 
-    Map<String, List<ActionData>> groupMap = {};
+    var groupMap = <String, List<ActionData>>{};
     allActions.forEach((action) =>
         (groupMap[getActionGroupDisplayLabel(action.actionMeta)] ??= [])
             .add(action));

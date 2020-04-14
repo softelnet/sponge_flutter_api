@@ -37,7 +37,7 @@ class ActionListItem extends StatefulWidget {
   final bool showQualifiedName;
 
   @override
-  createState() => _ActionListItemState();
+  _ActionListItemState createState() => _ActionListItemState();
 }
 
 class _ActionListItemState extends State<ActionListItem>
@@ -203,7 +203,7 @@ class _ActionListItemState extends State<ActionListItem>
     );
   }
 
-  _onActionCall(BuildContext context) async {
+  Future<void> _onActionCall(BuildContext context) async {
     await _presenter.onActionCall();
   }
 }

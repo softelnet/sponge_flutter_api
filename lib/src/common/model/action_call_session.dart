@@ -53,7 +53,7 @@ class ActionCallSession {
 
   bool _running = false;
 
-  bool _verifyIsActive = true;
+  final bool _verifyIsActive;
   bool _isActive;
 
   Map<String, ProvidedValue> _providedArgs = {};
@@ -69,7 +69,7 @@ class ActionCallSession {
   List<String> _refreshEvents;
   ClientSubscription _eventSubscription;
 
-  int _defaultPageableListPageSize;
+  final int _defaultPageableListPageSize;
 
   bool _isRefreshAllowedProvidedArgsPending = false;
 
@@ -124,7 +124,7 @@ class ActionCallSession {
     bool emitted = false;
     // Try to get all available provided values including that with dependencies.
     while (true) {
-      List<String> newNamesToProvide = [];
+      var newNamesToProvide = <String>[];
 
       _getQualifiedTypes().forEach((qType) {
         if (DataTypeUtils.isProvidedRead(qType.type) &&
@@ -280,7 +280,7 @@ class ActionCallSession {
   }
 
   List<QualifiedDataType> _getQualifiedTypes() {
-    List<QualifiedDataType> qualifiedTypes = [];
+    var qualifiedTypes = <QualifiedDataType>[];
     actionData.traverseArguments(
         (QualifiedDataType qType) => qualifiedTypes.add(qType),
         namedOnly: false);
@@ -524,9 +524,9 @@ class ActionArgDependencies {
   void rebuild() => _reverseDependencies = _createReverseDependencies();
 
   Map<String, Set<String>> _createReverseDependencies() {
-    Map<String, Set<String>> reverseDependencies = {};
+    var reverseDependencies = <String, Set<String>>{};
     actionData.traverseArguments(
-        (qType) => reverseDependencies[qType.path] = Set(),
+        (qType) => reverseDependencies[qType.path] = {},
         namedOnly: false);
     actionData.traverseArguments((qType) {
       qType.type.provided?.dependencies?.forEach(

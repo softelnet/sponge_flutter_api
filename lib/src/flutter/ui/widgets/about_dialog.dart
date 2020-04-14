@@ -23,7 +23,7 @@ Future<void> showDefaultAboutAppDialog(
   String imageAsset,
   String applicationLegalese,
 }) async {
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  var packageInfo = await PackageInfo.fromPlatform();
 
   showAboutDialog(
       context: context,

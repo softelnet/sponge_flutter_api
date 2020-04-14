@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Form(
-                key: this._formKey,
+                key: _formKey,
                 child: Column(
                   children: <Widget>[
                     Padding(
@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _logIn(BuildContext context) async {
-    if (this._formKey.currentState.validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
 
       final ApplicationService service =

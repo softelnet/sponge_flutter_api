@@ -23,7 +23,7 @@ class SpongeConnection implements Comparable {
     this.network,
     this.subscribe = false,
     List<String> subscriptionEventNames,
-  }) : this.subscriptionEventNames = subscriptionEventNames ?? [];
+  }) : subscriptionEventNames = subscriptionEventNames ?? [];
 
   String name;
   String url;

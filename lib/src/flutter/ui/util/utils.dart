@@ -50,12 +50,15 @@ Future<void> handleError(BuildContext context, e,
 }
 
 /// A static set containing build contexts that have modal error dialogs open.
-Set<BuildContext> _showingModalDialogContext = Set();
+Set<BuildContext> _showingModalDialogContext = {};
 
-T doInCallback<T>(BuildContext context, T operation(),
-    {bool showDialogOnError = true,
-    bool logStackTrace = true,
-    bool rethrowError = true}) {
+T doInCallback<T>(
+  BuildContext context,
+  T Function() operation, {
+  bool showDialogOnError = true,
+  bool logStackTrace = true,
+  bool rethrowError = true,
+}) {
   try {
     return operation();
   } catch (e) {
@@ -71,10 +74,12 @@ T doInCallback<T>(BuildContext context, T operation(),
 }
 
 FutureOr<T> doInCallbackAsync<T>(
-    BuildContext context, FutureOr<T> computation(),
-    {bool showDialogOnError = true,
-    bool logStackTrace = true,
-    bool rethrowError = true}) async {
+  BuildContext context,
+  FutureOr<T> Function() computation, {
+  bool showDialogOnError = true,
+  bool logStackTrace = true,
+  bool rethrowError = true,
+}) async {
   try {
     return await computation();
   } catch (e) {

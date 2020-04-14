@@ -33,12 +33,13 @@ class DrawingPage extends StatefulWidget {
   final DrawingBinaryValue drawingBinary;
 
   @override
-  createState() => _DrawingPageState();
+  _DrawingPageState createState() => _DrawingPageState();
 }
 
 class _DrawingPageState extends State<DrawingPage> {
   PainterController _controller;
 
+  @override
   Widget build(BuildContext context) {
     var service = ApplicationProvider.of(context).service;
 

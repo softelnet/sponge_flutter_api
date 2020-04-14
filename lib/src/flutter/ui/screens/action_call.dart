@@ -54,7 +54,7 @@ class ActionCallPage extends StatefulWidget {
   final String header;
 
   @override
-  createState() => _ActionCallPageState();
+  _ActionCallPageState createState() => _ActionCallPageState();
 }
 
 class _ActionCallPageState extends State<ActionCallPage>
@@ -379,8 +379,9 @@ class _ActionCallPageState extends State<ActionCallPage>
     await _presenter.refreshAllowedProvidedArgs();
   }
 
+  @override
   Future<bool> saveForm() async {
-    if (this._formKey.currentState.validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
       return true;
@@ -398,6 +399,7 @@ class _ActionCallPageState extends State<ActionCallPage>
     });
   }
 
+  @override
   void refresh() => setState(() {});
 
   @override
@@ -489,8 +491,8 @@ Future<void> showActionResultDialog({
 
 Future<void> callActionImmediately({
   @required BuildContext context,
-  void onBeforeCall(),
-  void onAfterCall(),
+  void Function() onBeforeCall,
+  void Function() onAfterCall,
   @required ActionData actionData,
   @required ActionCallBloc bloc,
   @required bool showResultDialog,

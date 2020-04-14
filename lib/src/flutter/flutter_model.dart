@@ -42,9 +42,10 @@ class FlutterActionData extends ActionData {
   }
 
   void _initArgProviders() {
-    _argProviders = Map.fromIterable(actionMeta.args,
-        key: (argType) => argType.name,
-        value: (argType) => typeGuiProviderRegistry.getProvider(argType));
+    _argProviders = {
+      for (var argType in actionMeta.args)
+        argType.name: typeGuiProviderRegistry.getProvider(argType)
+    };
   }
 
   void _initResultProvider() {
@@ -57,11 +58,11 @@ class FlutterActionData extends ActionData {
   }
 
   @override
-  FlutterActionData clone({ActionData prototype}) =>
-      (super.clone(prototype: FlutterActionData(actionMeta, typeGuiProviderRegistry))
-          as FlutterActionData)
-        .._initProviders()
-        .._additionalArgData = _additionalArgData;
+  FlutterActionData clone({ActionData prototype}) => (super.clone(
+          prototype: FlutterActionData(actionMeta, typeGuiProviderRegistry))
+      as FlutterActionData)
+    .._initProviders()
+    .._additionalArgData = _additionalArgData;
 
   @override
   void clear({bool clearReadOnly = true}) {

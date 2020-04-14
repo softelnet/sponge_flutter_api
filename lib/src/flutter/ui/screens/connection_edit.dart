@@ -29,7 +29,7 @@ class ConnectionEditPage extends StatefulWidget {
   final SpongeConnection originalConnection;
 
   @override
-  createState() => _ConnectionEditPageState();
+  _ConnectionEditPageState createState() => _ConnectionEditPageState();
 }
 
 class _ConnectionEditPageState extends State<ConnectionEditPage>
@@ -88,7 +88,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Form(
-                key: this._formKey,
+                key: _formKey,
                 child: Column(
                   children: <Widget>[
                     _buildConnectionFieldWidget(
@@ -249,7 +249,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   }
 
   Future<void> _testConnection(BuildContext context) async {
-    if (this._formKey.currentState.validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
       var snackController = Scaffold.of(context).showSnackBar(SnackBar(
@@ -273,7 +273,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   }
 
   Future<void> _saveConnection(BuildContext context) async {
-    if (this._formKey.currentState.validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
       Navigator.pop(context, _presenter.connection);

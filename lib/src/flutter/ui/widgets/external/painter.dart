@@ -58,13 +58,13 @@ import 'package:flutter/material.dart' as mat show Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart' hide Image;
 
-typedef FutureOr StrokeEndCallback();
+typedef StrokeEndCallback = FutureOr Function();
 
 class Painter extends StatefulWidget {
   Painter(
     PainterController painterController, {
     this.onStrokeEnd,
-  })  : this.painterController = painterController,
+  })  : painterController = painterController,
         super(key: ValueKey<PainterController>(painterController));
 
   final PainterController painterController;
@@ -136,7 +136,7 @@ class _PainterState extends State<Painter> {
   }
 
   void _onPanUpdate(DragUpdateDetails update) {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    var renderBox = context.findRenderObject() as RenderBox;
 
     Offset pos = renderBox.globalToLocal(update.globalPosition);
     Offset prev = widget.painterController._pathHistory.strokes.last.last;
@@ -188,10 +188,10 @@ class _PathEntry {
 
 class _PathHistory {
   _PathHistory();
-  final _paths = List<_PathEntry>();
-  final _strokes = List<List<Offset>>();
-  final _undone = List<_PathEntry>();
-  final _undoneStrokes = List<List<Offset>>();
+  final _paths = <_PathEntry>[];
+  final _strokes = <List<Offset>>[];
+  final _undone = <_PathEntry>[];
+  final _undoneStrokes = <List<Offset>>[];
   Paint currentPaint;
   final _backgroundPaint = Paint();
   bool _inDrag = false;
@@ -233,7 +233,7 @@ class _PathHistory {
   void add(Offset startPoint) {
     if (!_inDrag) {
       _inDrag = true;
-      Path path = Path();
+      var path = Path();
 
       path.moveTo(startPoint.dx, startPoint.dy);
       _paths.add(_PathEntry(path, currentPaint));
@@ -278,7 +278,7 @@ class _PathHistory {
       });
     } else {
       _strokes.forEach((stroke) {
-        for (int i = 0; i < stroke.length - 1; i++) {
+        for (var i = 0; i < stroke.length - 1; i++) {
           canvas.drawLine(stroke[i], stroke[i + 1], currentPaint);
         }
       });
@@ -310,10 +310,8 @@ class PainterController extends ChangeNotifier {
       return 0;
     }
 
-    if (_strokeUpdateDeltaThresholdSquaredCached == null) {
-      _strokeUpdateDeltaThresholdSquaredCached =
-          pow(_size.longestSide * _strokeUpdateDeltaThresholdRatio, 2);
-    }
+    _strokeUpdateDeltaThresholdSquaredCached ??=
+        pow(_size.longestSide * _strokeUpdateDeltaThresholdRatio, 2);
 
     return _strokeUpdateDeltaThresholdSquaredCached;
   }
@@ -441,8 +439,8 @@ class PainterController extends ChangeNotifier {
   Future<Uint8List> exportAsPngBytes() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext.findRenderObject();
-    Image image = await boundary.toImage();
-    ByteData byteData = await image.toByteData(format: ImageByteFormat.png);
+    var image = await boundary.toImage();
+    var byteData = await image.toByteData(format: ImageByteFormat.png);
     return byteData.buffer.asUint8List();
   }
 }

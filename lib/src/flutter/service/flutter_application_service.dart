@@ -46,7 +46,8 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     T extends FlutterApplicationSettings> extends ApplicationService<S, T> {
   static final Logger _logger = Logger('FlutterApplicationService');
   SharedPreferences _prefs;
-  DefaultTypeGuiProviderRegistry typeGuiProviderRegistry = DefaultTypeGuiProviderRegistry();
+  DefaultTypeGuiProviderRegistry typeGuiProviderRegistry =
+      DefaultTypeGuiProviderRegistry();
   final icons = MdiIcons();
   BuildContext _mainBuildContext;
   final Map<String, ActionIntentHandler> _actionIntentHandlers = {};
@@ -237,6 +238,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     return service;
   }
 
+  @override
   Future<void> configureSpongeService(
       FlutterSpongeService spongeService) async {
     spongeService.maxEventCount = settings.maxEventCount;
@@ -276,7 +278,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
                   if (subscription.subscribed) {
                     EventData eventData =
                         await spongeService.createEventData(event);
-                    _logger.fine(
+                    _logger.finer(
                         'Subscription ${subscription.id ?? ''} - received event: ${event.id}, ${event.name}, ${event.label}, ${event.attributes}');
                     await spongeService.addEvent(eventData);
 

@@ -20,7 +20,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.d
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/util/utils.dart';
 
-typedef UnitTypeGuiProvider UnitTypeGuiProviderSupplier(DataType type);
+typedef UnitTypeGuiProviderSupplier = UnitTypeGuiProvider Function(
+    DataType type);
 
 abstract class TypeGuiProviderRegistry {
   final Map<DataTypeKind, List<UnitTypeGuiProviderSupplier>> providerSuppliers =
@@ -163,7 +164,7 @@ class TypeGuiProvider<T extends DataType> {
   }
 
   Future<void> navigateToExtendedViewer(TypeViewerContext viewerContext) async {
-    Widget viewer = createExtendedViewer(viewerContext);
+    var viewer = createExtendedViewer(viewerContext);
     if (viewer != null) {
       await Navigator.push(
         viewerContext.context,

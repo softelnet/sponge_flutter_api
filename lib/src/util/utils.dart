@@ -52,8 +52,11 @@ DataType getActionArgByIntent(ActionMeta actionMeta, String intentValue) =>
         orElse: () => null);
 
 class DataTypeGuiUtils {
-  static bool hasType(DataType type, bool Function(DataType) predicate,
-      {bool recursively = false}) {
+  static bool hasType(
+    DataType type,
+    bool Function(DataType) predicate, {
+    bool recursively = false,
+  }) {
     if (recursively) {
       bool result = false;
 

@@ -15,7 +15,6 @@
 //import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
@@ -172,10 +171,9 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         editorContext.features, Features.WIDGET, () => null);
     var iconInfo = Features.getIcon(editorContext.features);
 
-    ValueChanged<bool> onChanged =
-        editorContext.readOnly || !editorContext.enabled
-            ? null
-            : (bool value) => editorContext.onSave(value);
+    var onChanged = editorContext.readOnly || !editorContext.enabled
+        ? null
+        : (bool value) => editorContext.onSave(value);
 
     var label = editorContext.getDecorationLabel();
 
@@ -230,7 +228,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
 
   @override
   Widget createViewer(TypeViewerContext viewerContext) {
-    bool boolValue = viewerContext.value as bool;
+    var boolValue = viewerContext.value as bool;
 
     var label = viewerContext.getDecorationLabel();
 
@@ -819,7 +817,7 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
             editorContext.features, Features.STRING_MULTILINE, () => false);
         int maxLines = Features.getOptional(editorContext.features,
             Features.STRING_MAX_LINES, () => multiline ? null : 1);
-        TextInputType inputType = (multiline || maxLines > 1)
+        var inputType = (multiline || maxLines > 1)
             ? TextInputType.multiline
             : TextInputType.text;
 

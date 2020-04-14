@@ -165,11 +165,13 @@ class FlutterApplicationSettings extends ApplicationSettings {
         AnnotatedValue(ActionsOrder.alphabetical, valueLabel: 'Alphabetical'),
       ];
 
+  @override
   bool get autoUseAuthToken => _prefs.getBool(PREF_AUTO_USE_AUTH_TOKEN) ?? true;
 
   Future<bool> setAutoUseAuthToken(bool value) async =>
       await _prefs.setBool(PREF_AUTO_USE_AUTH_TOKEN, value);
 
+  @override
   int get maxEventCount => _prefs.getInt(PREF_MAX_EVENT_COUNT) ?? 100;
 
   Future<bool> setMaxEventCount(int value) async =>
@@ -215,6 +217,7 @@ class FlutterApplicationSettings extends ApplicationSettings {
     return await _prefs.setInt(PREF_SERVICE_DISCOVERY_TIMEOUT, value);
   }
 
+  @override
   bool get showNewEventNotification =>
       _prefs.getBool(PREF_SHOW_NEW_EVENT_NOTIFICATION) ?? true;
 

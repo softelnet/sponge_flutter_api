@@ -28,6 +28,7 @@ class SharedPreferencesConnectionsConfiguration
   final SharedPreferences _prefs;
   final _baseConfiguration = BaseConnectionsConfiguration();
 
+  @override
   Future<void> init() async {
     await _baseConfiguration
         .setActiveConnection(_prefs.getString(_KEY_ACTIVE_CONNECTION));
@@ -35,6 +36,7 @@ class SharedPreferencesConnectionsConfiguration
         await _baseConfiguration.addConnection(connection));
   }
 
+  @override
   Future<void> setActiveConnection(String connectionName) async {
     if (connectionName != null) {
       await _prefs.setString(_KEY_ACTIVE_CONNECTION, connectionName);
@@ -45,9 +47,11 @@ class SharedPreferencesConnectionsConfiguration
     await _baseConfiguration.setActiveConnection(connectionName);
   }
 
+  @override
   String getActiveConnectionName() => _baseConfiguration
       .getActiveConnectionName(); //.getString(_KEY_ACTIVE_CONNECTION);
 
+  @override
   List<SpongeConnection> getConnections() =>
       _baseConfiguration.getConnections();
 
@@ -62,9 +66,11 @@ class SharedPreferencesConnectionsConfiguration
     return connections;
   }
 
+  @override
   SpongeConnection getConnection(String connectionName) =>
       _baseConfiguration.getConnection(connectionName);
 
+  @override
   Future<void> addConnection(SpongeConnection connection) async {
     List<String> connectionNameList =
         _prefs.getStringList(_KEY_CONNECTIONS) ?? [];
@@ -84,6 +90,7 @@ class SharedPreferencesConnectionsConfiguration
     await _baseConfiguration.addConnection(connection);
   }
 
+  @override
   Future<void> updateConnection(SpongeConnection connection) async {
     await _saveConnection(connection);
 
@@ -94,8 +101,8 @@ class SharedPreferencesConnectionsConfiguration
     await _prefs.setString(
         '$_KEY_PREFIX${connection.name}.url', connection.url);
 
-    String username = connection.username;
-    String password = connection.password;
+    var username = connection.username;
+    var password = connection.password;
 
     if (!connection.savePassword) {
       password = null;
@@ -143,6 +150,7 @@ class SharedPreferencesConnectionsConfiguration
     await _prefs.remove('$_KEY_PREFIX${connection.name}.subscription');
   }
 
+  @override
   Future<void> clearConnections() async {
     await _prefs.remove(_KEY_ACTIVE_CONNECTION);
     await _prefs.remove(_KEY_CONNECTIONS);

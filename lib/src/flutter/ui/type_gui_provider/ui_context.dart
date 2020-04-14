@@ -44,6 +44,7 @@ abstract class UiContextCallbacks {
 class NoOpUiContextCallbacks implements UiContextCallbacks {
   NoOpUiContextCallbacks(this.service);
 
+  @override
   final FlutterApplicationService service;
 
   @override
@@ -95,7 +96,7 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
       QualifiedDataType qType, String additionalDataKey, value) {}
 }
 
-typedef String TypeEditorValidatorCallback(String value);
+typedef TypeEditorValidatorCallback = String Function(String value);
 
 abstract class UiContext {
   UiContext(
@@ -114,8 +115,8 @@ abstract class UiContext {
     @required List<String> loading,
     @required bool enabled,
     @required this.rootRecordSingleLeadingField,
-  })  : this.features = features != null ? Map.from(features) : {},
-        this.markNullable = markNullable ?? true {
+  })  : features = features != null ? Map.from(features) : {},
+        markNullable = markNullable ?? true {
     this.typeLabel = typeLabel ?? qualifiedType.type.label;
     this.typeDescription = typeDescription ?? qualifiedType.type.description;
     this.showLabel = showLabel ?? true;
@@ -148,7 +149,8 @@ abstract class UiContext {
   // TODO Use this.
   FlutterApplicationService get service => callbacks.service;
 
-  TypeGuiProviderRegistry get typeGuiProviderRegistry => service.typeGuiProviderRegistry;
+  TypeGuiProviderRegistry get typeGuiProviderRegistry =>
+      service.typeGuiProviderRegistry;
 
   String get safeTypeLabel => typeLabel ?? qualifiedType.type.name;
 
@@ -176,7 +178,7 @@ abstract class UiContext {
 
     // Applying annotated properties.
     if (type.annotated && uiContext.value is AnnotatedValue) {
-      AnnotatedValue annotatedValue = uiContext.value as AnnotatedValue;
+      var annotatedValue = uiContext.value as AnnotatedValue;
       uiContext.value = annotatedValue.value;
       uiContext.valueLabel = annotatedValue.valueLabel;
       uiContext.valueDescription = annotatedValue.valueDescription;

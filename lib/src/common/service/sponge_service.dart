@@ -77,8 +77,7 @@ class SpongeService<AD extends ActionData> {
     );
 
     Map<String, dynamic> features = await _client.getFeatures();
-    String version =
-        features[SpongeClientConstants.REMOTE_API_FEATURE_VERSION];
+    String version = features[SpongeClientConstants.REMOTE_API_FEATURE_VERSION];
     if (version == null || !SpongeUtils.isServerVersionCompatible(version)) {
       throw SpongeException(
           'The Sponge server version $version is incompatible '
@@ -367,7 +366,7 @@ class SpongeService<AD extends ActionData> {
 
   Future<ActionData> findEventHandlerAction(EventData eventData) async {
     // Get the fresh event type.
-    var handlerActionName = (await client.getEventType(eventData.event.name))
+    String handlerActionName = (await client.getEventType(eventData.event.name))
         ?.features[Features.EVENT_HANDLER_ACTION];
 
     ActionData globalActionData = handlerActionName != null
@@ -451,11 +450,13 @@ class UsernamePasswordNotSetException implements Exception {
   String toString() => 'Username or password not set for $connectionName';
 }
 
-typedef void OnActionIntentPrepareCallback(ActionMeta actionMeta, List args);
-typedef Future<void> OnActionIntentCallback(ActionMeta actionMeta, List args);
-typedef Future<void> OnActionIntentAfterCallback(
+typedef OnActionIntentPrepareCallback = void Function(
+    ActionMeta actionMeta, List args);
+typedef OnActionIntentCallback = Future<void> Function(
+    ActionMeta actionMeta, List args);
+typedef OnActionIntentAfterCallback = Future<void> Function(
     ActionMeta actionMeta, List args, ActionCallResultInfo resultInfo);
-typedef bool OnActionIntentIsAllowedCallback(ActionMeta actionMeta);
+typedef OnActionIntentIsAllowedCallback = bool Function(ActionMeta actionMeta);
 
 class ActionIntentHandler {
   ActionIntentHandler({

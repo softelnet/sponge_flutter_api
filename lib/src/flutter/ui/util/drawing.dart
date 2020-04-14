@@ -48,11 +48,10 @@ Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,
 
   painterController.draw(canvas, size);
 
-  Picture p = recorder.endRecording();
+  var p = recorder.endRecording();
   var pictureImage = await p.toImage(binaryValue.displaySize.width.toInt(),
       binaryValue.displaySize.height.toInt());
-  ByteData pngBytes =
-      await pictureImage.toByteData(format: ImageByteFormat.png);
+  var pngBytes = await pictureImage.toByteData(format: ImageByteFormat.png);
 
   return pngBytes.buffer.asUint8List();
 }
@@ -60,7 +59,7 @@ Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,
 Future<String> convertImageToPngBase64(
     DrawingBinaryValue binaryValue, int width,
     [int height]) async {
-  Uint8List bytes =
+  var bytes =
       await convertImageToPng(binaryValue, width: width, height: height);
 
   // Run in a separate Isolate to prevent UI lags.

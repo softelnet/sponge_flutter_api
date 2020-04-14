@@ -86,8 +86,7 @@ class TypeGuiProviderUtils {
     }
 
     return ExtendedTextViewWidget(
-        textViewer:
-            createTextBasedViewer(viewerContext, showLabel: false));
+        textViewer: createTextBasedViewer(viewerContext, showLabel: false));
   }
 
   static Widget createTextBasedViewer<T extends DataType>(
