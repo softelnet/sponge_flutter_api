@@ -115,7 +115,7 @@ class DataTypeGuiUtils {
       var fieldValue = recordValue[fieldType.name];
       var fieldFeatures = DataTypeUtils.mergeFeatures(fieldType, fieldValue);
 
-      // TODO Better check.
+      // TODO Better check for the RootRecordSingleLeadingField.
       if (fieldFeatures[Features.GEO_MAP] != null) {
         return RootRecordSingleLeadingField(
             qualifiedRecordType.createChild(fieldType),
