@@ -109,7 +109,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
     } catch (e) {
       return Center(
         child: NotificationPanelWidget(
-          message: e,
+          notification: e,
           type: NotificationPanelType.error,
         ),
       );
@@ -429,7 +429,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
           .createEditor(editorContext);
     } catch (e) {
       return NotificationPanelWidget(
-        message: e,
+        notification: e,
         type: NotificationPanelType.error,
       );
     }
@@ -939,6 +939,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     var buttons = <Widget>[];
 
     if (_subActionsController.isCreateEnabled()) {
+      // TODO Support active/inactive verification to enable/disable the button.
       buttons.add(FlatButton(
         key: Key('list-create'),
         child: getActionIconByActionName(
@@ -1476,10 +1477,10 @@ class _TextEditWidgetState extends State<TextEditWidget> {
       controller: _controller,
       keyboardType: inputType,
       decoration: decoration,
+      // Both callbacks onFieldSubmitted and onSaved are necessary.
       onFieldSubmitted: (String value) {
         editorContext.onSave(widget.onGetValueFromString(value));
       },
-      // TODO Are both onFieldSubmitted and onSaved necessary?
       onSaved: (String value) {
         editorContext.onSave(widget.onGetValueFromString(value));
       },

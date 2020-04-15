@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/routes.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/login_widget.dart';
 
@@ -22,13 +23,13 @@ enum NotificationPanelType { error, info }
 class NotificationPanelWidget extends StatelessWidget {
   NotificationPanelWidget({
     Key key,
-    @required dynamic message,
+    @required dynamic notification,
     @required NotificationPanelType type,
-  })  : _message = message,
+  })  : _notification = notification,
         _type = type,
         super(key: key);
 
-  final dynamic _message;
+  final dynamic _notification;
   final NotificationPanelType _type;
 
   @override
@@ -38,10 +39,7 @@ class NotificationPanelWidget extends StatelessWidget {
     Color color;
     switch (_type) {
       case NotificationPanelType.error:
-        // TODO Verify error is SocketException.
-        var isSocketException = _message?.runtimeType?.toString() ==
-            'SocketException'; //error is SocketException
-        title = isSocketException ? 'Connection error' : 'Error';
+        title = isNetworkError(_notification) ? 'Connection error' : 'Error';
         icon = Icons.error;
         color = Colors.red;
         break;
@@ -63,7 +61,7 @@ class NotificationPanelWidget extends StatelessWidget {
           title: Text(title),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10),
-            child: Text('$_message'),
+            child: Text('$_notification'),
           ),
         ),
       ),

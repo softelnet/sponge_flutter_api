@@ -137,13 +137,13 @@ class _ActionCallPageState extends State<ActionCallPage>
                     ? _buildProvideArgsWidget(context)
                     : Center(
                         child: NotificationPanelWidget(
-                        message: '${_presenter.actionLabel} is inactive.',
+                        notification: '${_presenter.actionLabel} is inactive.',
                         type: NotificationPanelType.info,
                       ));
               } else if (snapshot.hasError) {
                 return Center(
                   child: NotificationPanelWidget(
-                    message: snapshot.error,
+                    notification: snapshot.error,
                     type: NotificationPanelType.error,
                   ),
                 );
@@ -167,7 +167,7 @@ class _ActionCallPageState extends State<ActionCallPage>
                 _presenter.error = snapshot.error;
                 return Center(
                   child: NotificationPanelWidget(
-                    message: snapshot.error,
+                    notification: snapshot.error,
                     type: NotificationPanelType.error,
                   ),
                 );

@@ -107,7 +107,7 @@ class _ActionsPageState extends State<ActionsPage>
                 context,
                 child: Center(
                   child: NotificationPanelWidget(
-                    message: state.error,
+                    notification: state.error,
                     type: NotificationPanelType.error,
                   ),
                 ),
@@ -392,7 +392,7 @@ class _ActionsPageState extends State<ActionsPage>
               connectionName: _presenter.connectionName);
         } else {
           return NotificationPanelWidget(
-            message: snapshot.error,
+            notification: snapshot.error,
             type: NotificationPanelType.error,
           );
         }

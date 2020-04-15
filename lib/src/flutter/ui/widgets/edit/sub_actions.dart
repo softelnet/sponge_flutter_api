@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/common/model/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
@@ -333,9 +334,8 @@ class SubActionsController extends BaseActionsController {
 
             var value = state.resultInfo.result;
             if (!DataTypeUtils.isNull(value)) {
-              // TODO This logic shouldn't be in a view.
               (uiContext.value as List)[index] = value;
-              // Save all list.
+              // Save the whole list.
               uiContext.callbacks
                   .onSave(uiContext.qualifiedType, uiContext.value);
             }
@@ -352,22 +352,24 @@ class SubActionsController extends BaseActionsController {
       hasContextActions(element);
 
   bool hasContextActions(dynamic element) =>
-      getContextActions(element).isNotEmpty;
+      _getContextActions(element).isNotEmpty;
 
-  List<SubActionSpec> getContextActions(dynamic element) =>
+  List<SubActionSpec> _getContextActions(dynamic element) =>
       Features.getStringList(getFeatures(element), Features.CONTEXT_ACTIONS)
           .map((actionSpecString) =>
               getSubActionSpec(actionSpecString, SubActionType.context))
           .where((subActionSpec) => subActionSpec != null)
           .toList();
 
-  Future<List<SubActionRuntimeSpec>> getActiveContextActions(
-      dynamic element) async {
-    var specs = getContextActions(element);
+  Future<List<SubActionRuntimeSpec>> getSubActionRuntimeSpecs(
+      List<SubActionSpec> specs, dynamic element) async {
     var entries = specs
         .map((spec) => IsActionActiveEntry(
             name: spec.actionName,
-            args: _substituteArgs(spec, elementType, element, bestEffort: true),
+            args: ModelUtils.substituteSubActionArgs(
+                spongeService, spec, elementType, element,
+                propagateContextActions: propagateContextActions,
+                bestEffort: true),
             qualifiedVersion: spongeService
                 .getCachedAction(spec.actionName)
                 .actionMeta
@@ -438,16 +440,6 @@ class SubActionsController extends BaseActionsController {
     }
   }
 
-  // void _validateSubActionArgs(ActionMeta actionMeta) {
-  //   // TODO More strict action arg validation.
-  //   var expectedTypeKind = elementType.kind;
-  //   Validate.isTrue(
-  //       actionMeta.args.isNotEmpty &&
-  //           actionMeta.args[0].kind == expectedTypeKind,
-  //           'The first argument of ${actionMeta.name} action should be $expectedTypeKind');
-  // }
-
-  // TODO Doesn't run if create, so create doesn't support substitutions.
   void setupSubAction(
       ActionData actionData, SubActionSpec subActionSpec, dynamic sourceValue) {
     if (subActionSpec.hasArgSubstitutions) {
@@ -455,17 +447,20 @@ class SubActionsController extends BaseActionsController {
         actionData.clear();
       }
 
-      actionData.args =
-          _substituteArgs(subActionSpec, elementType, sourceValue);
+      actionData.args = ModelUtils.substituteSubActionArgs(
+          spongeService, subActionSpec, elementType, sourceValue,
+          propagateContextActions: propagateContextActions);
     }
   }
 
   Future<void> onCreateElement(BuildContext context) async {
+    var createAction = getSubActionSpec(
+        parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
+        SubActionType.create);
+    // A create CRUD action doesn't support arg substitutions.
     await _onElementSubAction(
       context: context,
-      subActionSpec: getSubActionSpec(
-          parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
-          SubActionType.create),
+      subActionSpec: createAction,
     );
   }
 
@@ -557,7 +552,6 @@ class SubActionsController extends BaseActionsController {
     String header,
     bool showResultDialogIfNoResult = false,
   }) async {
-    // TODO implement busy state
     if (subActionSpec != null) {
       var service = ApplicationProvider.of(context).service;
 
@@ -569,9 +563,7 @@ class SubActionsController extends BaseActionsController {
         actionData = actionData.clone();
       }
 
-      if (setupCallback != null) {
-        setupCallback(actionData);
-      }
+      setupCallback?.call(actionData);
 
       var bloc = ActionCallBloc(
         spongeService: service.spongeService,
@@ -586,37 +578,30 @@ class SubActionsController extends BaseActionsController {
       try {
         if (showActionCallWidget) {
           // Call the sub-action in the ActionCall screen.
-          var newActionData = await showActionCall(context, actionData,
-              builder: (context) => ActionCallPage(
-                    actionData: actionData,
-                    readOnly: readOnly,
-                    bloc: bloc,
-                    callImmediately: true,
-                    showResultDialog: subActionSpec.resultSubstitution == null,
-                    showResultDialogIfNoResult: showResultDialogIfNoResult,
-                    verifyIsActive: false,
-                    header: header,
-                  ));
+          var newActionData = await showActionCall(
+            context,
+            actionData,
+            builder: (context) => ActionCallPage(
+              actionData: actionData,
+              readOnly: readOnly,
+              bloc: bloc,
+              callImmediately: true,
+              showResultDialog: subActionSpec.resultSubstitution == null,
+              showResultDialogIfNoResult: showResultDialogIfNoResult,
+              verifyIsActive: false,
+              header: header,
+            ),
+          );
           callState = newActionData != null
               ? ActionCallStateEnded(newActionData.resultInfo)
               : null;
         } else {
-          // await callActionImmediately(
-          //   context: context,
-          //   onBeforeCall: () => setState(() => _busy = true),
-          //   onAfterCall: () => setState(() => _busy = false),
-          //   actionData: actionData,
-          //   bloc: bloc,
-          //   showNoResultDialog: showNoResultDialog,
-          // );
-
           bool autoClosing = !showResultDialogIfNoResult &&
               actionData.actionMeta.result is VoidType &&
               actionData.actionMeta.result?.label == null;
 
-          if (autoClosing && onBeforeInstantCall != null) {
-            // TODO If no dialog will be shown, show simple HUD.
-            await onBeforeInstantCall();
+          if (autoClosing) {
+            await onBeforeInstantCall?.call();
           }
 
           bloc.add(actionData.args);
@@ -636,138 +621,54 @@ class SubActionsController extends BaseActionsController {
               orElse: () => null);
         }
       } finally {
-        // TODO Always refreshes. Maybe feature "refreshAfterCall"?
-        if (onAfterCall != null) {
-          await onAfterCall(subActionSpec, callState, index);
-        }
+        await onAfterCall?.call(subActionSpec, callState, index);
 
         await bloc.close();
       }
     }
   }
 
-  // TODO Move to common.
-  List<dynamic> _substituteArgs(
-      SubActionSpec subActionSpec, DataType sourceType, dynamic sourceValue,
-      {bool bestEffort = false}) {
-    ActionMeta subActionMeta =
-        spongeService.getCachedAction(subActionSpec.actionName).actionMeta;
-    var subActionData = ActionData(subActionMeta);
+  List<SubActionSpec> _getCrudActions(dynamic element) {
+    var crudActionSpecs = <SubActionSpec>[];
 
-    bool showActionCallWidget = subActionMeta.args.length >
-        (subActionSpec.argSubstitutions?.length ?? 1);
-
-    if (subActionSpec.argSubstitutions == null) {
-      // The default behavior that sets the first arg of the sub-action, if any.
-      if (subActionMeta.args.isNotEmpty) {
-        try {
-          // TODO More strict action arg validation.
-          Validate.isTrue(subActionMeta.args[0].kind == sourceType.kind,
-              'The first argument of ${subActionMeta.name} action should be ${sourceType.kind}');
-          subActionData.args[0] = DataTypeUtils.cloneValue(sourceValue);
-        } catch (e) {
-          if (!bestEffort) {
-            rethrow;
-          }
-        }
-      }
-    } else {
-      for (var i = 0; i < subActionData.args.length; i++) {
-        var subArgType = subActionMeta.args[i];
-
-        var subActionArgSpec = subActionSpec.argSubstitutions.firstWhere(
-            (substitution) => substitution.target == subArgType.name,
-            orElse: () => null);
-        if (subActionArgSpec != null) {
-          try {
-            subActionData.args[i] = DataTypeUtils.cloneValue(
-                DataTypeUtils.getSubValue(sourceValue, subActionArgSpec.source,
-                    unwrapAnnotatedTarget: false, unwrapDynamicTarget: false));
-          } catch (e) {
-            if (!bestEffort) {
-              rethrow;
-            }
-          }
-        }
-      }
+    var readAction = getSubActionSpec(
+        getFeatures(element)[Features.SUB_ACTION_READ_ACTION],
+        SubActionType.read);
+    if (readAction != null) {
+      crudActionSpecs.add(readAction);
     }
 
-    if (!bestEffort) {
-      for (var i = 0; i < subActionData.args.length; i++) {
-        var subArgType = subActionMeta.args[i];
-
-        var subActionArgSpec = subActionSpec.argSubstitutions?.firstWhere(
-            (substitution) => substitution.target == subArgType.name,
-            orElse: () => null);
-
-        // Exception if the target argument is not visible, not nullable and substituted by null.
-        Validate.isTrue(
-            Features.getOptional(
-                        subArgType.features, Features.VISIBLE, () => true) &&
-                    showActionCallWidget ||
-                subArgType.nullable ||
-                DataTypeUtils.hasAllNotNullValuesSet(
-                    subArgType, subActionData.args[i]),
-            // TODO Support context actions in dynamic types.
-            subActionArgSpec != null
-                ? 'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceType, subActionArgSpec.source, null))}\' is not set properly'
-                : 'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
-      }
+    var updateAction = getSubActionSpec(
+        getFeatures(element)[Features.SUB_ACTION_UPDATE_ACTION],
+        SubActionType.update);
+    if (updateAction != null) {
+      crudActionSpecs.add(updateAction);
     }
 
-    // Do not propagate context actions to sub-actions.
-    subActionData.args = subActionData.args.map((arg) {
-      if (arg is AnnotatedValue && !propagateContextActions) {
-        arg = AnnotatedValue.of(arg)
-          ..features
-              .removeWhere((name, value) => name == Features.CONTEXT_ACTIONS);
-      }
+    var deleteAction = getSubActionSpec(
+        getFeatures(element)[Features.SUB_ACTION_DELETE_ACTION],
+        SubActionType.delete);
+    if (deleteAction != null) {
+      crudActionSpecs.add(deleteAction);
+    }
 
-      return arg;
-    }).toList();
-
-    return subActionData.args;
+    return crudActionSpecs;
   }
 
   Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(
       dynamic value) async {
-    var specs = <SubActionRuntimeSpec>[];
+    List<SubActionSpec> crudActionSpecs = _getCrudActions(value);
+    List<SubActionSpec> contextActionSpecs = _getContextActions(value);
 
-    var readAction = getSubActionSpec(
-        getFeatures(value)[Features.SUB_ACTION_READ_ACTION],
-        SubActionType.read);
-    if (readAction != null) {
-      specs.add(SubActionRuntimeSpec(readAction));
+    // Check actions for active/inactive.
+    List<SubActionRuntimeSpec> runtimeSpecs = await getSubActionRuntimeSpecs(
+        crudActionSpecs + contextActionSpecs, value);
+
+    if (crudActionSpecs.isNotEmpty && contextActionSpecs.isNotEmpty) {
+      // Insert a separator between CRUD actions and context actions.
+      runtimeSpecs.insert(crudActionSpecs.length, null);
     }
 
-    var updateAction = getSubActionSpec(
-        getFeatures(value)[Features.SUB_ACTION_UPDATE_ACTION],
-        SubActionType.update);
-    if (updateAction != null) {
-      specs.add(SubActionRuntimeSpec(updateAction));
-    }
-
-    var deleteAction = getSubActionSpec(
-        getFeatures(value)[Features.SUB_ACTION_DELETE_ACTION],
-        SubActionType.delete);
-    if (deleteAction != null) {
-      specs.add(SubActionRuntimeSpec(deleteAction));
-    }
-
-    // TODO Support for active/inactive CRUD actions.
-
-    List<SubActionRuntimeSpec> contextActionRuntimeSpecs =
-        await getActiveContextActions(value);
-
-    if (contextActionRuntimeSpecs.isNotEmpty) {
-      if (specs.isNotEmpty) {
-        specs.add(null);
-      }
-
-      contextActionRuntimeSpecs.forEach(
-          (contextActionRuntimeSpec) => specs.add(contextActionRuntimeSpec));
-    }
-
-    return specs;
+    return runtimeSpecs;
   }
 }

@@ -431,3 +431,8 @@ Icon getPopupMenuIcon(BuildContext context) {
 
   return iconData != null ? Icon(iconData) : null;
 }
+
+bool isNetworkError(dynamic error) =>
+    // It's important not to use the SocketException class directly because it will impact the supported platforms.
+    // The https://pub.dev/packages/io doesn't support web.
+    error?.runtimeType?.toString() == 'SocketException';
