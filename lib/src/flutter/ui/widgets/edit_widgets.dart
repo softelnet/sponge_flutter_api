@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
@@ -468,7 +469,7 @@ class _ProvidedValueSetEditorWidgetState
   /// Creates a new controller initially and every time an argument value has changed.
   TextEditingController getOrCreateController() {
     if (_controller == null || widget.value != _controller.text) {
-      // TODO Dispose controller when creating a new.
+      // TODO Dispose controller when creating a new one.
       _controller = TextEditingController(text: widget.value?.toString() ?? '')
         ..addListener(() {
           widget.onSaved(_controller.text);
@@ -494,9 +495,7 @@ class _ProvidedValueSetEditorWidgetState
       var dropdown = DropdownButtonHideUnderline(
         child: DropdownButton(
           key: createDataTypeKey(widget.qType),
-          // TODO Is this condition required?
-          value: hasItems
-              ? widget.value /*widget.presenter.getArg(widget.index)*/ : null,
+          value: hasItems ? widget.value : null,
           items: hasItems ? items : null,
           onChanged: (value) {
             setState(() {});
@@ -504,7 +503,6 @@ class _ProvidedValueSetEditorWidgetState
           },
           disabledHint: Container(),
           isExpanded: true,
-          //isDense: true,
         ),
       );
 
@@ -679,12 +677,18 @@ class DateTimeEditWidget extends StatefulWidget {
     @required this.initialValue,
     @required this.onValueChanged,
     this.enabled = true,
+    this.firstDate,
+    this.lastDate,
+    this.yearsRange = 200,
   }) : super(key: key);
 
   final String name;
   final DateTime initialValue;
   final ValueChanged<DateTime> onValueChanged;
   final bool enabled;
+  final DateTime firstDate;
+  final DateTime lastDate;
+  final int yearsRange;
 
   @override
   _DateTimeEditWidgetState createState() => _DateTimeEditWidgetState();
@@ -717,13 +721,28 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
   }
 
   Future<void> _showDatePicker() async {
-    DateTime initialDate = widget.initialValue ?? DateTime.now();
+    DateTime now = DateTime.now();
+    DateTime initialDate = widget.initialValue ?? now;
+
+    DateTime firstDate =
+        widget.firstDate ?? Jiffy(now).subtract(years: widget.yearsRange);
+    // Apply a tolerance.
+    if (Jiffy(firstDate).add(years: 1).isAfter(initialDate)) {
+      firstDate = Jiffy(initialDate).subtract(years: widget.yearsRange);
+    }
+
+    DateTime lastDate =
+        widget.lastDate ?? Jiffy(now).add(years: widget.yearsRange);
+    // Apply a tolerance.
+    if (Jiffy(lastDate).subtract(years: 1).isBefore(initialDate)) {
+      lastDate = Jiffy(initialDate).add(years: widget.yearsRange);
+    }
+
     DateTime picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      // TODO Date picker firstDate and lastDate.
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
     if (picked != null) {
       widget.onValueChanged(picked);
@@ -963,8 +982,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       ));
     }
 
-    // TODO What if element type has no name?
-    // TODO What if element type is annotated?
     var qElementType = widget.uiContext.qualifiedType.createChild(elementType);
 
     var label = widget.uiContext.getDecorationLabel();
@@ -983,7 +1000,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       return index < data.length
           ? _createElementWidget(index, qElementType, data[index])
           : Container();
-      // }
     };
 
     var separatorBuilder =
@@ -1100,8 +1116,11 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   }
 
   Widget _createElementWidget(
-      int index, QualifiedDataType qElementType, dynamic element,
-      {double verticalMargin}) {
+    int index,
+    QualifiedDataType qElementType,
+    dynamic element, {
+    double verticalMargin,
+  }) {
     var subUiContext = TypeViewerContext(
       widget.uiContext.name,
       context,
@@ -1112,9 +1131,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       loading: widget.uiContext.loading,
     );
 
-    // TODO Can elementTypeProvider be cached?
-    var elementTypeProvider = widget.guiProvider.elementTypeProvider
-      ..setupContext(subUiContext);
+    var elementTypeProvider = widget.guiProvider.getElementTypeProvider();
 
     var elementIconInfo = Features.getIcon(subUiContext.features);
 

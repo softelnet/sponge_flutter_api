@@ -65,8 +65,6 @@ class TypeGuiProvider<T extends DataType> {
           .firstWhere((value) => value != null, orElse: () => null);
 
   Widget createEditor(TypeEditorContext editorContext) {
-    setupContext(editorContext);
-
     try {
       return _wrapIfLoading(
               (_) =>
@@ -84,8 +82,6 @@ class TypeGuiProvider<T extends DataType> {
   }
 
   Widget createCompactViewer(TypeViewerContext viewerContext) {
-    setupContext(viewerContext);
-
     try {
       // Create a compact viewer with a valueLabel.
       if (viewerContext.valueLabel != null) {
@@ -108,8 +104,6 @@ class TypeGuiProvider<T extends DataType> {
   }
 
   Widget createViewer(TypeViewerContext viewerContext) {
-    setupContext(viewerContext);
-
     try {
       return _wrapIfLoading(
               (_) =>
@@ -124,8 +118,6 @@ class TypeGuiProvider<T extends DataType> {
   }
 
   Widget createExtendedViewer(TypeViewerContext viewerContext) {
-    setupContext(viewerContext);
-
     try {
       return _traverse(
           (provider) => provider.createExtendedViewer(viewerContext));
@@ -134,8 +126,6 @@ class TypeGuiProvider<T extends DataType> {
       rethrow;
     }
   }
-
-  void setupContext(UiContext uiContext) => UiContext.setupContext(uiContext);
 
   Widget _wrapIfLoading(WidgetBuilder builder, UiContext uiContext) {
     bool isLoading = uiContext.isThisValueLoading;

@@ -125,7 +125,7 @@ abstract class UiContext {
     this.enabled = enabled;
     this.readOnly = readOnly;
 
-    setupContext(this);
+    _setup();
   }
 
   final String name;
@@ -167,40 +167,38 @@ abstract class UiContext {
         : label;
   }
 
-  static void setupContext<C extends UiContext>(C uiContext) {
-    if (uiContext._isSetUp) {
+  void _setup() {
+    if (_isSetUp) {
       return;
     }
 
-    var type = uiContext.qualifiedType.type;
+    _doSetup();
+
+    _isSetUp = true;
+  }
+
+  @mustCallSuper
+  void _doSetup() {
+    var type = qualifiedType.type;
 
     // Merge features before unwrapping an annotated value.
-    uiContext.features = DataTypeUtils.mergeFeatures(type, uiContext.value);
+    features = DataTypeUtils.mergeFeatures(type, value);
 
     // Applying annotated properties.
-    if (type.annotated && uiContext.value is AnnotatedValue) {
-      var annotatedValue = uiContext.value as AnnotatedValue;
-      uiContext.value = annotatedValue.value;
-      uiContext.valueLabel = annotatedValue.valueLabel;
-      uiContext.valueDescription = annotatedValue.valueDescription;
+    if (type.annotated && value is AnnotatedValue) {
+      var annotatedValue = value as AnnotatedValue;
+      value = annotatedValue.value;
+      valueLabel = annotatedValue.valueLabel;
+      valueDescription = annotatedValue.valueDescription;
 
       if (annotatedValue.typeLabel != null) {
-        uiContext.typeLabel = annotatedValue.typeLabel;
+        typeLabel = annotatedValue.typeLabel;
       }
 
       if (annotatedValue.typeDescription != null) {
-        uiContext.typeDescription = annotatedValue.typeDescription;
+        typeDescription = annotatedValue.typeDescription;
       }
     }
-
-    if (uiContext is TypeEditorContext) {
-      uiContext.enabled =
-          uiContext.enabled && (uiContext.features[Features.ENABLED] ?? true);
-      uiContext.readOnly = uiContext.readOnly ||
-          (uiContext.qualifiedType.type.provided?.readOnly ?? false);
-    }
-
-    uiContext._isSetUp = true;
   }
 
   bool get isThisValueLoading =>
@@ -258,6 +256,14 @@ class TypeEditorContext extends UiContext {
   ValueChanged onSave;
   ValueChanged onUpdate;
   TypeEditorValidatorCallback validator;
+
+  @override
+  void _doSetup() {
+    super._doSetup();
+
+    enabled = enabled && (features[Features.ENABLED] ?? true);
+    readOnly = readOnly || (qualifiedType.type.provided?.readOnly ?? false);
+  }
 
   TypeEditorContext clone() => TypeEditorContext(
         name,

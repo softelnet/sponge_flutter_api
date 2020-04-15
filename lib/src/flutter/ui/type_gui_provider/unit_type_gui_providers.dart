@@ -262,6 +262,9 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
         initialValue: editorContext.value,
         onValueChanged: editorContext.onSave,
         enabled: editorContext.enabled && !editorContext.readOnly,
+        // TODO Add support for minValue and maxValue in the DateTimeType.
+        // firstDate: type.minValue,
+        // lastDate: type.maxValue,
       );
     }
   }
@@ -475,12 +478,8 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
 class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
   ListTypeGuiProvider(DataType type) : super(type);
 
-  //UnitTypeGuiProvider _elementTypeProvider;
-
-  TypeGuiProvider get elementTypeProvider {
-    //_elementTypeProvider ??=
+  TypeGuiProvider getElementTypeProvider() {
     return typeProviderRegistry.getProvider(type.elementType);
-    //return _elementTypeProvider;
   }
 
   bool _useScrollableIndexedList(UiContext uiContext) =>

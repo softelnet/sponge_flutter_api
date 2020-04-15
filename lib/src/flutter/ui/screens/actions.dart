@@ -146,7 +146,7 @@ class _ActionsPageState extends State<ActionsPage>
 
         var tabBar = _useTabs
             ? TabBar(
-                // TODO Parametrize tabbar scroll in settings.
+                // TODO Parametrize the tabbar scroll in settings.
                 isScrollable: snapshot.data.length > 3,
                 tabs: snapshot.data
                     .map(
