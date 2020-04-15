@@ -45,10 +45,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Log in to ${widget.connectionName}'),
-        ),
-        body: ModalProgressHUD(child: _buildMainWidget(), inAsyncCall: _busy));
+      appBar: AppBar(
+        title: Text('Log in to ${widget.connectionName}'),
+      ),
+      body: ModalProgressHUD(
+        child: _buildMainWidget(),
+        inAsyncCall: _busy,
+      ),
+    );
   }
 
   Widget _buildMainWidget() {
@@ -130,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _logIn(BuildContext context) async {
     if (_formKey.currentState.validate()) {
-      _formKey.currentState.save(); // Save our form now.
+      _formKey.currentState.save();
 
       final ApplicationService service =
           ApplicationProvider.of(context).service;
@@ -138,7 +142,12 @@ class _LoginPageState extends State<LoginPage> {
       service.spongeService.connection.username = _loginData.username;
       service.spongeService.connection.password = _loginData.password;
 
-      await service.spongeService.getVersion();
+      setState(() => _busy = true);
+      try {
+        await service.spongeService.getVersion();
+      } finally {
+        setState(() => _busy = false);
+      }
     }
   }
 }
