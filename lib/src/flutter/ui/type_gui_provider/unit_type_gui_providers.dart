@@ -134,7 +134,13 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
               .apply(fontSizeFactor: 1.5));
     }
 
-    return Icon(Icons.insert_drive_file, size: 50);
+    return getIcon(
+      viewerContext.context,
+      viewerContext.service,
+      Features.getIcon(viewerContext.features),
+      orIconData: () => Icons.insert_drive_file,
+      forcedSize: 50,
+    );
   }
 
   @override

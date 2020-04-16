@@ -217,10 +217,10 @@ Icon getIcon(
   BuildContext context,
   FlutterApplicationService service,
   IconInfo iconInfo, {
-  IconData Function() defaultIconData,
+  IconData Function() orIconData,
+  double forcedSize,
 }) {
-  var iconData = getIconData(service, iconInfo?.name) ??
-      (defaultIconData != null ? defaultIconData() : null);
+  var iconData = getIconData(service, iconInfo?.name) ?? orIconData?.call();
 
   if (iconData == null) {
     return null;
@@ -229,7 +229,7 @@ Icon getIcon(
   return Icon(
     iconData,
     color: string2color(iconInfo?.color) ?? getIconColor(context),
-    size: iconInfo.size,
+    size: iconInfo?.size ?? forcedSize,
   );
 }
 
