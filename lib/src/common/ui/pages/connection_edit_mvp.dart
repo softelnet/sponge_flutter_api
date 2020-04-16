@@ -15,7 +15,7 @@
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 
 class ConnectionEditViewModel extends BaseViewModel {
   ConnectionEditViewModel(this.originalConnection)

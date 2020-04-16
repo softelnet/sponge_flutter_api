@@ -17,7 +17,7 @@ import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/event_received_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
-import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 
 class EventsViewModel extends BaseViewModel {}
 

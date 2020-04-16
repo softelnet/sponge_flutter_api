@@ -19,6 +19,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
+import 'package:sponge_flutter_api/src/common/util/image.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/edit_widgets.dart';
 
 abstract class BaseUnitTypeGuiProvider<T extends DataType>
     extends UnitTypeGuiProvider<T> {

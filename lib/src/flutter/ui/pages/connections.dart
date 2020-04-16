@@ -17,14 +17,14 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
-import 'package:sponge_flutter_api/src/common/ui/connections_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/connections_mvp.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
+import 'package:sponge_flutter_api/src/flutter/gui_factory.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/connection_edit.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/connection_edit.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/widget_factory.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ConnectionsPage extends StatefulWidget {
   ConnectionsPage({
@@ -154,7 +154,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   }
 
   List<Widget> _buildMenu(BuildContext context) {
-    var customItems = Provider.of<SpongeWidgetsFactory>(context)
+    var customItems = Provider.of<SpongeGuiFactory>(context)
         .createConnectionsPageMenuItems(context);
 
     var service = FlutterApplicationService.of(_presenter.service);

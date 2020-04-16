@@ -18,10 +18,10 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
+import 'package:sponge_flutter_api/src/common/model/type/type_value.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/drawing.dart';
-import 'package:sponge_flutter_api/src/type/generic_type.dart';
-import 'package:sponge_flutter_api/src/type/type_value.dart';
 
 TypeConverter createTypeConverter(ApplicationService service) =>
     DefaultTypeConverter()

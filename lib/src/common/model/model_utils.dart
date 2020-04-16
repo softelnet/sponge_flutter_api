@@ -15,7 +15,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 
 class ModelUtils {
   static List<dynamic> substituteSubActionArgs(

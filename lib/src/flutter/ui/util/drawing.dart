@@ -15,10 +15,10 @@
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
-import 'package:sponge_flutter_api/src/type/type_value.dart';
-import 'package:sponge_flutter_api/src/util/image.dart';
+import 'package:sponge_flutter_api/src/common/model/type/type_value.dart';
+import 'package:sponge_flutter_api/src/common/util/image.dart';
+import 'package:sponge_flutter_api/src/external/painter.dart';
+import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
 
 /// Converts by drawing using the displaySize if `width` and `height` not set.
 Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,

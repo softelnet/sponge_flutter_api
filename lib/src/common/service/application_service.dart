@@ -17,12 +17,12 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/application_constants.dart';
 import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
 import 'package:sponge_flutter_api/src/common/configuration/connections_configuration.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
+import 'package:sponge_flutter_api/src/common/sponge_service_constants.dart';
 
 enum ActionIconsView { custom, internal, none }
 enum ActionsOrder { defaultOrder, alphabetical }
@@ -93,12 +93,12 @@ abstract class ApplicationService<S extends SpongeService,
   Future<void> updateDefaultConnections() async {
     var existsDemoService = _connectionsConfiguration.getConnections().any(
         (c) =>
-            c.name == ApplicationConstants.DEMO_SERVICE_NAME ||
-            c.url == ApplicationConstants.DEMO_SERVICE_ADDRESS);
+            c.name == SpongeServiceConstants.DEMO_SERVICE_NAME ||
+            c.url == SpongeServiceConstants.DEMO_SERVICE_ADDRESS);
     if (!existsDemoService) {
       await _connectionsConfiguration.addConnection(SpongeConnection(
-          name: ApplicationConstants.DEMO_SERVICE_NAME,
-          url: ApplicationConstants.DEMO_SERVICE_ADDRESS,
+          name: SpongeServiceConstants.DEMO_SERVICE_NAME,
+          url: SpongeServiceConstants.DEMO_SERVICE_ADDRESS,
           anonymous: true));
     }
   }

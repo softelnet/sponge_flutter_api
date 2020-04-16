@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
-import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 typedef OnRefreshCallback = void Function();

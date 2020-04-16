@@ -23,14 +23,14 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
+import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
-import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
+import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ApplicationStateNotifier extends ChangeNotifier {
   ApplicationStateNotifier(this.service);

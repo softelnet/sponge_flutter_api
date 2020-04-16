@@ -18,17 +18,18 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
-import 'package:sponge_flutter_api/src/common/ui/action_call_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_flutter_presenter.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_result.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/edit_widgets.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_actions.dart';
 
 class ActionCallPage extends StatefulWidget {
   ActionCallPage({
@@ -58,7 +59,7 @@ class ActionCallPage extends StatefulWidget {
 
 class _ActionCallPageState extends State<ActionCallPage>
     implements ActionCallView {
-  ActionCallPresenter _presenter;
+  FlutterActionCallPresenter _presenter;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TypeGuiProvider _mainArgsGuiProvider;
 
@@ -73,7 +74,7 @@ class _ActionCallPageState extends State<ActionCallPage>
     var service = ApplicationProvider.of(context).service;
 
     // Use a copy of the action data.
-    _presenter ??= ActionCallPresenter(
+    _presenter ??= FlutterActionCallPresenter(
         ActionCallViewModel(widget.actionData.clone()), this)
       ..setService(service)
       ..init(

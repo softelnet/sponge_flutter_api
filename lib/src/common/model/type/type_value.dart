@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/type/generic_type.dart';
+import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
 
 abstract class BinaryValue {
   BinaryValue(this.type);

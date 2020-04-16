@@ -19,11 +19,11 @@ import 'package:flutter/rendering.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 //import 'package:image_picker_saver/image_picker_saver.dart';
 
 typedef OnFileSaveCallback = Future<String> Function();

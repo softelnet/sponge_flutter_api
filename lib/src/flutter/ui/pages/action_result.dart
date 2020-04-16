@@ -18,9 +18,9 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/flutter/flutter_model.dart';
+import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 
 class ActionResultWidget extends StatefulWidget {
   ActionResultWidget({

@@ -15,10 +15,10 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_providers_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 typedef UnitTypeGuiProviderSupplier = UnitTypeGuiProvider Function(
     DataType type);

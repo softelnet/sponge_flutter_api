@@ -14,7 +14,7 @@
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 
-class ApplicationConstants {
+class SpongeServiceConstants {
   static const String URL_TEMPLATE = 'http://';
 
   static const DEMO_SERVICE_ADDRESS = 'https://spongedemoapi.openksavi.org';

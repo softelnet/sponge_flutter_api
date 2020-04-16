@@ -14,10 +14,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/view_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/view/view_widgets.dart';
 
 class TypeGuiProviderUtils {
   static const UNSUPPORTED_BACKGROUND_COLOR = Colors.yellow;

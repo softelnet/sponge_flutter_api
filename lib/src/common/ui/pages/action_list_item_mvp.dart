@@ -15,8 +15,8 @@
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/common/ui/base_mvp.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 
 typedef OnActionCall = Future<void> Function(ActionData actionData);
 

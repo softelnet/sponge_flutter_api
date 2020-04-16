@@ -21,12 +21,12 @@ import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
+import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
+import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/type/generic_type.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> handleError(BuildContext context, e,

@@ -18,9 +18,9 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
-import 'package:sponge_flutter_api/src/common/ui/action_list_item_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/action_list_item_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_result.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_result.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 
 class ActionListItem extends StatefulWidget {

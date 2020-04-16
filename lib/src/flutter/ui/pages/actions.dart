@@ -23,14 +23,15 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/ui/actions_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/actions_mvp.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_list_item.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_list_item.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 class ActionsPage extends StatefulWidget {
   ActionsPage({
@@ -200,7 +201,7 @@ class _ActionsPageState extends State<ActionsPage>
         actions: _buildConnectionsWidget(context),
         bottom: tabBar,
       ),
-      drawer: Provider.of<SpongeWidgetsFactory>(context).createDrawer(context),
+      drawer: Provider.of<SpongeGuiFactory>(context).createDrawer(context),
       body: SafeArea(
         child: ModalProgressHUD(
           child: child,

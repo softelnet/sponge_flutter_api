@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_mobile.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
-import 'package:sponge_flutter_api/src/type/type_value.dart';
+import 'package:sponge_flutter_api/src/common/model/type/type_value.dart';
+import 'package:sponge_flutter_api/src/external/painter.dart';
+import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
 
 class PainterPanel extends StatefulWidget {
   PainterPanel({

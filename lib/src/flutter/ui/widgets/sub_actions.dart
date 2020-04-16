@@ -19,13 +19,13 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/model/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/screens/action_call.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/async_popup_menu_button.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 
 typedef BeforeSelectedSubActionCallback = Future<bool> Function(
     ActionData subActionData,

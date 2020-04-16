@@ -22,16 +22,16 @@ import 'package:jiffy/jiffy.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/sub_actions.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/view_widgets.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_actions.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/view/view_widgets.dart';
 
 class OptionalScrollContainer extends InheritedWidget {
   OptionalScrollContainer({

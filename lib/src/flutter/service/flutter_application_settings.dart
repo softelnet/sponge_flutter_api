@@ -15,8 +15,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
+import 'package:sponge_flutter_api/src/external/painter.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/external/painter.dart';
 
 class FlutterApplicationSettings extends ApplicationSettings {
   FlutterApplicationSettings(this._prefs, this._stateNotifier);

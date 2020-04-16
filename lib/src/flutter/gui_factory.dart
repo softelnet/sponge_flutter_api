@@ -14,10 +14,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sponge_flutter_api/src/common/ui/connections_mvp.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/connections_mvp.dart';
 
-class SpongeWidgetsFactory {
-  SpongeWidgetsFactory({
+class SpongeGuiFactory {
+  SpongeGuiFactory({
     WidgetBuilder onCreateDrawer,
     OnCreateConnectionsPageMenuItemsCallback onCreateConnectionsPageMenuItems,
     OnCreateRoutesCallback onCreateRoutes,

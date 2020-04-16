@@ -20,8 +20,8 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
+import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/util/utils.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 
 typedef ProvideArgsFilterCallback = bool Function(QualifiedDataType qType);
