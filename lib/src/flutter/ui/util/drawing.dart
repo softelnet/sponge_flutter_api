@@ -18,7 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sponge_flutter_api/src/common/model/type/type_value.dart';
 import 'package:sponge_flutter_api/src/common/util/image.dart';
 import 'package:sponge_flutter_api/src/external/painter.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
+import 'package:sponge_flutter_api/src/flutter/compatibility/generic_type_conversions.dart';
 
 /// Converts by drawing using the displaySize if `width` and `height` not set.
 Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,

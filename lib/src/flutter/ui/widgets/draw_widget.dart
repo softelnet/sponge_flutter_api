@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/external/painter.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/compatibility/compatibility_flutter.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawing_painter.dart';
 
