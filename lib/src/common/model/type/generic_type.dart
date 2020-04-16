@@ -48,8 +48,8 @@ class GenericColor {
   factory GenericColor.fromHexString(String colorRgbHex) =>
       GenericColor(int.parse('0x$colorRgbHex'));
 
-  static const GenericColor white = GenericColor(0xFFFFFFFF);
-  static const GenericColor black = GenericColor(0xFF000000);
+  static const white = GenericColor(0xFFFFFFFF);
+  static const black = GenericColor(0xFF000000);
 
   String _toHexString(int v) =>
       v.toRadixString(16).toUpperCase().padLeft(2, '0');

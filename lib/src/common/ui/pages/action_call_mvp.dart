@@ -18,7 +18,8 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
+import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
 
 class ActionCallViewModel extends BaseViewModel {
   ActionCallViewModel(this.actionData);
@@ -92,7 +93,8 @@ class ActionCallPresenter
 
   ActionMeta get actionMeta => actionData.actionMeta;
 
-  String get actionLabel => getActionMetaDisplayLabel(actionData.actionMeta);
+  String get actionLabel =>
+      ModelUtils.getActionMetaDisplayLabel(actionData.actionMeta);
 
   void clearArgs() {
     _session.clearArgs();
@@ -105,13 +107,13 @@ class ActionCallPresenter
   void validateArgs() => service.spongeService.client
       .validateCallArgs(actionMeta, actionData.args);
 
-  bool get showCall => DataTypeGuiUtils.showCall(actionMeta);
+  bool get showCall => ModelUtils.showCall(actionMeta);
 
-  bool get showRefresh => DataTypeGuiUtils.showRefresh(actionMeta);
+  bool get showRefresh => ModelUtils.showRefresh(actionMeta);
 
-  bool get showClear => DataTypeGuiUtils.showClear(actionMeta);
+  bool get showClear => ModelUtils.showClear(actionMeta);
 
-  bool get showCancel => DataTypeGuiUtils.showCancel(actionMeta);
+  bool get showCancel => ModelUtils.showCancel(actionMeta);
 
   String get callLabel => Features.getOptional(
       actionMeta.features, Features.ACTION_CALL_CALL_LABEL, () => 'RUN');
@@ -135,8 +137,7 @@ class ActionCallPresenter
   }
 
   bool hasRootRecordSingleLeadingField() =>
-      DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(actionData) !=
-      null;
+      ModelUtils.getRootRecordSingleLeadingFieldByAction(actionData) != null;
 
   Future<bool> isActionActive() async => await _session.isActionActive();
 

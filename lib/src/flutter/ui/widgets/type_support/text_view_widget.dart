@@ -1,4 +1,4 @@
-// Copyright 2018 The Sponge authors.
+// Copyright 2020 The Sponge authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,78 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-//import 'package:image_picker_saver/image_picker_saver.dart';
-
-typedef OnFileSaveCallback = Future<String> Function();
-
-class ImageViewPage extends StatelessWidget {
-  ImageViewPage({
-    Key key,
-    @required this.name,
-    @required this.imageData,
-    @required this.onSave,
-  }) : super(key: key);
-
-  final String name;
-  final Uint8List imageData;
-  final OnFileSaveCallback onSave;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Builder(
-        builder: (BuildContext context) => Scaffold(
-          appBar: MediaQuery.of(context).orientation == Orientation.portrait
-              ? AppBar(
-                  title: Text('${name ?? ''}'),
-                  actions: <Widget>[
-                    PopupMenuButton<String>(
-                      key: Key('actions'),
-                      onSelected: (value) async {
-                        switch (value) {
-                          case 'save':
-                            var filePath = await onSave();
-                            await showModalDialog(
-                                context,
-                                'Information',
-                                Text(
-                                    'The image has been saved to the file $filePath'));
-                            break;
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                            key: Key('save'),
-                            value: 'save',
-                            child: Text('Save to a file...')),
-                      ],
-                    )
-                  ],
-                )
-              : null,
-          body: Container(
-            child: PhotoView(
-              imageProvider: MemoryImage(imageData),
-              backgroundDecoration: BoxDecoration(),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
 class TextViewWidget extends StatefulWidget {
   TextViewWidget({
@@ -227,3 +162,4 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
     );
   }
 }
+

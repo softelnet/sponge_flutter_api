@@ -1,4 +1,4 @@
-// Copyright 2018 The Sponge authors.
+// Copyright 2020 The Sponge authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:sponge_flutter_api/src/common/model/type/type_value.dart';
-import 'package:sponge_flutter_api/src/common/util/image.dart';
+import 'package:sponge_flutter_api/src/common/util/image_processing.dart';
 import 'package:sponge_flutter_api/src/external/painter.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/generic_type_conversions.dart';
 
 /// Converts by drawing using the displaySize if `width` and `height` not set.
-Future<Uint8List> convertImageToPng(DrawingBinaryValue binaryValue,
+Future<Uint8List> convertDrawingToPng(DrawingBinaryValue binaryValue,
     {int width, int height}) async {
   if (binaryValue == null || binaryValue.displaySize == null) {
     return null;
@@ -60,7 +60,7 @@ Future<String> convertImageToPngBase64(
     DrawingBinaryValue binaryValue, int width,
     [int height]) async {
   var bytes =
-      await convertImageToPng(binaryValue, width: width, height: height);
+      await convertDrawingToPng(binaryValue, width: width, height: height);
 
   // Run in a separate Isolate to prevent UI lags.
   return await compute(encodeImageToPngBase64,

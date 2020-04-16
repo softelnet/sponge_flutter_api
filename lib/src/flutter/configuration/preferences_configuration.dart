@@ -48,8 +48,8 @@ class SharedPreferencesConnectionsConfiguration
   }
 
   @override
-  String getActiveConnectionName() => _baseConfiguration
-      .getActiveConnectionName(); //.getString(_KEY_ACTIVE_CONNECTION);
+  String getActiveConnectionName() =>
+      _baseConfiguration.getActiveConnectionName();
 
   @override
   List<SpongeConnection> getConnections() =>

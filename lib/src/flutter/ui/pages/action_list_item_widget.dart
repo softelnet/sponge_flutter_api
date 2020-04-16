@@ -20,8 +20,9 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_list_item_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_result.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_result_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 
 class ActionListItem extends StatefulWidget {
   ActionListItem({
@@ -32,7 +33,7 @@ class ActionListItem extends StatefulWidget {
   }) : super(key: key);
 
   final ActionData actionData;
-  final OnActionCall onActionCall;
+  final OnActionCallCalllback onActionCall;
   final bool showQualifiedName;
 
   @override

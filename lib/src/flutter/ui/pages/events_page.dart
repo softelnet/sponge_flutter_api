@@ -17,12 +17,13 @@ import 'package:pedantic/pedantic.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/events_mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_factory.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 
 class EventsPage extends StatefulWidget {
   EventsPage({Key key}) : super(key: key);
@@ -67,8 +68,7 @@ class _EventsPageState extends State<EventsPage>
           title: _buildTitle(context),
           actions: _buildActionsWidget(context),
         ),
-        drawer:
-            Provider.of<SpongeGuiFactory>(context).createDrawer(context),
+        drawer: Provider.of<SpongeGuiFactory>(context).createDrawer(context),
         body: SafeArea(
           child: _presenter.bloc != null
               ? StreamBuilder<EventData>(
@@ -79,11 +79,6 @@ class _EventsPageState extends State<EventsPage>
                 )
               : Container(),
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () => setState(() {}),
-        //   tooltip: 'Refresh events',
-        //   child: Icon(Icons.refresh),
-        // ),
       ),
       onWillPop: () async => await showAppExitConfirmationDialog(context),
     );

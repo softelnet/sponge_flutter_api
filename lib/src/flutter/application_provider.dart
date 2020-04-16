@@ -105,24 +105,4 @@ class _InheritedStateContainer extends InheritedWidget {
   bool updateShouldNotify(_InheritedStateContainer old) => true;
 }
 
-class PageStorageConsumer extends StatelessWidget {
-  PageStorageConsumer({
-    Key key,
-    @required this.child,
-  }) : super(key: key);
 
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    var stateContainer = ApplicationProvider.of(context);
-
-    return stateContainer != null
-        ? PageStorage(
-            bucket: stateContainer.bucket,
-            key: stateContainer.storageKey,
-            child: child,
-          )
-        : child;
-  }
-}

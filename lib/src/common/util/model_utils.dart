@@ -14,10 +14,36 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
 
 class ModelUtils {
+  static String getActionMetaDisplayLabel(ActionMeta actionMeta) =>
+      actionMeta.label ?? actionMeta.name;
+
+  static String getSafeTypeDisplayLabel(DataType type) =>
+      type.label ?? type.name;
+
+  static String getActionGroupDisplayLabel(ActionMeta actionMeta) =>
+      actionMeta.category?.label ??
+      actionMeta.category?.name ??
+      actionMeta.knowledgeBase?.label ??
+      actionMeta.knowledgeBase?.name;
+
+  /// Returns the qualified action label (category or knowledge base: action).
+  static String getQualifiedActionDisplayLabel(ActionMeta actionMeta) {
+    return '${getActionGroupDisplayLabel(actionMeta)}: ${getActionMetaDisplayLabel(actionMeta)}';
+  }
+
+  /// Returns `null` if not found.
+  static DataType getActionArgByIntent(
+          ActionMeta actionMeta, String intentValue) =>
+      actionMeta.args.firstWhere(
+          (arg) =>
+              arg.features[Features.INTENT] == intentValue ||
+              arg.name == intentValue,
+          orElse: () => null);
+
   static List<dynamic> substituteSubActionArgs(
     SpongeService spongeService,
     SubActionSpec subActionSpec,
@@ -103,4 +129,75 @@ class ModelUtils {
 
     return subActionData.args;
   }
+
+  static RootRecordSingleLeadingField getRootRecordSingleLeadingFieldByAction(
+      ActionData actionData) {
+    var recordType = actionData.argsAsRecordType;
+    var rootRecordSingleLeadingField = getRootRecordSingleLeadingField(
+        QualifiedDataType(recordType), actionData.argsAsRecord);
+
+    if (rootRecordSingleLeadingField != null) {
+      // If the action has buttons, it cannot have the record single leading field.
+      var actionMeta = actionData.actionMeta;
+      if (actionMeta.callable && showCall(actionMeta) ||
+          showRefresh(actionMeta) ||
+          showClear(actionMeta) ||
+          showCancel(actionMeta)) {
+        return null;
+      }
+    }
+
+    return rootRecordSingleLeadingField;
+  }
+
+  static RootRecordSingleLeadingField getRootRecordSingleLeadingField(
+      QualifiedDataType qualifiedRecordType, Map recordValue) {
+    if (!(qualifiedRecordType.type is RecordType)) {
+      return null;
+    }
+
+    var recordType = qualifiedRecordType.type as RecordType;
+
+    if (qualifiedRecordType.isRoot && recordType.fields.length == 1) {
+      var fieldType = recordType.fields[0];
+      var fieldValue = recordValue[fieldType.name];
+      var fieldFeatures = DataTypeUtils.mergeFeatures(fieldType, fieldValue);
+
+      // TODO Better check for the RootRecordSingleLeadingField.
+      if (fieldFeatures[Features.GEO_MAP] != null) {
+        return RootRecordSingleLeadingField(
+            qualifiedRecordType.createChild(fieldType),
+            fieldValue,
+            fieldFeatures);
+      }
+    }
+
+    return null;
+  }
+
+  static bool showCall(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features, Features.ACTION_CALL_SHOW_CALL, () => true);
+
+  static bool showRefresh(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_REFRESH,
+      () => actionMeta.features[Features.ACTION_CALL_REFRESH_LABEL] != null);
+
+  static bool showClear(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_CLEAR,
+      () => actionMeta.features[Features.ACTION_CALL_CLEAR_LABEL] != null);
+
+  static bool showCancel(ActionMeta actionMeta) => Features.getOptional(
+      actionMeta.features,
+      Features.ACTION_CALL_SHOW_CANCEL,
+      () => actionMeta.features[Features.ACTION_CALL_CANCEL_LABEL] != null);
+
+  static String getValueLabel(dynamic value) =>
+      (value != null && value is AnnotatedValue) ? value.valueLabel : null;
+
+  static String getValueDescription(dynamic value) =>
+      (value != null && value is AnnotatedValue)
+          ? value.valueDescription
+          : null;
 }

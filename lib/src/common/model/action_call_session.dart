@@ -20,8 +20,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 
 typedef ProvideArgsFilterCallback = bool Function(QualifiedDataType qType);
@@ -94,7 +93,7 @@ class ActionCallSession {
   }
 
   Future<bool> isActionActive() async {
-    // Cache the value.
+    // Cache the active/inactive flag.
     _isActive ??= (!_verifyIsActive || !actionMeta.activatable)
         ? true
         : await spongeService.isActionActive(actionMeta.name);
@@ -251,7 +250,6 @@ class ActionCallSession {
       yield ProvideActionArgsStateAfterInvocation();
       emitted = true;
     }
-    //});
   }
 
   Set<String> _getCurrentArgNamesForSubmit() {

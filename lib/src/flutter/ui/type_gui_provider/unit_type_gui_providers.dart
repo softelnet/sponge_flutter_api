@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
-import 'package:sponge_flutter_api/src/common/util/image.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/edit/edit_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/drawing_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/date_time_edit_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/list_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/map_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/multi_choice_list_edit_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/record_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/slider.dart';
 
 abstract class BaseUnitTypeGuiProvider<T extends DataType>
     extends UnitTypeGuiProvider<T> {
@@ -118,7 +123,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   }
 
   Future<Uint8List> _createDrawingThumbnail(DrawingBinaryValue value) async =>
-      await convertImageToPng(value, width: 100);
+      await convertDrawingToPng(value, width: 100);
 
   Widget _createCompactViewerDataWidget(TypeViewerContext viewerContext) {
     var mimeType = getMimeType(viewerContext) ?? '';
@@ -200,19 +205,16 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
           ],
         );
 
-    // A 'required' property doesn't matter in a case of a checkbox so it is ignored.
-
-    Widget valueWidget;
     if (widgetType == Features.WIDGET_SWITCH &&
         !editorContext.qualifiedType.type.nullable) {
-      valueWidget = wrap(Switch(
+      return wrap(Switch(
         key: createDataTypeKey(editorContext.qualifiedType),
         value: editorContext.value ?? (type.nullable ? null : false),
         onChanged: onChanged,
       ));
     } else if (iconInfo?.name != null &&
         !editorContext.qualifiedType.type.nullable) {
-      valueWidget = IconButton(
+      return IconButton(
         key: createDataTypeKey(editorContext.qualifiedType),
         icon: getIcon(editorContext.context, editorContext.service, iconInfo),
         onPressed: onChanged != null
@@ -220,15 +222,13 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
             : null,
       );
     } else {
-      valueWidget = wrap(Checkbox(
+      return wrap(Checkbox(
         key: createDataTypeKey(editorContext.qualifiedType),
         value: editorContext.value ?? (type.nullable ? null : false),
         onChanged: onChanged,
         tristate: type.nullable,
       ));
     }
-
-    return valueWidget;
   }
 
   @override
@@ -528,9 +528,6 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       guiProvider: this,
       useScrollableIndexedList: _useScrollableIndexedList(viewerContext),
     );
-
-    // return TypeGuiProviderUtils.createTextBasedCompactViewer(
-    //     this, viewerContext.copy()..value ??= _createListString(viewerContext));
   }
 
   @override
@@ -706,15 +703,6 @@ class ObjectTypeGuiProvider extends BaseUnitTypeGuiProvider<ObjectType> {
 class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   RecordTypeGuiProvider(DataType type) : super(type);
 
-  // Map<String, UnitTypeGuiProvider> _fieldTypeProviders;
-
-  // UnitTypeGuiProvider _getFieldTypeProvider(String fieldName) {
-  //   _fieldTypeProviders ??= Map.fromIterable(type.fields,
-  //       key: (field) => field.name,
-  //       value: (field) => typeProviderRegistry.getProvider(field.type));
-  //   return _fieldTypeProviders[fieldName];
-  // }
-
   @override
   Widget createEditor(TypeEditorContext editorContext) {
     return RecordTypeWidget(
@@ -722,16 +710,6 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
       uiContext: editorContext,
     );
   }
-
-  // String _createRecordString(TypeViewerContext viewerContext) => viewerContext
-  //             .value !=
-  //         null
-  //     ? '\n' +
-  //         type.fields
-  //             .map((field) =>
-  //                 '\t${field.label ?? field.name}: ${viewerContext.value[field.name]}')
-  //             .join(',\n')
-  //     : null;
 
   @override
   Widget createCompactViewer(TypeViewerContext viewerContext) {

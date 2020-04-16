@@ -22,14 +22,12 @@ import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
-import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/actions_mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_list_item.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_list_item_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 
@@ -67,7 +65,8 @@ class _ActionsPageState extends State<ActionsPage>
 
     var groupMap = <String, List<ActionData>>{};
     allActions.forEach((action) =>
-        (groupMap[getActionGroupDisplayLabel(action.actionMeta)] ??= [])
+        (groupMap[ModelUtils.getActionGroupDisplayLabel(action.actionMeta)] ??=
+                [])
             .add(action));
 
     var actionGroups = groupMap.entries
@@ -407,7 +406,7 @@ class _ActionsPageState extends State<ActionsPage>
   @override
   Future<bool> showActionCallConfirmationDialog(ActionData actionData) async =>
       await showConfirmationDialog(context,
-          'Do you want to run ${getActionMetaDisplayLabel(actionData.actionMeta)}?');
+          'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(actionData.actionMeta)}?');
 
   @override
   Future<ActionData> showActionCallScreen(ActionData actionData) async {

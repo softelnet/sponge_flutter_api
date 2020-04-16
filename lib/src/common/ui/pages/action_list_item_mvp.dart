@@ -16,14 +16,14 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 
-typedef OnActionCall = Future<void> Function(ActionData actionData);
+typedef OnActionCallCalllback = Future<void> Function(ActionData actionData);
 
 class ActionListItemViewModel extends BaseViewModel {
   ActionListItemViewModel(this.actionData, this.onActionCall);
   final ActionData actionData;
-  final OnActionCall onActionCall;
+  final OnActionCallCalllback onActionCall;
 }
 
 abstract class ActionListItemView extends BaseView {}
@@ -42,9 +42,9 @@ class ActionListItemPresenter
   ActionCallBloc get bloc =>
       service.spongeService.getActionCallBloc(actionMeta.name);
 
-  String get label => getActionMetaDisplayLabel(actionMeta);
+  String get label => ModelUtils.getActionMetaDisplayLabel(actionMeta);
 
-  String get qualifiedLabel => getQualifiedActionDisplayLabel(actionMeta);
+  String get qualifiedLabel => ModelUtils.getQualifiedActionDisplayLabel(actionMeta);
 
   String get tooltip =>
       actionMeta.description ?? actionMeta.label ?? actionMeta.name;

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:sponge_client_dart/sponge_client_dart.dart';
+
 class SpongeConnection implements Comparable {
   SpongeConnection({
     this.name,
@@ -79,4 +81,12 @@ class NetworkStatus {
 
   final String name;
   final bool isLocal;
+}
+
+class RootRecordSingleLeadingField {
+  RootRecordSingleLeadingField(this.qType, this.fieldValue, this.features);
+
+  QualifiedDataType qType;
+  dynamic fieldValue;
+  Map<String, Object> features;
 }

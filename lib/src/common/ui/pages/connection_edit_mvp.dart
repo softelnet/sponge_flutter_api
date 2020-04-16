@@ -98,6 +98,6 @@ class ConnectionEditPresenter
   bool get savePassword => viewModel.connection.savePassword;
   set savePassword(bool value) => viewModel.connection.savePassword = value;
 
-  Future<String> testConnection() async =>
-      await SpongeService.testConnection(viewModel.connection);
+  Future<String> verifyConnection() async =>
+      await SpongeService.verifyConnection(viewModel.connection);
 }

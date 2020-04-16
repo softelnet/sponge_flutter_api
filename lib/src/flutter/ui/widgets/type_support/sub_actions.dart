@@ -17,20 +17,30 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/common/model/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
 typedef BeforeSelectedSubActionCallback = Future<bool> Function(
     ActionData subActionData,
     SubActionType subActionType,
     dynamic contextValue);
+
+typedef AfterSubActionCallCallback = Future<void> Function(
+    SubActionSpec subActionSpec, ActionCallState actionCallState, int index);
+
+class SubActionRuntimeSpec {
+  SubActionRuntimeSpec(this.spec, {this.active = true});
+
+  final SubActionSpec spec;
+  final bool active;
+}
 
 class SubActionsWidget extends StatefulWidget {
   SubActionsWidget({
@@ -73,7 +83,7 @@ class SubActionsWidget extends StatefulWidget {
             SubActionType subActionType, dynamic contextValue) async {
           if (subActionData.needsRunConfirmation) {
             if (!(await showConfirmationDialog(uiContext.context,
-                'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
+                'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
               return false;
             }
           }
@@ -117,7 +127,7 @@ class SubActionsWidget extends StatefulWidget {
                 'Do you want to remove ${contextValueLabel ?? " the element"}?';
           } else {
             confirmationQuestion =
-                'Do you want to run ${getActionMetaDisplayLabel(subActionData.actionMeta)}?';
+                'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?';
           }
           if (!(await showConfirmationDialog(
               uiContext.context, confirmationQuestion))) {
@@ -209,7 +219,7 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       value: subActionRuntimeSpec.spec,
       child: ListTile(
         leading: getActionIcon(context, service, actionMeta),
-        title: Text(getActionMetaDisplayLabel(actionMeta)),
+        title: Text(ModelUtils.getActionMetaDisplayLabel(actionMeta)),
         enabled: subActionRuntimeSpec.active,
       ),
       enabled: subActionRuntimeSpec.active,
@@ -247,16 +257,6 @@ class BaseActionsController {
     spongeService.setupSubActionSpec(subActionSpec, elementType);
     return subActionSpec;
   }
-}
-
-typedef AfterSubActionCallCallback = Future<void> Function(
-    SubActionSpec subActionSpec, ActionCallState actionCallState, int index);
-
-class SubActionRuntimeSpec {
-  SubActionRuntimeSpec(this.spec, {this.active = true});
-
-  final SubActionSpec spec;
-  final bool active;
 }
 
 class SubActionsController extends BaseActionsController {

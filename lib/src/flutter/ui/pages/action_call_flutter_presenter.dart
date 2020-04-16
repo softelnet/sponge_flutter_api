@@ -17,10 +17,8 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 
 class FlutterActionCallPresenter extends ActionCallPresenter
     implements UiContextCallbacks {
@@ -121,7 +119,7 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   bool get canSwipeToClose =>
       // TODO Is checking the record single leading field for swipe to close ok? Swipe should be disabled for maps.
       service.settings.actionSwipeToClose &&
-      !(DataTypeGuiUtils.getRootRecordSingleLeadingFieldByAction(actionData)
+      !(ModelUtils.getRootRecordSingleLeadingFieldByAction(actionData)
               ?.features
               ?.containsKey(Features.GEO_MAP) ??
           false);

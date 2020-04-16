@@ -157,9 +157,7 @@ abstract class ApplicationService<S extends SpongeService,
   }
 
   Future<void> closeSpongeService() async {
-    // The asynchronous close() is called without await in order not to block the current thread.
     await _spongeService?.close();
-    // ?.catchError((e) => _logger.severe('Sponge service closing error', e));
   }
 
   Future<S> createSpongeService(

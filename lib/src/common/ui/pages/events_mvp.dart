@@ -39,7 +39,7 @@ class EventsPresenter extends BasePresenter<EventsViewModel, EventsView> {
 
   List<EventData> getEvents() {
     // Create a new copy of the list.
-    return service.spongeService.getEvents().toList(growable: false);
+    return service.spongeService.events.toList(growable: false);
   }
 
   Future<void> removeEvent(String eventId) async =>

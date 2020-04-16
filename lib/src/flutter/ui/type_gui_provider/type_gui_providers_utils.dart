@@ -16,8 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/view/view_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/text_view_widget.dart';
 
 class TypeGuiProviderUtils {
   static const UNSUPPORTED_BACKGROUND_COLOR = Colors.yellow;
@@ -25,9 +26,7 @@ class TypeGuiProviderUtils {
   static const double PADDING = 10.0;
   static const int LABEL_MAX_LENGTH = 200;
 
-  static String getFormat<T extends DataType>(
-    UiContext uiContext,
-  ) =>
+  static String getFormat<T extends DataType>(UiContext uiContext) =>
       DataTypeUtils.getFeatureOrProperty(
         uiContext.qualifiedType.type,
         uiContext.value,
@@ -53,7 +52,6 @@ class TypeGuiProviderUtils {
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           filled: true,
-          //fillColor: UNSUPPORTED_BACKGROUND_COLOR,
           labelText: labelText,
           hintText: hintText,
         ),

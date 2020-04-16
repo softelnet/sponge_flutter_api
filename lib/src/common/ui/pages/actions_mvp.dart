@@ -17,8 +17,8 @@ import 'package:sponge_flutter_api/src/common/bloc/connection_state.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 
 class ActionsViewModel extends BaseViewModel {}
 
@@ -76,8 +76,8 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
     // Sort actions.
     if (service.settings.actionsOrder == ActionsOrder.alphabetical) {
       actionDataList.sort((a1, a2) =>
-          getQualifiedActionDisplayLabel(a1.actionMeta)
-              .compareTo(getQualifiedActionDisplayLabel(a2.actionMeta)));
+          ModelUtils.getQualifiedActionDisplayLabel(a1.actionMeta)
+              .compareTo(ModelUtils.getQualifiedActionDisplayLabel(a2.actionMeta)));
     }
     return actionDataList;
   }

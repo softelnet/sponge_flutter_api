@@ -20,6 +20,8 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/event_received_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
+import 'package:sponge_flutter_api/src/common/service/action_intent_handler.dart';
+import 'package:sponge_flutter_api/src/common/service/exceptions.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -34,9 +36,10 @@ class SpongeService<AD extends ActionData> {
 
   static final Logger _logger = Logger('SpongeService');
 
+  final SpongeConnection _connection;
   TypeConverter typeConverter;
   FeatureConverter featureConverter;
-  final SpongeConnection _connection;
+
   SpongeRestClient _client;
   SpongeRestClient get client => _client;
   SpongeGrpcClient _grpcClient;
@@ -302,19 +305,7 @@ class SpongeService<AD extends ActionData> {
     });
   }
 
-  // Future<void> resubscribe() async {
-  //   await _lock.synchronized(() async {
-  //     bool subscribed = _subscription != null;
-
-  //     await unsubscribe();
-
-  //     if (subscribed) {
-  //       await subscribe();
-  //     }
-  //   });
-  // }
-
-  List<EventData> getEvents() => _events;
+  List<EventData> get events => _events;
 
   EventData getEvent(String eventId) =>
       _events?.singleWhere((eventData) => eventData.event.id == eventId,
@@ -402,7 +393,7 @@ class SpongeService<AD extends ActionData> {
         false;
   }
 
-  static Future<String> testConnection(SpongeConnection connection) async =>
+  static Future<String> verifyConnection(SpongeConnection connection) async =>
       await _createSpongeClient(connection).getVersion();
 
   static SpongeRestClient _createSpongeClient(
@@ -439,47 +430,4 @@ class SpongeService<AD extends ActionData> {
       ),
     );
   }
-}
-
-class UsernamePasswordNotSetException implements Exception {
-  const UsernamePasswordNotSetException(this.connectionName);
-
-  final String connectionName;
-
-  @override
-  String toString() => 'Username or password not set for $connectionName';
-}
-
-typedef OnActionIntentPrepareCallback = void Function(
-    ActionMeta actionMeta, List args);
-typedef OnActionIntentCallback = Future<void> Function(
-    ActionMeta actionMeta, List args);
-typedef OnActionIntentAfterCallback = Future<void> Function(
-    ActionMeta actionMeta, List args, ActionCallResultInfo resultInfo);
-typedef OnActionIntentIsAllowedCallback = bool Function(ActionMeta actionMeta);
-
-class ActionIntentHandler {
-  ActionIntentHandler({
-    OnActionIntentPrepareCallback onPrepare,
-    OnActionIntentCallback onBeforeCall,
-    OnActionIntentAfterCallback onAfterCall,
-    OnActionIntentCallback onCallError,
-    OnActionIntentIsAllowedCallback onIsAllowed,
-  }) {
-    this.onPrepare = onPrepare ?? ((ActionMeta actionMeta, List args) {});
-    this.onBeforeCall =
-        onBeforeCall ?? ((ActionMeta actionMeta, List args) async {});
-    this.onAfterCall = onAfterCall ??
-        ((ActionMeta actionMeta, List args,
-            ActionCallResultInfo resultInfo) async {});
-    this.onCallError =
-        onCallError ?? ((ActionMeta actionMeta, List args) async {});
-    this.onIsAllowed = onIsAllowed ?? ((ActionMeta actionMeta) => true);
-  }
-
-  OnActionIntentPrepareCallback onPrepare;
-  OnActionIntentCallback onBeforeCall;
-  OnActionIntentAfterCallback onAfterCall;
-  OnActionIntentCallback onCallError;
-  OnActionIntentIsAllowedCallback onIsAllowed;
 }

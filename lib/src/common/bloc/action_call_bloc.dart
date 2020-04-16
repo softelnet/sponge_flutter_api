@@ -48,8 +48,6 @@ class ActionCallBloc extends Bloc<List, ActionCallState> {
 
   @override
   Stream<ActionCallState> transformStates(Stream<ActionCallState> states) =>
-      //.debounce(const Duration(milliseconds: 250))
-      // If another call is initiated, the previous call is discarded so we don't deliver stale results.
       super.transformStates(states).asBroadcastStream();
 
   Stream<ActionCallState> _callAction(SpongeService spongeService,

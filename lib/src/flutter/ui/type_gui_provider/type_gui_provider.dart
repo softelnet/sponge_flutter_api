@@ -15,10 +15,10 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_providers_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 
 typedef UnitTypeGuiProviderSupplier = UnitTypeGuiProvider Function(
     DataType type);
@@ -142,15 +142,6 @@ class TypeGuiProvider<T extends DataType> {
             absorbing: true,
           )
         : widget;
-
-    // TODO ModalProgressHUD would be the best widget here but causes rendering errors, e.g. for pageable lists.
-
-    // return widget != null
-    //     ? ModalProgressHUD(
-    //         child: widget,
-    //         inAsyncCall: TypeGuiProviderUtils.isWaitingForValue(uiContext),
-    //       )
-    //     : null;
   }
 
   Future<void> navigateToExtendedViewer(TypeViewerContext viewerContext) async {
@@ -170,6 +161,7 @@ class TypeGuiProvider<T extends DataType> {
   }
 }
 
+/// Any of the create methods may return `null` meaning that a default widget should be used.
 abstract class UnitTypeGuiProvider<T extends DataType> {
   UnitTypeGuiProvider(this.type);
 
@@ -182,6 +174,5 @@ abstract class UnitTypeGuiProvider<T extends DataType> {
 
   Widget createViewer(TypeViewerContext viewerContext);
 
-  /// An extended viewer is optional so this method may return `null`.
   Widget createExtendedViewer(TypeViewerContext viewerContext);
 }

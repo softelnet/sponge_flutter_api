@@ -16,8 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/external/painter.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/drawing_painter.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
 class DrawingPage extends StatefulWidget {
   DrawingPage({
@@ -100,5 +99,54 @@ class _DrawingPageState extends State<DrawingPage> {
           displaySize: convertToSize(_controller.size),
           strokes: convertToStrokes(_controller.strokes),
         ));
+  }
+}
+
+class PainterPanel extends StatefulWidget {
+  PainterPanel({
+    Key key,
+    @required this.drawingBinary,
+    @required this.controller,
+    this.onStrokeEnd,
+  }) : super(key: key);
+
+  final PainterController controller;
+  final DrawingBinaryValue drawingBinary;
+  final StrokeEndCallback onStrokeEnd;
+
+  @override
+  _PainterPanelState createState() => _PainterPanelState();
+}
+
+class _PainterPanelState extends State<PainterPanel> {
+  PainterController get _controller => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller
+      ..drawColor = convertFromColor(widget.drawingBinary.color)
+      ..backgroundColor = convertFromColor(widget.drawingBinary.background)
+      ..addStrokes(convertFromStrokes(widget.drawingBinary.strokes));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        var currentSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+        _controller
+          ..size = currentSize
+          ..globalThickness =
+              currentSize.width * widget.drawingBinary.strokeWidthRatio;
+
+        return Painter(
+          _controller,
+          onStrokeEnd: widget.onStrokeEnd,
+        );
+      },
+    );
   }
 }

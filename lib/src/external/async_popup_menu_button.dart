@@ -24,7 +24,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
 typedef AsyncPopupMenuItemBuilder<T> = FutureOr<List<PopupMenuEntry<T>>>
     Function(BuildContext context);

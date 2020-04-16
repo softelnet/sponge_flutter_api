@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:sponge_flutter_api/src/flutter/routes.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/default_routes.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/login_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/login_widget.dart';
 
 enum NotificationPanelType { error, info }
 

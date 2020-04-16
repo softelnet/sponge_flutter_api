@@ -20,7 +20,7 @@ import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/sponge_service_constants.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/connection_edit_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
 class ConnectionEditPage extends StatefulWidget {
@@ -196,7 +196,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       child: Text('OK', style: getButtonTextStyle(context)),
                     ),
                     FlatButton(
-                      onPressed: () => _testConnection(context)
+                      onPressed: () => _verifyConnection(context)
                           .catchError((e) => handleError(context, e)),
                       child: Text('VERIFY', style: getButtonTextStyle(context)),
                     ),
@@ -233,12 +233,9 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
         keyboardType: keyboardType,
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
-          //filled: true,
           labelText: labelText,
-          //prefixIcon: icon,
         ),
         onSaved: onSaved,
-        //onFieldSubmitted: (String value) => _setArg(index, value),
         initialValue: initialValue,
         validator: validator,
         obscureText: obscureText,
@@ -248,7 +245,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
     );
   }
 
-  Future<void> _testConnection(BuildContext context) async {
+  Future<void> _verifyConnection(BuildContext context) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
@@ -257,7 +254,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
           duration: Duration(hours: 1)));
 
       try {
-        var version = await _presenter.testConnection();
+        var version = await _presenter.verifyConnection();
 
         if (_presenter.isBound) {
           await verifyServerVersion(context, version);

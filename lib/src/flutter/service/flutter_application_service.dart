@@ -21,15 +21,16 @@ import 'package:pedantic/pedantic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
+import 'package:sponge_flutter_api/src/common/service/action_intent_handler.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
-import 'package:sponge_flutter_api/src/common/util/utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/feature_converter.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/type_converter.dart';
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
-import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
+import 'package:sponge_flutter_api/src/flutter/service/flutter_sponge_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
@@ -91,15 +92,15 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_LOGIN] =
         ActionIntentHandler(
       onBeforeCall: (ActionMeta actionMeta, List args) async {
-        var usernameArg = getActionArgByIntent(
+        var usernameArg = ModelUtils.getActionArgByIntent(
             actionMeta, Features.TYPE_INTENT_VALUE_USERNAME);
         Validate.notNull(usernameArg,
-            'The action ${getActionMetaDisplayLabel(actionMeta)} should have the username argument');
+            'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the username argument');
 
-        var passwordArg = getActionArgByIntent(
+        var passwordArg = ModelUtils.getActionArgByIntent(
             actionMeta, Features.TYPE_INTENT_VALUE_PASSWORD);
         Validate.notNull(passwordArg,
-            'The action ${getActionMetaDisplayLabel(actionMeta)} should have the password argument');
+            'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the password argument');
 
         var username = args[actionMeta.getArgIndex(usernameArg.name)];
         var password = args[actionMeta.getArgIndex(passwordArg.name)];
@@ -159,13 +160,13 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         var eventNamesArg =
             args[_getSubscribeEventNamesActionArgIndex(actionMeta)];
         Validate.isTrue(eventNamesArg is List,
-            'The action ${getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument value should be a list');
+            'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument value should be a list');
 
         // Get the subscribe argument.
         var subscribeArg =
             args[_getSubscribeSubscribeActionArgIndex(actionMeta)];
         Validate.isTrue(subscribeArg is bool,
-            'The action ${getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument value should be a boolean');
+            'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument value should be a boolean');
 
         // Modify the subscription configuration.
         await changeActiveConnectionSubscription(
@@ -198,23 +199,23 @@ class FlutterApplicationService<S extends FlutterSpongeService,
   }
 
   int _getSubscribeEventNamesActionArgIndex(ActionMeta actionMeta) {
-    DataType eventNamesType = getActionArgByIntent(
+    DataType eventNamesType = ModelUtils.getActionArgByIntent(
         actionMeta, Features.TYPE_INTENT_VALUE_EVENT_NAMES);
     Validate.notNull(eventNamesType,
-        'The action ${getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument');
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument');
     Validate.isTrue(
         eventNamesType is ListType && eventNamesType.elementType is StringType,
-        'The action ${getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument type should be a list of strings');
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_EVENT_NAMES} argument type should be a list of strings');
     return actionMeta.getArgIndex(eventNamesType.name);
   }
 
   int _getSubscribeSubscribeActionArgIndex(ActionMeta actionMeta) {
-    DataType subscribeType =
-        getActionArgByIntent(actionMeta, Features.TYPE_INTENT_VALUE_SUBSCRIBE);
+    DataType subscribeType = ModelUtils.getActionArgByIntent(
+        actionMeta, Features.TYPE_INTENT_VALUE_SUBSCRIBE);
     Validate.notNull(subscribeType,
-        'The action ${getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument');
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument');
     Validate.isTrue(subscribeType is BooleanType,
-        'The action ${getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument type should be a boolean');
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_SUBSCRIBE} argument type should be a boolean');
     return actionMeta.getArgIndex(subscribeType.name);
   }
 
@@ -330,34 +331,4 @@ class FlutterApplicationService<S extends FlutterSpongeService,
   }
 
   Future<void> showEventNotification(EventData eventData) async {}
-}
-
-class FlutterSpongeService extends SpongeService<FlutterActionData> {
-  FlutterSpongeService(
-    SpongeConnection connection,
-    TypeConverter typeConverter,
-    FeatureConverter featureConverter,
-    this.typeGuiProviderRegistry, {
-    Map<String, ActionIntentHandler> actionIntentHandlers,
-  }) : super(connection,
-            typeConverter: typeConverter,
-            featureConverter: featureConverter,
-            actionIntentHandlers: actionIntentHandlers);
-
-  final TypeGuiProviderRegistry typeGuiProviderRegistry;
-
-  @override
-  FlutterActionData createActionData(ActionMeta actionMeta) =>
-      FlutterActionData(actionMeta, typeGuiProviderRegistry);
-}
-
-class EventNotificationState with ChangeNotifier {
-  RemoteEvent _lastEvent;
-
-  RemoteEvent get lastEvent => _lastEvent;
-
-  set lastEvent(RemoteEvent value) {
-    _lastEvent = value;
-    notifyListeners();
-  }
 }
