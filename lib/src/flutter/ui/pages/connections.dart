@@ -317,9 +317,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   @override
   void refresh([OnRefreshCallback callback]) {
     setState(() {
-      if (callback != null) {
-        callback();
-      }
+      callback?.call();
     });
   }
 

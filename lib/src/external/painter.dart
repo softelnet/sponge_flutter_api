@@ -58,7 +58,7 @@ import 'package:flutter/material.dart' as mat show Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart' hide Image;
 
-typedef StrokeEndCallback = FutureOr Function();
+typedef StrokeEndCallback = FutureOr<void> Function();
 
 class Painter extends StatefulWidget {
   Painter(
@@ -157,9 +157,7 @@ class _PainterState extends State<Painter> {
     widget.painterController._pathHistory.endCurrent();
     widget.painterController._notifyListeners();
 
-    if (widget.onStrokeEnd != null) {
-      widget.onStrokeEnd();
-    }
+    widget.onStrokeEnd?.call();
   }
 }
 
