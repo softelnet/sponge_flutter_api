@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_mvp.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/provided_value_set_widget.dart';
@@ -42,15 +42,15 @@ class RecordTypeWidget extends StatefulWidget {
 }
 
 class _RecordTypeWidgetState extends State<RecordTypeWidget>
-    implements RecordView {
-  RecordPresenter _presenter;
+    implements RecordTypeView {
+  RecordTypePresenter _presenter;
 
   @override
   Widget build(BuildContext context) {
-    var model = RecordViewModel(widget.uiContext);
+    var model = RecordTypeViewModel(widget.uiContext);
 
     _presenter ??=
-        RecordPresenter(ApplicationProvider.of(context).service, model, this);
+        RecordTypePresenter(ApplicationProvider.of(context).service, model, this);
 
     // The model contains the UiContext so it has to be updated every build.
     _presenter.updateModel(model);

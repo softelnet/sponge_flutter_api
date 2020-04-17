@@ -18,9 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/list_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
@@ -43,14 +43,16 @@ class ListTypeWidget extends StatefulWidget {
   _ListTypeWidgetState createState() => _ListTypeWidgetState();
 }
 
-class _ListTypeWidgetState extends State<ListTypeWidget> {
+class _ListTypeWidgetState extends State<ListTypeWidget>
+    implements ListTypeView {
+  ListTypePresenter _presenter;
+
   SubActionsController _subActionsController;
 
   ScrollController _scrollController;
   ItemScrollController _itemScrollController;
   ItemPositionsListener _itemPositionsListener;
 
-  bool _fetchingData = false;
   final _itemMargin = 1.0;
   String _lastFeatureKey;
 
@@ -66,22 +68,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return _lastListWidgetHeight;
   }
 
-  FlutterApplicationService get service => widget.uiContext.service;
-
-  bool get isPageable =>
-      widget.uiContext.features[Features.PROVIDE_VALUE_PAGEABLE] ?? false;
-
-  int get pageableOffset =>
-      widget.uiContext.features[Features.PROVIDE_VALUE_OFFSET];
-
-  int get pageableLimit =>
-      widget.uiContext.features[Features.PROVIDE_VALUE_LIMIT];
-
-  int get pageableCount =>
-      widget.uiContext.features[Features.PROVIDE_VALUE_COUNT];
-
   void _setupScrollController() {
-    var featureKey = _createFeatureKey();
+    var featureKey = _presenter.createFeatureKey();
     var isFeatureKeyChanged = featureKey != null &&
         _lastFeatureKey != null &&
         _lastFeatureKey != featureKey;
@@ -105,7 +93,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
   bool _shouldGetMoreDataByScroll() {
     if (widget.useScrollableIndexedList) {
-      var data = _getData();
+      var data = _presenter.getData();
       var positions = List.of(_itemPositionsListener.itemPositions.value);
 
       if (positions.isNotEmpty) {
@@ -116,9 +104,6 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         }
       }
     } else {
-      // print(
-      //     'position.pixels= ${_scrollController.position.pixels}, maxScrollExtent=${_scrollController.position.maxScrollExtent}');
-
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         return true;
@@ -136,19 +121,10 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return false;
   }
 
-  // double _getLastListWidgetHeight() {
-  //   final renderBox = _lastListWidgetKey.currentContext?.findRenderObject();
-  //   return renderBox is RenderBox ? renderBox.size?.height : null;
-  // }
-
   void _onScroll() {
     if (_shouldGetMoreDataByScroll()) {
-      _getMoreData();
+      _presenter.getMoreData();
     }
-  }
-
-  void _tryGetMoreData() {
-    _onScroll();
   }
 
   @override
@@ -157,17 +133,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     super.dispose();
   }
 
-  List _getData() => isPageable
-      ? (widget.uiContext.callbacks
-              .getPageableList(widget.uiContext.qualifiedType) ??
-          PageableList())
-      : (widget.uiContext.value as List ?? []);
-
-  String _createFeatureKey() => widget.uiContext.callbacks
-      .getKey(widget.uiContext.features[Features.KEY]);
-
   PageStorageKey _createListKey() {
-    var featureKey = _createFeatureKey();
+    var featureKey = _presenter.createFeatureKey();
 
     // Both list implementations must have diffrent keys.
     return PageStorageKey(
@@ -176,18 +143,24 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var data = _getData();
+    var model = ListTypeViewModel(widget.uiContext);
 
-    if (isPageable) {
+    _presenter ??=
+        ListTypePresenter(ApplicationProvider.of(context).service, model, this);
+
+    // The model contains the UiContext so it has to be updated every build.
+    _presenter.updateModel(model);
+
+    var data = _presenter.getData();
+
+    if (_presenter.isPageable) {
       _setupScrollController();
 
-      WidgetsBinding.instance.addPostFrameCallback((_) => _tryGetMoreData());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
     }
 
-    var elementType = widget.guiProvider.type.elementType;
-
-    _subActionsController =
-        SubActionsController.forList(widget.uiContext, service.spongeService);
+    _subActionsController = SubActionsController.forList(
+        widget.uiContext, _presenter.service.spongeService);
 
     var buttons = <Widget>[];
 
@@ -197,7 +170,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         key: Key('list-create'),
         child: getActionIconByActionName(
               context,
-              service,
+              _presenter.service,
               _subActionsController.getCreateActionName(),
             ) ??
             Icon(
@@ -211,7 +184,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       ));
     }
 
-    if (_isRefreshEnabled) {
+    if (_presenter.isRefreshEnabled) {
       buttons.add(FlatButton(
         key: Key('list-refresh'),
         child: Icon(
@@ -219,7 +192,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
           color: getIconColor(context),
         ),
         padding: EdgeInsets.zero,
-        onPressed: () => _refresh().catchError((e) => handleError(context, e)),
+        onPressed: () =>
+            _presenter.onRefresh().catchError((e) => handleError(context, e)),
       ));
     }
 
@@ -236,14 +210,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       ));
     }
 
-    var qElementType = widget.uiContext.qualifiedType.createChild(elementType);
-
-    var label = widget.uiContext.getDecorationLabel();
+    var qElementType = _presenter.createElementQualifiedType();
 
     const listPadding = EdgeInsets.only(bottom: 5);
-
-    var isListScroll =
-        DataTypeGuiUtils.hasListTypeScroll(widget.uiContext.qualifiedType.type);
 
     var itemBuilder = (BuildContext context, int index) {
       if (index == data.length) {
@@ -264,7 +233,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
           children: <Widget>[
             Padding(
               child: Text(
-                label ?? '',
+                _presenter.label ?? '',
                 style: getArgLabelTextStyle(context),
               ),
               padding: EdgeInsets.symmetric(vertical: 10),
@@ -278,7 +247,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
             ),
           ],
         ),
-        isListScroll
+        _presenter.hasListScroll()
             ? Expanded(
                 child: Padding(
                   padding: listPadding,
@@ -286,10 +255,12 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                     child: widget.useScrollableIndexedList
                         ? ScrollablePositionedList.separated(
                             key: _createListKey(),
-                            itemScrollController:
-                                isPageable ? _itemScrollController : null,
-                            itemPositionsListener:
-                                isPageable ? _itemPositionsListener : null,
+                            itemScrollController: _presenter.isPageable
+                                ? _itemScrollController
+                                : null,
+                            itemPositionsListener: _presenter.isPageable
+                                ? _itemPositionsListener
+                                : null,
                             itemCount: data.length + 1,
                             itemBuilder: itemBuilder,
                             separatorBuilder: separatorBuilder,
@@ -297,7 +268,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
                           )
                         : ListView.separated(
                             key: _createListKey(),
-                            controller: isPageable ? _scrollController : null,
+                            controller: _presenter.isPageable
+                                ? _scrollController
+                                : null,
                             //shrinkWrap: true,
                             itemCount: data.length + 1,
                             itemBuilder: itemBuilder,
@@ -330,33 +303,11 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
       padding: const EdgeInsets.all(5),
       child: Center(
         child: Opacity(
-          opacity: _fetchingData ? 1 : 0,
+          opacity: _presenter.fetchingData ? 1 : 0,
           child: CircularProgressIndicator(),
         ),
       ),
     );
-  }
-
-  Future<void> _getMoreData() async {
-    var pageableList = widget.uiContext.callbacks
-        .getPageableList(widget.uiContext.qualifiedType);
-
-    if (pageableList.hasMorePages) {
-      if (!_fetchingData) {
-        setState(() {
-          _fetchingData = true;
-        });
-
-        try {
-          await widget.uiContext.callbacks
-              .fetchPageableListPage(widget.uiContext.qualifiedType);
-        } finally {
-          setState(() {
-            _fetchingData = false;
-          });
-        }
-      }
-    }
   }
 
   Widget _createElementCard(Widget child, {double verticalMargin}) {
@@ -392,28 +343,25 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     return _createElementCard(
       ListTile(
         key: Key('list-element-$index'),
-        leading: getIcon(context, service, elementIconInfo),
+        leading: getIcon(context, _presenter.service, elementIconInfo),
         title: elementTypeProvider.createCompactViewer(subUiContext),
         subtitle: subUiContext.valueDescription != null
             ? Text(subUiContext.valueDescription)
             : null,
-        trailing: _subActionsController.hasSubActions(element) &&
-                widget.uiContext.enabled
-            ? SubActionsWidget.forListElement(
-                subUiContext,
-                service.spongeService,
-                controller: _subActionsController,
-                element: element,
-                index: index,
-                header: subUiContext.valueLabel != null
-                    ? Text(subUiContext.valueLabel)
-                    : null,
-              )
-            : null,
-
-        //Icon(Icons.more_vert),
+        trailing:
+            _subActionsController.hasSubActions(element) && _presenter.enabled
+                ? SubActionsWidget.forListElement(
+                    subUiContext,
+                    _presenter.service.spongeService,
+                    controller: _subActionsController,
+                    element: element,
+                    index: index,
+                    header: subUiContext.valueLabel != null
+                        ? Text(subUiContext.valueLabel)
+                        : null,
+                  )
+                : null,
         dense: true,
-        //contentPadding: EdgeInsets.all(0),
         onTap: widget.uiContext.enabled && _isOnElementTap(element)
             ? () => _onElementTap(subUiContext, element, index)
                 .catchError((e) => handleError(context, e))
@@ -432,7 +380,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
   bool _isOnElementTap(dynamic rawElement) =>
       _isOnActivateSubmit(rawElement) ||
       _subActionsController.isActivateEnabled(rawElement) ||
-      service.settings.argumentListElementTapBehavior == 'update' &&
+      _presenter.service.settings.argumentListElementTapBehavior == 'update' &&
           _subActionsController.isUpdateEnabled(rawElement) ||
       _subActionsController.isReadEnabled(rawElement);
 
@@ -443,7 +391,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     } else if (_subActionsController.isActivateEnabled(rawElement)) {
       await _subActionsController.onActivateElement(context, rawElement,
           index: index);
-    } else if (service.settings.argumentListElementTapBehavior == 'update' &&
+    } else if (_presenter.service.settings.argumentListElementTapBehavior ==
+            'update' &&
         _subActionsController.isUpdateEnabled(rawElement)) {
       await _subActionsController.onUpdateElement(context, rawElement,
           index: index);
@@ -453,12 +402,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
     }
   }
 
-  bool get _isRefreshEnabled =>
-      widget.uiContext?.qualifiedType?.type?.provided != null &&
-      (widget.uiContext?.features[Features.REFRESHABLE] ?? false);
-
   bool get _isIndicatedIndexEnabled {
-    var data = _getData();
+    var data = _presenter.getData();
 
     return widget.useScrollableIndexedList &&
         data is PageableList &&
@@ -466,17 +411,18 @@ class _ListTypeWidgetState extends State<ListTypeWidget> {
         data.indicatedIndex < data.length;
   }
 
-  Future<void> _refresh() async {
-    await widget.uiContext?.callbacks?.onRefreshArgs();
-  }
-
   Future<void> _goToIndicatedItem() async {
-    var data = _getData();
+    var data = _presenter.getData();
 
     if (data is PageableList &&
         data.indicatedIndex != null &&
         data.indicatedIndex < data.length) {
       _itemScrollController?.jumpTo(index: data.indicatedIndex);
     }
+  }
+
+  @override
+  void refresh() {
+    setState(() {});
   }
 }

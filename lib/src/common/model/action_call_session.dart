@@ -55,6 +55,7 @@ class ActionCallSession {
   final bool _verifyIsActive;
   bool _isActive;
 
+  bool _initialProvideArgs = true;
   Map<String, ProvidedValue> _providedArgs;
 
   final Map<String, dynamic> _argsToSubmit = {};
@@ -214,7 +215,10 @@ class ActionCallSession {
         current: current,
         dynamicTypes: dynamicTypes,
         features: features,
+        initial: _initialProvideArgs,
       );
+
+      _initialProvideArgs = false;
 
       _logger.finest('\t-> provided: ${newProvidedArgs.keys}');
 
@@ -225,20 +229,8 @@ class ActionCallSession {
       newProvidedArgs.forEach((name, argValue) {
         var argType = actionData.getArgType(name);
         if (argType.provided != null && (argValue?.valuePresent ?? false)) {
-          // Verify the returned provided values.
-          if (argType.provided.readOnly ||
-              argType.provided.overwrite ||
-              actionData.getArgValueByName(name, unwrapAnnotatedTarget: true) ==
-                  null ||
-              !previousViewModelProvidedArgs.containsKey(name)) {
-            _setArg(name, argValue.value,
-                preserveDependencies: preserveDependencies);
-          } else {
-            if (argType.provided.mode == ProvidedMode.EXPLICIT) {
-              _logger.warning(
-                  'Unexpected provided values for ${actionMeta.name}/${argType.name}');
-            }
-          }
+          _setArg(name, argValue.value,
+              preserveDependencies: preserveDependencies);
         }
       });
 

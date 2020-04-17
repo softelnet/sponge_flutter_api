@@ -21,11 +21,11 @@ import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/drawing_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/date_time_edit_widget.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/list_widget.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/map_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/date_time_edit_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/list_type_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/map_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/multi_choice_list_edit_widget.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/record_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/record_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/slider.dart';
 
 abstract class BaseUnitTypeGuiProvider<T extends DataType>

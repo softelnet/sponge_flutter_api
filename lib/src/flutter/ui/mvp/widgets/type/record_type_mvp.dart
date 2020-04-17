@@ -21,17 +21,17 @@ import 'package:sponge_flutter_api/src/flutter/service/flutter_application_servi
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
-class RecordViewModel extends BaseViewModel {
-  RecordViewModel(this.uiContext);
+class RecordTypeViewModel extends BaseViewModel {
+  RecordTypeViewModel(this.uiContext);
 
   final UiContext uiContext;
 }
 
-abstract class RecordView extends BaseView {}
+abstract class RecordTypeView extends BaseView {}
 
-class RecordPresenter extends BasePresenter<RecordViewModel, RecordView> {
-  RecordPresenter(
-      ApplicationService service, RecordViewModel model, RecordView view)
+class RecordTypePresenter extends BasePresenter<RecordTypeViewModel, RecordTypeView> {
+  RecordTypePresenter(
+      ApplicationService service, RecordTypeViewModel model, RecordTypeView view)
       : super(service, model, view);
 
   Map<String, TypeGuiProvider> _typeGuiProviders;
