@@ -43,13 +43,6 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   ConnectionsPresenter _presenter;
 
   @override
-  void initState() {
-    super.initState();
-
-    _presenter = ConnectionsPresenter(ConnectionsViewModel(), this);
-  }
-
-  @override
   void dispose() {
     _presenter.unbound();
 
@@ -58,9 +51,13 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
   @override
   Widget build(BuildContext context) {
-    _presenter
-      ..setService(ApplicationProvider.of(context).service)
-      ..refreshModel();
+    _presenter ??= ConnectionsPresenter(
+      ApplicationProvider.of(context).service,
+      ConnectionsViewModel(),
+      this,
+    );
+
+    _presenter.refreshModel();
 
     return Scaffold(
       appBar: AppBar(

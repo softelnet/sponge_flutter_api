@@ -80,11 +80,9 @@ class _ActionsPageState extends State<ActionsPage>
 
   @override
   Widget build(BuildContext context) {
-    _presenter ??= ActionsPresenter(this);
-
     var service = ApplicationProvider.of(context).service;
+    _presenter ??= ActionsPresenter(service, this);
     service.bindMainBuildContext(context);
-    _presenter.setService(service);
 
     return WillPopScope(
       child: BlocBuilder<ForwardingBloc<SpongeConnectionState>,

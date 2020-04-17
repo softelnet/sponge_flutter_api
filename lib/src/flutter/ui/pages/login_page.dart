@@ -16,17 +16,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:sponge_flutter_api/src/common/service/application_service.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/login_mvp.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
-class LoginData {
-  LoginData({this.username, this.password});
-
-  String username;
-  String password;
-}
-
+// TODO Test this component.
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, @required this.connectionName}) : super(key: key);
 
@@ -36,17 +31,23 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _loginData = LoginData();
+class _LoginPageState extends State<LoginPage> implements LoginView {
+  LoginPresenter _presenter;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static const double PADDING = 10.0;
   bool _busy = false;
 
   @override
   Widget build(BuildContext context) {
+    _presenter ??= LoginPresenter(
+      ApplicationProvider.of(context).service,
+      LoginViewModel(widget.connectionName),
+      this,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Log in to ${widget.connectionName}'),
+        title: Text(_presenter.title),
       ),
       body: ModalProgressHUD(
         child: _buildMainWidget(),
@@ -77,14 +78,12 @@ class _LoginPageState extends State<LoginPage> {
                           labelText: 'User name',
                           prefixIcon: Icon(Icons.person),
                         ),
-                        onSaved: (value) => setState(() => _loginData.username =
-                            value != null && value.isNotEmpty
-                                ? value.trim()
-                                : null),
-                        initialValue: _loginData.username,
-                        validator: (value) => (value ?? '').trim().isNotEmpty
-                            ? null
-                            : 'The user name must not be empty',
+                        onSaved: (value) => setState(() => _presenter.username =
+                            CommonUtils.normalizeString(value)),
+                        initialValue: _presenter.username,
+                        validator: (value) => (value?.trim()?.isEmpty ?? true)
+                            ? 'The user name must not be empty'
+                            : null,
                       ),
                     ),
                     Padding(
@@ -97,14 +96,12 @@ class _LoginPageState extends State<LoginPage> {
                           labelText: 'Password',
                           prefixIcon: Icon(Icons.verified_user),
                         ),
-                        onSaved: (value) => setState(() => _loginData.password =
-                            value != null && value.isNotEmpty
-                                ? value.trim()
-                                : null),
-                        initialValue: _loginData.password,
-                        validator: (value) => (value ?? '').trim().isNotEmpty
-                            ? null
-                            : 'The password must not be empty',
+                        onSaved: (value) => setState(() => _presenter.password =
+                            CommonUtils.normalizeString(value)),
+                        initialValue: _presenter.password,
+                        validator: (value) => (value?.trim()?.isEmpty ?? true)
+                            ? 'The password must not be empty'
+                            : null,
                         obscureText: true,
                       ),
                     ),
@@ -115,7 +112,8 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   RaisedButton(
                     onPressed: () => _logIn(context)
-                        .then((_) => Navigator.pop(context, _loginData))
+                        .then(
+                            (_) => Navigator.pop(context, _presenter.loginData))
                         .catchError((e) => handleError(context, e)),
                     child: Text('LOG IN'),
                   ),
@@ -136,15 +134,11 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      final ApplicationService service =
-          ApplicationProvider.of(context).service;
-
-      service.spongeService.connection.username = _loginData.username;
-      service.spongeService.connection.password = _loginData.password;
-
       setState(() => _busy = true);
       try {
-        await service.spongeService.getVersion();
+        await _presenter.logIn();
+      } catch (e) {
+        await handleError(context, e);
       } finally {
         setState(() => _busy = false);
       }

@@ -34,7 +34,7 @@ abstract class ActionsView extends BaseView {
 }
 
 class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
-  ActionsPresenter(ActionsView view) : super(ActionsViewModel(), view);
+  ActionsPresenter(ApplicationService service, ActionsView view) : super(service, ActionsViewModel(), view);
 
   List<SpongeConnectionViewModel> getConnections(
       bool isFilterByNetwork, NetworkStatus networkStatus) {

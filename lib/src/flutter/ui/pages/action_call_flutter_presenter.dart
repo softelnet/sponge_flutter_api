@@ -22,8 +22,8 @@ import 'package:sponge_flutter_api/src/flutter/service/flutter_application_servi
 
 class FlutterActionCallPresenter extends ActionCallPresenter
     implements UiContextCallbacks {
-  FlutterActionCallPresenter(ActionCallViewModel viewModel, ActionCallView view)
-      : super(viewModel, view);
+  FlutterActionCallPresenter(ApplicationService service,ActionCallViewModel viewModel, ActionCallView view)
+      : super(service, viewModel, view);
 
   static final Logger _logger = Logger('FlutterActionCallPresenter');
 

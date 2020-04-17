@@ -17,6 +17,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
+import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
@@ -37,8 +38,8 @@ abstract class ActionCallView extends BaseView {
 
 class ActionCallPresenter
     extends BasePresenter<ActionCallViewModel, ActionCallView> {
-  ActionCallPresenter(ActionCallViewModel viewModel, ActionCallView view)
-      : super(viewModel, view);
+  ActionCallPresenter(ApplicationService service, ActionCallViewModel viewModel, ActionCallView view)
+      : super(service, viewModel, view);
 
   bool busy = false;
   bool get callable => actionMeta.callable ?? true;

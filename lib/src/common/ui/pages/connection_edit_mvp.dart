@@ -31,9 +31,9 @@ abstract class ConnectionEditView extends BaseView {}
 
 class ConnectionEditPresenter
     extends BasePresenter<ConnectionEditViewModel, ConnectionEditView> {
-  ConnectionEditPresenter(
+  ConnectionEditPresenter(ApplicationService service, 
       ConnectionEditViewModel viewModel, ConnectionEditView view)
-      : super(viewModel, view);
+      : super(service, viewModel, view);
 
   bool busy = false;
 

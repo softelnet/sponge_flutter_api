@@ -54,8 +54,10 @@ class _ActionListItemState extends State<ActionListItem>
     var service = ApplicationProvider.of(context).service;
 
     _presenter ??= ActionListItemPresenter(
-        ActionListItemViewModel(widget.actionData, widget.onActionCall), this)
-      ..setService(service);
+      service,
+      ActionListItemViewModel(widget.actionData, widget.onActionCall),
+      this,
+    );
 
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 

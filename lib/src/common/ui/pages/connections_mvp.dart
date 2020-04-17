@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
+import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 
@@ -32,8 +33,8 @@ abstract class ConnectionsView extends BaseView {
 
 class ConnectionsPresenter
     extends BasePresenter<ConnectionsViewModel, ConnectionsView> {
-  ConnectionsPresenter(ConnectionsViewModel viewModel, ConnectionsView view)
-      : super(viewModel, view);
+  ConnectionsPresenter(ApplicationService service, ConnectionsViewModel viewModel, ConnectionsView view)
+      : super(service, viewModel, view);
 
   bool busy = false;
 

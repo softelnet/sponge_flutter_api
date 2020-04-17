@@ -43,11 +43,11 @@ class _ActionResultWidgetState extends State<ActionResultWidget>
 
   @override
   Widget build(BuildContext context) {
-    var service = ApplicationProvider.of(context).service;
-
     _presenter ??= ActionResultPresenter(
-        ActionResultViewModel(widget.actionData, widget.bloc), this)
-      ..setService(service);
+      ApplicationProvider.of(context).service,
+      ActionResultViewModel(widget.actionData, widget.bloc),
+      this,
+    );
 
     return BlocBuilder<ActionCallBloc, ActionCallState>(
       bloc: _presenter.bloc,

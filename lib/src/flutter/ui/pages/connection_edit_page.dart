@@ -40,14 +40,6 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   static const double PADDING = 10.0;
 
   @override
-  void initState() {
-    super.initState();
-
-    _presenter = ConnectionEditPresenter(
-        ConnectionEditViewModel(widget.originalConnection), this);
-  }
-
-  @override
   void dispose() {
     _presenter.unbound();
 
@@ -56,7 +48,11 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
 
   @override
   Widget build(BuildContext context) {
-    _presenter..setService(ApplicationProvider.of(context).service);
+    _presenter ??= ConnectionEditPresenter(
+      ApplicationProvider.of(context).service,
+      ConnectionEditViewModel(widget.originalConnection),
+      this,
+    );
 
     return Scaffold(
       appBar: AppBar(

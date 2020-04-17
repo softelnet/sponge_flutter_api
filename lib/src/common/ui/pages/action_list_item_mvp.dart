@@ -15,6 +15,7 @@
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 
@@ -30,9 +31,9 @@ abstract class ActionListItemView extends BaseView {}
 
 class ActionListItemPresenter
     extends BasePresenter<ActionListItemViewModel, ActionListItemView> {
-  ActionListItemPresenter(
+  ActionListItemPresenter(ApplicationService service, 
       ActionListItemViewModel model, ActionListItemView view)
-      : super(model, view);
+      : super(service, model, view);
 
   ActionCallState state = ActionCallStateInitialize();
 

@@ -14,6 +14,7 @@
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
+import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 
 class ActionResultViewModel extends BaseViewModel {
@@ -26,8 +27,8 @@ abstract class ActionResultView extends BaseView {}
 
 class ActionResultPresenter
     extends BasePresenter<ActionResultViewModel, ActionResultView> {
-  ActionResultPresenter(ActionResultViewModel model, ActionResultView view)
-      : super(model, view);
+  ActionResultPresenter(ApplicationService service, ActionResultViewModel model, ActionResultView view)
+      : super(service, model, view);
 
   ActionData get actionData => viewModel.actionData;
   ActionCallBloc get bloc => viewModel.bloc;

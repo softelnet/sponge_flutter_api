@@ -71,20 +71,19 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   @override
   Widget build(BuildContext context) {
-    var service = ApplicationProvider.of(context).service;
-
     // Use a copy of the action data.
     _presenter ??= FlutterActionCallPresenter(
-        ActionCallViewModel(widget.actionData.clone()), this)
-      ..setService(service)
-      ..init(
+      ApplicationProvider.of(context).service,
+      ActionCallViewModel(widget.actionData.clone()),
+      this,
+    )..init(
         verifyIsActive: widget.verifyIsActive,
       );
 
     _presenter.ensureRunning();
 
-    _mainArgsGuiProvider ??=
-        service.getTypeGuiProvider(widget.actionData.argsAsRecordType);
+    _mainArgsGuiProvider ??= _presenter.service
+        .getTypeGuiProvider(widget.actionData.argsAsRecordType);
 
     var subActionsWidget = _resolveSubActionsWidget(context);
 

@@ -17,6 +17,7 @@ import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/event_received_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
+import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 
 class EventsViewModel extends BaseViewModel {}
@@ -24,7 +25,7 @@ class EventsViewModel extends BaseViewModel {}
 abstract class EventsView extends BaseView {}
 
 class EventsPresenter extends BasePresenter<EventsViewModel, EventsView> {
-  EventsPresenter(EventsView view) : super(EventsViewModel(), view);
+  EventsPresenter(ApplicationService service, EventsView view) : super(service, EventsViewModel(), view);
 
   static final Logger _logger = Logger('EventsPresenter');
 

@@ -58,7 +58,7 @@ class _EventsPageState extends State<EventsPage>
   Widget build(BuildContext context) {
     var service = ApplicationProvider.of(context).service;
 
-    _presenter ??= EventsPresenter(this)..setService(service);
+    _presenter ??= EventsPresenter(service, this);
 
     service.bindMainBuildContext(context);
 
