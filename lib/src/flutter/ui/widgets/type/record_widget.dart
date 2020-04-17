@@ -30,12 +30,14 @@ class RecordTypeWidget extends StatefulWidget {
   RecordTypeWidget({
     Key key,
     @required this.uiContext,
+    this.showBorder = false,
   }) : super(key: key) {
     Validate.isTrue(
         uiContext.qualifiedType.type is RecordType, 'Record type expected');
   }
 
   final UiContext uiContext;
+  final bool showBorder;
 
   @override
   _RecordTypeWidgetState createState() => _RecordTypeWidgetState();
@@ -127,7 +129,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
                 style: getArgLabelTextStyle(context),
               ),
           ],
-          //alignment: Alignment.centerLeft,
         ),
         if (_isExpanded)
           Container(
@@ -147,19 +148,18 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget> {
                 : Card(
                     margin: margin,
                     elevation: 0,
-                    //shape: BeveledRectangleBorder(),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: _buildFieldsWidgets(context),
                     ),
                     color: Theme.of(widget.uiContext.context)
                         .scaffoldBackgroundColor,
-                    shape: ContinuousRectangleBorder(
+                    shape: widget.showBorder ? ContinuousRectangleBorder(
                       side: BorderSide(
                         width: 1,
                         color: getBorderColor(widget.uiContext.context),
                       ),
-                    ),
+                    ) : null,
                   ),
           ),
       ],

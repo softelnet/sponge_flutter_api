@@ -304,8 +304,11 @@ class DynamicTypeGuiProvider extends BaseUnitTypeGuiProvider<DynamicType> {
     var dynamicValue = editorContext.value as DynamicValue;
 
     if (dynamicValue == null) {
-      return TypeGuiProviderUtils.createTextBasedCompactViewer(
-          editorContext.cloneAsViewer());
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: TypeGuiProviderUtils.createTextBasedCompactViewer(
+            editorContext.cloneAsViewer()),
+      );
     }
 
     Validate.notNull(dynamicValue.type, 'A dynamic type is not set');
