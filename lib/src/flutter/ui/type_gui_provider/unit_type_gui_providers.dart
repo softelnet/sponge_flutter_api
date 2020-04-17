@@ -272,8 +272,6 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
         onValueChanged: editorContext.onSave,
         enabled: editorContext.enabled && !editorContext.readOnly,
         // TODO Add support for minValue and maxValue in the DateTimeType.
-        // firstDate: type.minValue,
-        // lastDate: type.maxValue,
       );
     }
   }
@@ -444,22 +442,11 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
       );
     }
 
-    // editorContext.labelText +=
-    //     TypeGuiProviderUtils.getNumberRangeLabel(minValue, maxValue);
-
     return TextEditWidget(
       editorContext: editorContext,
       inputType: TextInputType.numberWithOptions(decimal: false),
       validator: (value) {
-        if (!type.nullable && value.isEmpty) {
-          return '${editorContext.safeTypeLabel} is required';
-        }
-
-        value = value.isEmpty ? null : value;
-        int intValue = value != null ? int.tryParse(value) : null;
-        if (value != null && intValue == null) {
-          return 'The value is not an integer';
-        }
+        int intValue = value as int;
 
         String message = TypeGuiProviderUtils.validateNumberRange(
             intValue, minValue, exclusiveMin, maxValue, exclusiveMax);
@@ -467,11 +454,10 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
           return message;
         }
 
-        return editorContext.validator != null
-            ? editorContext.validator(value)
-            : null;
+        return editorContext.validator?.call(value);
       },
       onGetValueFromString: (String value) => _getValueFromString(value),
+      labelSuffix: TypeGuiProviderUtils.getNumberRangeLabel(minValue, maxValue),
     );
   }
 
@@ -579,23 +565,11 @@ class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {
         NumberType.FEATURE_EXCLUSIVE_MAX,
         () => type.exclusiveMax);
 
-    // editorContext.labelText +=
-    //     TypeGuiProviderUtils.getNumberRangeLabel(minValue, maxValue);
-
     return TextEditWidget(
       editorContext: editorContext,
       inputType: TextInputType.numberWithOptions(decimal: true),
       validator: (value) {
-        if (!type.nullable && value.isEmpty) {
-          return '${editorContext.safeTypeLabel} is required';
-        }
-
-        value = value.isEmpty ? null : value;
-
-        num numValue = value != null ? num.tryParse(value) : null;
-        if (value != null && numValue == null) {
-          return 'The value is not a number';
-        }
+        num numValue = value as num;
 
         String message = TypeGuiProviderUtils.validateNumberRange(
             numValue, minValue, exclusiveMin, maxValue, exclusiveMax);
@@ -603,11 +577,10 @@ class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {
           return message;
         }
 
-        return editorContext.validator != null
-            ? editorContext.validator(value)
-            : null;
+        return editorContext.validator?.call(value);
       },
       onGetValueFromString: (String value) => _getValueFromString(value),
+      labelSuffix: TypeGuiProviderUtils.getNumberRangeLabel(minValue, maxValue),
     );
   }
 
@@ -800,14 +773,7 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
               return 'The text is longer than $maxLength';
             }
 
-            if (editorContext.validator != null) {
-              String validationMessage = editorContext.validator(value);
-              if (validationMessage != null) {
-                return validationMessage;
-              }
-            }
-
-            return null;
+            return editorContext.validator?.call(value);
           },
           maxLines: maxLines,
           onGetValueFromString: (String value) => normalizeString(value),

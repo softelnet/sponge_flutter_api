@@ -143,21 +143,13 @@ class TypeGuiProviderUtils {
     );
   }
 
+  /// Returns `null` if both [min] and [max] are null.
   static String getNumberRangeLabel(num min, num max) {
     if (min == null && max == null) {
-      return '';
+      return null;
     }
 
-    String range = ' [';
-    if (min != null) {
-      range += '$min';
-    }
-    range += '-';
-    if (max != null) {
-      range += '$max';
-    }
-    range += ']';
-    return range;
+    return '[${min ?? ""}-${max ?? ""}]';
   }
 
   static String validateNumberRange(

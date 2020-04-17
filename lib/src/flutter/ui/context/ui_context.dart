@@ -19,7 +19,7 @@ import 'package:sponge_flutter_api/src/flutter/service/flutter_application_servi
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context_callbacks.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
-typedef TypeEditorValidatorCallback = String Function(String value);
+typedef TypeEditorValidatorCallback = String Function(dynamic value);
 
 abstract class UiContext {
   UiContext(

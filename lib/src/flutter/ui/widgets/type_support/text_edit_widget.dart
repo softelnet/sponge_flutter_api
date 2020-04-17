@@ -27,6 +27,7 @@ class TextEditWidget extends StatefulWidget {
     this.validator,
     this.maxLines,
     @required this.onGetValueFromString,
+    this.labelSuffix,
   }) : super(key: key);
 
   final TypeEditorContext editorContext;
@@ -34,6 +35,7 @@ class TextEditWidget extends StatefulWidget {
   final TypeEditorValidatorCallback validator;
   final int maxLines;
   final dynamic Function(String) onGetValueFromString;
+  final String labelSuffix;
 
   @override
   _TextEditWidgetState createState() => _TextEditWidgetState();
@@ -73,42 +75,35 @@ class _TextEditWidgetState extends State<TextEditWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _createTextEditWidget(
-      widget.editorContext,
-      inputType: widget.inputType,
-    );
-  }
+    var editorContext = widget.editorContext;
 
-  Widget _createTextEditWidget<T extends DataType>(
-    TypeEditorContext editorContext, {
-    @required TextInputType inputType,
-    TypeEditorValidatorCallback validator,
-    int maxLines,
-  }) {
     var decoration = InputDecoration(
-        border: InputBorder.none,
-        labelText: editorContext.getDecorationLabel(),
-        hintText: editorContext.hintText,
-        suffixIcon: editorContext.enabled && !editorContext.readOnly
-            ? InkResponse(
-                key: Key('text-clear'),
-                child: Icon(
-                  MdiIcons.close,
-                  //Icons.cancel,
-                  color: Colors.grey,
-                  size: getArgLabelTextStyle(editorContext.context).fontSize *
-                      1.5,
-                ),
-                onTap: () => WidgetsBinding.instance
-                    .addPostFrameCallback((_) => _controller.clear()))
-            : null);
+      border: InputBorder.none,
+      labelText: editorContext.getDecorationLabel() +
+          (widget.labelSuffix != null ? ' ${widget.labelSuffix}' : ''),
+      hintText: editorContext.hintText,
+      suffixIcon: editorContext.enabled && !editorContext.readOnly
+          ? InkResponse(
+              key: Key('text-clear'),
+              child: Icon(
+                MdiIcons.close,
+                //Icons.cancel,
+                color: Colors.grey,
+                size:
+                    getArgLabelTextStyle(editorContext.context).fontSize * 1.5,
+              ),
+              onTap: () => WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _controller.clear()))
+          : null,
+    );
+
     bool obscure = Features.getOptional(
         editorContext.features, Features.STRING_OBSCURE, () => false);
 
     return TextFormField(
       key: createDataTypeKey(editorContext.qualifiedType),
       controller: _controller,
-      keyboardType: inputType,
+      keyboardType: widget.inputType,
       decoration: decoration,
       // Both callbacks onFieldSubmitted and onSaved are necessary.
       onFieldSubmitted: (String value) {
@@ -122,14 +117,11 @@ class _TextEditWidgetState extends State<TextEditWidget> {
           return '${editorContext.qualifiedType.type.label ?? "Value"} is required';
         }
 
-        return validator != null
-            ? validator(widget.onGetValueFromString(value))
-            : null;
+        return widget.validator?.call(widget.onGetValueFromString(value));
       },
-      maxLines: obscure ? 1 : maxLines,
+      maxLines: obscure ? 1 : widget.maxLines,
       enabled: editorContext.enabled && !editorContext.readOnly,
       obscureText: obscure,
     );
   }
 }
-

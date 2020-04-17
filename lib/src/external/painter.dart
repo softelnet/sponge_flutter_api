@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 //
-// The code in this file is a modified library https://pub.dartlang.org/packages/painter2 (released under the MIT licenses).
+// The code in this file is a modified https://pub.dartlang.org/packages/painter2 library.
 // It is used by the `BinaryTypeGuiProvider` for drawings.
 //
 //
@@ -146,8 +146,6 @@ class _PainterState extends State<Painter> {
         widget.painterController.strokeUpdateDeltaThresholdSquared;
 
     if (thresholdSquared == 0 || delta.distanceSquared < thresholdSquared) {
-      // print(
-      //     'update: $pos, delta: $delta, box: ${renderBox.size}, threshold: ${sqrt(thresholdSquared)}');
       widget.painterController._pathHistory.updateCurrent(pos);
       widget.painterController._notifyListeners();
     }
