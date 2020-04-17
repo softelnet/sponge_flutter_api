@@ -19,8 +19,11 @@ import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/generic_type_conversions.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 
 IconData getActionArgsIconData(int size) {
   switch (size) {
@@ -165,4 +168,19 @@ Key createDataTypeKey(
   return value != null ? Key(value) : null;
 }
 
-
+Future<void> navigateToExtendedViewer(
+    TypeGuiProvider provider, TypeViewerContext viewerContext) async {
+  var viewer = provider.createExtendedViewer(viewerContext);
+  if (viewer != null) {
+    await Navigator.push(
+      viewerContext.context,
+      createPageRoute(
+        viewerContext.context,
+        builder: (context) => SwipeDetector(
+          child: viewer,
+          onSwipe: (context) => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+}

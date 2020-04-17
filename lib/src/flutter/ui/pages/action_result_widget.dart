@@ -18,6 +18,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
+import 'package:sponge_flutter_api/src/common/ui/pages/action_result_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
@@ -29,7 +30,6 @@ class ActionResultWidget extends StatefulWidget {
     @required this.bloc,
   }) : super(key: key);
 
-  // TODO Refactor to the presenter.
   final ActionData actionData;
   final ActionCallBloc bloc;
 
@@ -37,11 +37,20 @@ class ActionResultWidget extends StatefulWidget {
   _ActionResultWidgetState createState() => _ActionResultWidgetState();
 }
 
-class _ActionResultWidgetState extends State<ActionResultWidget> {
+class _ActionResultWidgetState extends State<ActionResultWidget>
+    implements ActionResultView {
+  ActionResultPresenter _presenter;
+
   @override
   Widget build(BuildContext context) {
+    var service = ApplicationProvider.of(context).service;
+
+    _presenter ??= ActionResultPresenter(
+        ActionResultViewModel(widget.actionData, widget.bloc), this)
+      ..setService(service);
+
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-      bloc: widget.bloc,
+      bloc: _presenter.bloc,
       builder: (BuildContext context, ActionCallState state) {
         return _buildResultWidget(context, state);
       },
@@ -50,14 +59,14 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
 
   Widget _buildResultWidget(BuildContext context, ActionCallState state) {
     if (state is ActionCallStateInitialize) {
-      // View the previous state in ActionData.
-      if (widget.actionData.calling) {
+      // View the previous state from the ActionData.
+      if (_presenter.actionData.calling) {
         return Center(child: CircularProgressIndicator());
-      } else if (widget.actionData.isSuccess) {
+      } else if (_presenter.actionData.isSuccess) {
         return _buildActualResultWidget(
-            context, widget.actionData.resultInfo.result);
-      } else if (widget.actionData.isError) {
-        return _buildErrorWidget(widget.actionData.resultInfo.exception);
+            context, _presenter.actionData.resultInfo.result);
+      } else if (_presenter.actionData.isError) {
+        return _buildErrorWidget(_presenter.actionData.resultInfo.exception);
       }
     } else if (state is ActionCallStateCalling) {
       return Center(child: CircularProgressIndicator());
@@ -83,40 +92,22 @@ class _ActionResultWidgetState extends State<ActionResultWidget> {
         ),
       );
 
-  // TODO Refactor to the presenter.
-  String get resultLabel =>
-      widget.actionData.actionMeta.result?.label ?? 'Result';
-
-  static TypeGuiProvider getActionResultProvider(
-      BuildContext context, ActionData actionData) {
-    if (actionData is FlutterActionData) {
-      return actionData.resultProvider;
-    }
-
-    // TODO Refactor to the presenter - service.
-    return ApplicationProvider.of(context)
-        .service
-        .typeGuiProviderRegistry
-        .getProvider(actionData.actionMeta.result);
-  }
-
   Widget _buildActualResultWidget(BuildContext context, dynamic result) {
     TypeGuiProvider provider =
-        getActionResultProvider(context, widget.actionData);
+        (_presenter.actionData as FlutterActionData).resultProvider;
     var createViewerContext = () => TypeViewerContext(
           '${widget.actionData.actionMeta.name}-result',
           context,
-          // TODO Refactor to the presenter - service.
-          NoOpUiContextCallbacks(ApplicationProvider.of(context).service),
+          NoOpUiContextCallbacks(_presenter.service),
           QualifiedDataType(widget.actionData.actionMeta.result),
           result,
-          typeLabel: resultLabel,
+          typeLabel: _presenter.resultLabel,
           markNullable: false,
           loading: [],
         );
 
     return InkWell(
-      onTap: () => provider.navigateToExtendedViewer(createViewerContext()),
+      onTap: () => navigateToExtendedViewer(provider, createViewerContext()),
       child: provider.createCompactViewer(createViewerContext()),
     );
   }

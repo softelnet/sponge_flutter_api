@@ -17,8 +17,6 @@ import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_providers_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 
 typedef UnitTypeGuiProviderSupplier = UnitTypeGuiProvider Function(
     DataType type);
@@ -142,22 +140,6 @@ class TypeGuiProvider<T extends DataType> {
             absorbing: true,
           )
         : widget;
-  }
-
-  Future<void> navigateToExtendedViewer(TypeViewerContext viewerContext) async {
-    var viewer = createExtendedViewer(viewerContext);
-    if (viewer != null) {
-      await Navigator.push(
-        viewerContext.context,
-        createPageRoute(
-          viewerContext.context,
-          builder: (context) => SwipeDetector(
-            child: viewer,
-            onSwipe: (context) => Navigator.pop(context),
-          ),
-        ),
-      );
-    }
   }
 }
 
