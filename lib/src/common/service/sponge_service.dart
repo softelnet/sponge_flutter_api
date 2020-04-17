@@ -71,6 +71,8 @@ class SpongeService<AD extends ActionData> {
   EventReceivedBloc eventReceivedBloc;
   ForwardingBloc<bool> subscriptionBloc;
 
+  Map<String, dynamic> serviceFeatures;
+
   Future<void> open() async {
     _client = _createSpongeClient(
       _connection,
@@ -79,18 +81,20 @@ class SpongeService<AD extends ActionData> {
       autoUseAuthToken: autoUseAuthToken,
     );
 
-    Map<String, dynamic> features = await _client.getFeatures();
-    String version = features[SpongeClientConstants.REMOTE_API_FEATURE_VERSION];
+    serviceFeatures = await _client.getFeatures();
+    String version =
+        serviceFeatures[SpongeClientConstants.REMOTE_API_FEATURE_VERSION];
     if (version == null || !SpongeUtils.isServerVersionCompatible(version)) {
       throw SpongeException(
           'The Sponge server version $version is incompatible '
           'with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*');
     }
 
-    if (features[SpongeClientConstants.REMOTE_API_FEATURE_GRPC_ENABLED] ??
-        false) {
-      _grpcClient = createSpongeGrpcClient(_client, _connection);
-    }
+    _grpcClient = (serviceFeatures[
+                SpongeClientConstants.REMOTE_API_FEATURE_GRPC_ENABLED] ??
+            false)
+        ? createSpongeGrpcClient(_client, _connection)
+        : null;
 
     eventReceivedBloc?.close();
     eventReceivedBloc = EventReceivedBloc();
@@ -186,6 +190,7 @@ class SpongeService<AD extends ActionData> {
   Future<void> close() async {
     eventReceivedBloc?.close();
     await _grpcClient?.close(terminate: true);
+    _grpcClient = null;
   }
 
   Future<AD> getAction(String actionName, {bool required = true}) async {
@@ -262,6 +267,8 @@ class SpongeService<AD extends ActionData> {
   Future<ReloadResponse> reload() => _client.reload();
 
   Future<ClientSubscription> subscribe() async {
+    Validate.notNull(_grpcClient, 'The gRPC service is not enabled');
+
     return await _lock.synchronized(() async {
       var shouldSubscribe =
           _connection.subscriptionEventNames?.isNotEmpty ?? false;
@@ -335,10 +342,7 @@ class SpongeService<AD extends ActionData> {
     }
   }
 
-  Future<bool> isGrpcEnabled() async =>
-      (await _client?.getFeatures())[
-          SpongeClientConstants.REMOTE_API_FEATURE_GRPC_ENABLED] ??
-      false;
+  bool get isGrpcEnabled => _grpcClient != null;
 
   Future<ActionData> findIntentAction(String intent) async {
     return (await getActions()).firstWhere(

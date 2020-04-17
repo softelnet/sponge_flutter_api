@@ -97,10 +97,16 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: Center(
-        child: Text(hasConnections
-            ? 'Please activate a Sponge connection'
-            : 'Please tap here to add a new Sponge connection'),
+      child: Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.all(10),
+        child: Text(
+          hasConnections
+              ? 'Please tap here to activate\na Sponge connection'
+              : 'Please tap here to add \na new Sponge connection',
+          style: Theme.of(context).textTheme.headline5,
+          textAlign: TextAlign.center,
+        ),
       ),
       onTap: () => Navigator.pushNamed(context, DefaultRoutes.CONNECTIONS),
     );

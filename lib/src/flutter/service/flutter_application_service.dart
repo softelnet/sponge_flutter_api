@@ -175,6 +175,8 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         // Subscribe.
         await subscribe(spongeService);
       },
+      onIsAllowed: (ActionMeta actionMeta) =>
+          spongeService?.isGrpcEnabled ?? false,
     );
 
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_RELOAD] =
