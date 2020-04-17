@@ -123,7 +123,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
   }
 
   Future<Uint8List> _createDrawingThumbnail(DrawingBinaryValue value) async =>
-      await convertDrawingToPng(value, width: 100);
+      await DrawingUtils.convertDrawingToPng(value, width: 100);
 
   Widget _createCompactViewerDataWidget(TypeViewerContext viewerContext) {
     var mimeType = getMimeType(viewerContext) ?? '';
@@ -387,7 +387,7 @@ class IntegerTypeGuiProvider extends BaseUnitTypeGuiProvider<IntegerType> {
   IntegerTypeGuiProvider(DataType type) : super(type);
 
   int _getValueFromString(String s) {
-    var normalized = normalizeString(s);
+    var normalized = CommonUtils.normalizeString(s);
 
     return normalized != null ? int.parse(normalized) : null;
   }
@@ -546,7 +546,7 @@ class NumberTypeGuiProvider extends BaseUnitTypeGuiProvider<NumberType> {
   NumberTypeGuiProvider(DataType type) : super(type);
 
   num _getValueFromString(String s) {
-    var normalized = normalizeString(s);
+    var normalized = CommonUtils.normalizeString(s);
 
     return normalized != null ? num.parse(normalized) : null;
   }
@@ -779,7 +779,8 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
             return editorContext.validator?.call(value);
           },
           maxLines: maxLines,
-          onGetValueFromString: (String value) => normalizeString(value),
+          onGetValueFromString: (String value) =>
+              CommonUtils.normalizeString(value),
         );
     }
   }

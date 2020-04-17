@@ -17,7 +17,6 @@ import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 

@@ -15,7 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
@@ -61,7 +61,7 @@ class _TextViewWidgetState extends State<TextViewWidget> {
   Widget build(BuildContext context) {
     Widget mainWidget;
     String text = widget.maxLength > -1
-        ? substring(widget.text, widget.maxLength)
+        ? ModelUtils.substring(widget.text, widget.maxLength)
         : widget.text;
     var key = Key('value');
 

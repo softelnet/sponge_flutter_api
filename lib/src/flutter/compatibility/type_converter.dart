@@ -29,7 +29,7 @@ TypeConverter createTypeConverter(ApplicationService service) =>
 
 Future<String> _marshallBinaryImageDrawing(
     DrawingBinaryValue binaryValue) async {
-  return await convertImageToPngBase64(
+  return await DrawingUtils.convertImageToPngBase64(
       binaryValue, binaryValue.expectedWidth, binaryValue.expectedHeight);
 }
 

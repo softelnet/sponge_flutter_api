@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 
 class ColorEditWidget extends StatefulWidget {

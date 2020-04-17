@@ -44,7 +44,7 @@ class ConnectionEditPresenter
   SpongeConnection get connection => viewModel.connection;
 
   String get name => viewModel.connection.name;
-  set name(String value) => viewModel.connection.name = normalizeString(value);
+  set name(String value) => viewModel.connection.name = CommonUtils.normalizeString(value);
   String validateName(String value) {
     value = value?.trim();
 
@@ -65,14 +65,14 @@ class ConnectionEditPresenter
   }
 
   String get url => viewModel.connection.url;
-  set url(String value) => viewModel.connection.url = normalizeString(value);
+  set url(String value) => viewModel.connection.url = CommonUtils.normalizeString(value);
   String validateUrl(String value) => (value == null || value.isEmpty)
       ? 'The Sponge address must not be empty'
       : null;
 
   String get network => viewModel.connection.network;
   set network(String value) =>
-      viewModel.connection.network = normalizeString(value);
+      viewModel.connection.network = CommonUtils.normalizeString(value);
 
   bool get anonymous => viewModel.connection.anonymous;
   set anonymous(bool value) {
@@ -81,7 +81,7 @@ class ConnectionEditPresenter
 
   String get username => viewModel.connection.username;
   set username(String value) =>
-      viewModel.connection.username = normalizeString(value);
+      viewModel.connection.username = CommonUtils.normalizeString(value);
   String validateUsername(String value) =>
       !anonymous && (value == null || value.isEmpty)
           ? 'The user name must not be empty'
@@ -89,7 +89,7 @@ class ConnectionEditPresenter
 
   String get password => viewModel.connection.password;
   set password(String value) =>
-      viewModel.connection.password = normalizeString(value);
+      viewModel.connection.password = CommonUtils.normalizeString(value);
   String validatePassword(String value) =>
       !anonymous && (value == null || value.isEmpty)
           ? 'The user password must not be empty'

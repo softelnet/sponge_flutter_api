@@ -16,17 +16,15 @@ import 'dart:async';
 
 typedef VoidFutureOrCallback = FutureOr<void> Function();
 
-String substring(String s, int maxLength) => s != null && s.length > maxLength
-    ? s.substring(0, maxLength).trim() + '...'
-    : s;
+class CommonUtils {
+  static String normalizeString(String value) {
+    value = value?.trim();
 
-String normalizeString(String value) {
-  value = value?.trim();
+    return (value?.isEmpty ?? true) ? null : value;
+  }
 
-  return (value?.isEmpty ?? true) ? null : value;
+  static bool isNetworkError(dynamic error) =>
+      // It's important not to use the SocketException class directly because it will impact the supported platforms.
+      // The https://pub.dev/packages/io doesn't support web.
+      error?.runtimeType?.toString() == 'SocketException';
 }
-
-bool isNetworkError(dynamic error) =>
-    // It's important not to use the SocketException class directly because it will impact the supported platforms.
-    // The https://pub.dev/packages/io doesn't support web.
-    error?.runtimeType?.toString() == 'SocketException';

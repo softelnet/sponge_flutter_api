@@ -151,6 +151,12 @@ bool isDarkTheme(BuildContext context) =>
 
 Color getButtonTextColor(BuildContext context) => Theme.of(context).accentColor;
 
+Color getContrastColor(Color color) {
+  // Using YIQ color space.
+  double y = (299 * color.red + 587 * color.green + 114 * color.blue) / 1000;
+  return y >= 128 ? Colors.black : Colors.white;
+}
+
 TextStyle getButtonTextStyle(BuildContext context) =>
     TextStyle(color: getButtonTextColor(context));
 

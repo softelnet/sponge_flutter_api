@@ -200,4 +200,17 @@ class ModelUtils {
       (value != null && value is AnnotatedValue)
           ? value.valueDescription
           : null;
+
+  static String substring(String s, int maxLength) =>
+      s != null && s.length > maxLength
+          ? s.substring(0, maxLength).trim() + '...'
+          : s;
+
+  static bool shouldConnectionBeFiltered(
+      SpongeConnection connection, NetworkStatus networkStatus) {
+    return connection.network == null ||
+        connection.network.isEmpty ||
+        networkStatus == null ||
+        connection.network?.toLowerCase() == networkStatus.name?.toLowerCase();
+  }
 }

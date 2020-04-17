@@ -460,12 +460,12 @@ class ActionCallSession {
 
   dynamic _normalizeValue(DataType type, value) {
     if (value is String) {
-      value = normalizeString(value);
+      value = CommonUtils.normalizeString(value);
     }
 
     // Normalize the annotated value.
     if (value is AnnotatedValue && value.value is String) {
-      value.value = normalizeString(value.value);
+      value.value = CommonUtils.normalizeString(value.value);
     }
 
     // TODO Handle a dynamic type value.

@@ -39,7 +39,9 @@ class NotificationPanelWidget extends StatelessWidget {
     Color color;
     switch (_type) {
       case NotificationPanelType.error:
-        title = isNetworkError(_notification) ? 'Connection error' : 'Error';
+        title = CommonUtils.isNetworkError(_notification)
+            ? 'Connection error'
+            : 'Error';
         icon = Icons.error;
         color = Colors.red;
         break;

@@ -15,7 +15,6 @@
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/generic_type_conversions.dart';
@@ -56,14 +55,6 @@ Color string2color(String colorRgbHex) => colorRgbHex != null
 
 String color2string(Color color) =>
     color != null ? convertToColor(color).toHexString() : null;
-
-Color getContrastColor(Color color) {
-  // Using YIQ color space.
-  double y = (299 * color.red + 587 * color.green + 114 * color.blue) / 1000;
-  return y >= 128 ? Colors.black : Colors.white;
-}
-
-
 
 Icon getActionIconByActionName(BuildContext context,
     FlutterApplicationService service, String actionName) {
@@ -118,7 +109,6 @@ IconData getIconData(FlutterApplicationService service, String iconName) {
 
   return null;
 }
-
 
 Future<void> showEventHandlerActionById(
     BuildContext context, String eventId) async {
@@ -175,11 +165,4 @@ Key createDataTypeKey(
   return value != null ? Key(value) : null;
 }
 
-bool shouldConnectionBeFiltered(
-    SpongeConnection connection, NetworkStatus networkStatus) {
-  return connection.network == null ||
-      connection.network.isEmpty ||
-      networkStatus == null ||
-      connection.network?.toLowerCase() == networkStatus.name?.toLowerCase();
-}
 

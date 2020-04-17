@@ -14,7 +14,7 @@
 
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
+import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 
 typedef OnRefreshCallback = void Function();
 
@@ -50,7 +50,7 @@ class ConnectionsPresenter
     return viewModel.connections
         .where((connection) =>
             !isFilterByNetwork ||
-            shouldConnectionBeFiltered(connection, networkStatus))
+            ModelUtils.shouldConnectionBeFiltered(connection, networkStatus))
         .toList();
   }
 
