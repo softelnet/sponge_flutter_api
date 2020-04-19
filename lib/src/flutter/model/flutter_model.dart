@@ -27,8 +27,6 @@ class FlutterActionData extends ActionData {
   TypeGuiProvider _resultProvider;
   TypeGuiProvider get resultProvider => _resultProvider;
 
-  Map<String, Map<String, dynamic>> _additionalArgData = {};
-
   @override
   set args(List<Object> value) {
     super.args = value;
@@ -61,24 +59,5 @@ class FlutterActionData extends ActionData {
   FlutterActionData clone({ActionData prototype}) => (super.clone(
           prototype: FlutterActionData(actionMeta, typeGuiProviderRegistry))
       as FlutterActionData)
-    .._initProviders()
-    .._additionalArgData = _additionalArgData;
-
-  @override
-  void clear({bool clearReadOnly = true}) {
-    super.clear(clearReadOnly: clearReadOnly);
-
-    _additionalArgData.clear();
-  }
-
-  void setAdditionalArgData(String argPath, String type, dynamic value) {
-    _additionalArgData.putIfAbsent(argPath, () => <String, dynamic>{})[type] =
-        value;
-  }
-
-  dynamic getAdditionalArgData(String argPath, String type) {
-    var argData = _additionalArgData[argPath];
-
-    return (argData?.containsKey(type) ?? false) ? argData[type] : null;
-  }
+    .._initProviders();
 }

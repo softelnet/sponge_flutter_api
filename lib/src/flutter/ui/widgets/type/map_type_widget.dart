@@ -15,8 +15,10 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/map_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
+// Supports only viewing.
 class MapTypeWidget extends StatefulWidget {
   MapTypeWidget({Key key, this.uiContext}) : super(key: key);
 
@@ -26,18 +28,26 @@ class MapTypeWidget extends StatefulWidget {
   _MapTypeWidgetState createState() => _MapTypeWidgetState();
 }
 
-class _MapTypeWidgetState extends State<MapTypeWidget> {
-  MapType get type => widget.uiContext.qualifiedType.type;
+class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
+  MapTypePresenter _presenter;
+
+  final margin = EdgeInsets.all(5);
 
   @override
   Widget build(BuildContext context) {
-    var label = widget.uiContext.getDecorationLabel();
-    var valueMap = widget.uiContext.value as Map;
+    var model = MapTypeViewModel(widget.uiContext);
 
-    var keyLabel = type.keyType.label;
-    var valueLabel = type.valueType.label;
+    _presenter ??= MapTypePresenter(model, this);
 
-    var margin = EdgeInsets.all(5);
+    // The model contains the UiContext so it has to be updated every build.
+    _presenter.updateModel(model);
+
+    String label = _presenter.label;
+    String keyLabel = _presenter.keyLabel;
+    String valueLabel = _presenter.valueLabel;
+    Map valueMap = _presenter.valueMap;
+
+    MapType type = _presenter.type;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -491,12 +491,14 @@ class ListTypeGuiProvider extends BaseUnitTypeGuiProvider<ListType> {
       return type.unique
           ? MultiChoiceListEditWidget(
               key: createDataTypeKey(editorContext.qualifiedType),
-              qType: editorContext.qualifiedType,
-              labelText: editorContext.getDecorationLabel(),
-              value: editorContext.value as List,
-              onGetProvidedArg: editorContext.callbacks.onGetProvidedArg,
-              onSave: editorContext.onSave,
-              enabled: editorContext.enabled,
+              viewModel: MultiChoiceListEditViewModel(
+                qType: editorContext.qualifiedType,
+                labelText: editorContext.getDecorationLabel(),
+                value: editorContext.value as List,
+                onGetProvidedArg: editorContext.callbacks.onGetProvidedArg,
+                onSave: editorContext.onSave,
+                enabled: editorContext.enabled,
+              ),
             )
           : null;
     } else {

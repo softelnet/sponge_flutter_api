@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
@@ -30,9 +29,8 @@ class RecordTypeViewModel extends BaseViewModel {
 abstract class RecordTypeView extends BaseView {}
 
 class RecordTypePresenter extends BasePresenter<RecordTypeViewModel, RecordTypeView> {
-  RecordTypePresenter(
-      ApplicationService service, RecordTypeViewModel model, RecordTypeView view)
-      : super(service, model, view);
+  RecordTypePresenter(RecordTypeViewModel model, RecordTypeView view)
+      : super(model.uiContext.service, model, view);
 
   Map<String, TypeGuiProvider> _typeGuiProviders;
   bool _isExpanded;

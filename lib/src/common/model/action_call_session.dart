@@ -21,6 +21,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 
 typedef ProvideArgsFilterCallback = bool Function(QualifiedDataType qType);
@@ -121,9 +122,13 @@ class ActionCallSession {
       var value = actionData.getArgValueByName(qType.path,
           unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
       if (!DataTypeUtils.isValueNotSet(value)) {
+        ProvidedValue oldProvidedValue = actionData.providedValues[qType.path];
+
         _providedArgs[qType.path] = ProvidedValue(
           value: value,
           valuePresent: true,
+          annotatedValueSet: oldProvidedValue?.annotatedValueSet,
+          annotatedElementValueSet: oldProvidedValue?.annotatedElementValueSet,
         );
       }
     });
@@ -222,8 +227,10 @@ class ActionCallSession {
 
       _logger.finest('\t-> provided: ${newProvidedArgs.keys}');
 
-      var previousViewModelProvidedArgs = Map.from(_providedArgs);
       _providedArgs.addAll(newProvidedArgs);
+
+      // Update provided values in the ActionData as well.
+      actionData.providedValues.addAll(newProvidedArgs);
 
       var preserveDependencies = Set.of(newProvidedArgs.keys);
       newProvidedArgs.forEach((name, argValue) {
@@ -528,6 +535,15 @@ class ActionCallSession {
 
       _initEventSubscription();
     }
+  }
+
+  dynamic getAdditionalData(String path, String additionalDataKey) =>
+      (actionData as FlutterActionData)
+          .getAdditionalArgData(path, additionalDataKey);
+
+  void setAdditionalData(String path, String additionalDataKey, dynamic value) {
+    (actionData as FlutterActionData)
+        .setAdditionalArgData(path, additionalDataKey, value);
   }
 }
 

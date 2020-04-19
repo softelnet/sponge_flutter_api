@@ -116,7 +116,8 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   void _onClose() {
-    widget.actionData.rebind(_presenter.actionData);
+    _presenter.rebindActionData(widget.actionData);
+
 
     if (_presenter.anyArgSavedOrUpdated) {
       if (widget.callImmediately) {

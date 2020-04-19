@@ -17,12 +17,12 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
-import 'package:sponge_flutter_api/src/flutter/model/flutter_model.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 
 class FlutterActionCallPresenter extends ActionCallPresenter
     implements UiContextCallbacks {
-  FlutterActionCallPresenter(ApplicationService service,ActionCallViewModel viewModel, ActionCallView view)
+  FlutterActionCallPresenter(ApplicationService service,
+      ActionCallViewModel viewModel, ActionCallView view)
       : super(service, viewModel, view);
 
   static final Logger _logger = Logger('FlutterActionCallPresenter');
@@ -103,14 +103,12 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   @override
   dynamic getAdditionalData(
           QualifiedDataType qType, String additionalDataKey) =>
-      (actionData as FlutterActionData)
-          .getAdditionalArgData(qType.path, additionalDataKey);
+      session.getAdditionalData(qType.path, additionalDataKey);
 
   @override
   void setAdditionalData(
       QualifiedDataType qType, String additionalDataKey, dynamic value) {
-    (actionData as FlutterActionData)
-        .setAdditionalArgData(qType.path, additionalDataKey, value);
+    session.setAdditionalData(qType.path, additionalDataKey, value);
   }
 
   @override
@@ -123,4 +121,8 @@ class FlutterActionCallPresenter extends ActionCallPresenter
               ?.features
               ?.containsKey(Features.GEO_MAP) ??
           false);
+
+  void rebindActionData(ActionData target) {
+    target.rebind(actionData);
+  }
 }

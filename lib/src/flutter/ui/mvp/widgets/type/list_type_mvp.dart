@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
@@ -30,9 +29,8 @@ abstract class ListTypeView extends BaseView {
 }
 
 class ListTypePresenter extends BasePresenter<ListTypeViewModel, ListTypeView> {
-  ListTypePresenter(
-      ApplicationService service, ListTypeViewModel model, ListTypeView view)
-      : super(service, model, view);
+  ListTypePresenter(ListTypeViewModel model, ListTypeView view)
+      : super(model.uiContext.service, model, view);
 
   bool _fetchingData = false;
   bool get fetchingData => _fetchingData;

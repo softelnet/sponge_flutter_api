@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/list_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
@@ -145,8 +144,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
   Widget build(BuildContext context) {
     var model = ListTypeViewModel(widget.uiContext);
 
-    _presenter ??=
-        ListTypePresenter(ApplicationProvider.of(context).service, model, this);
+    _presenter ??= ListTypePresenter(model, this);
 
     // The model contains the UiContext so it has to be updated every build.
     _presenter.updateModel(model);

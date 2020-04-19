@@ -14,7 +14,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
@@ -49,8 +48,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
   Widget build(BuildContext context) {
     var model = RecordTypeViewModel(widget.uiContext);
 
-    _presenter ??=
-        RecordTypePresenter(ApplicationProvider.of(context).service, model, this);
+    _presenter ??= RecordTypePresenter(model, this);
 
     // The model contains the UiContext so it has to be updated every build.
     _presenter.updateModel(model);

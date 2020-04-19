@@ -52,12 +52,10 @@ class _ActionListItemState extends State<ActionListItem>
   @override
   Widget build(BuildContext context) {
     var service = ApplicationProvider.of(context).service;
+    var model = ActionListItemViewModel(widget.actionData, widget.onActionCall);
 
-    _presenter ??= ActionListItemPresenter(
-      service,
-      ActionListItemViewModel(widget.actionData, widget.onActionCall),
-      this,
-    );
+    _presenter ??= ActionListItemPresenter(service, model, this);
+    _presenter.updateModel(model);
 
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 
