@@ -67,29 +67,35 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
     );
   }
 
-  Future<void> _showDatePicker() async {
-    DateTime now = DateTime.now();
-    DateTime initialDate = widget.initialValue ?? now;
-
-    DateTime firstDate =
-        widget.firstDate ?? Jiffy(now).subtract(years: widget.yearsRange);
+  DateTime _getDefaultFirstDate(DateTime initialDate, DateTime now) {
+    var firstDate = Jiffy(now).subtract(years: widget.yearsRange);
     // Apply a tolerance.
     if (Jiffy(firstDate).add(years: 1).isAfter(initialDate)) {
       firstDate = Jiffy(initialDate).subtract(years: widget.yearsRange);
     }
 
-    DateTime lastDate =
-        widget.lastDate ?? Jiffy(now).add(years: widget.yearsRange);
+    return firstDate;
+  }
+
+  DateTime _getDefaultLastDate(DateTime initialDate, DateTime now) {
+    var lastDate = Jiffy(now).add(years: widget.yearsRange);
     // Apply a tolerance.
     if (Jiffy(lastDate).subtract(years: 1).isBefore(initialDate)) {
       lastDate = Jiffy(initialDate).add(years: widget.yearsRange);
     }
 
+    return lastDate;
+  }
+
+  Future<void> _showDatePicker() async {
+    DateTime now = DateTime.now();
+    DateTime initialDate = widget.initialValue ?? now;
+
     DateTime picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
+      firstDate: widget.firstDate ?? _getDefaultFirstDate(initialDate, now),
+      lastDate: widget.lastDate ?? _getDefaultLastDate(initialDate, now),
     );
     if (picked != null) {
       widget.onValueChanged(picked);

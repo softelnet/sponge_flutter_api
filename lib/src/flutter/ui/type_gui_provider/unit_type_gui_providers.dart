@@ -272,7 +272,8 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
         initialValue: editorContext.value,
         onValueChanged: editorContext.onSave,
         enabled: editorContext.enabled && !editorContext.readOnly,
-        // TODO Add support for minValue and maxValue in the DateTimeType.
+        firstDate: type.minValue,
+        lastDate: type.maxValue,
       );
     }
   }
