@@ -23,11 +23,11 @@ class MultiChoiceListEditViewModel extends BaseViewModel {
   MultiChoiceListEditViewModel({
     @required this.qType,
     @required this.labelText,
-    @required this.value,
+    @required List value,
     @required this.onGetProvidedArg,
     @required this.onSave,
     @required this.enabled,
-  });
+  }) : value = value?.toList();
 
   final QualifiedDataType qType;
   final String labelText;

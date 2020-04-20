@@ -66,9 +66,8 @@ class _MultiChoiceListEditWidgetState extends State<MultiChoiceListEditWidget>
                         ? (bool selected) {
                             setState(() {
                               _presenter.updateValue(item.value, selected);
+                              _presenter.save();
                             });
-
-                            _presenter.save();
                           }
                         : null,
                   ),

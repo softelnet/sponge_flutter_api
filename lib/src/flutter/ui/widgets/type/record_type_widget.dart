@@ -75,7 +75,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
 
     var margin = EdgeInsets.only(bottom: 5);
 
-    // Return widget for null record in the read only mode.
+    // Return widget for a null record in the read only mode.
     if (_presenter.shouldShowNullValue) {
       return TextViewWidget(
         label: label,

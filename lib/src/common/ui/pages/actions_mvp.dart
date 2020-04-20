@@ -34,7 +34,8 @@ abstract class ActionsView extends BaseView {
 }
 
 class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
-  ActionsPresenter(ApplicationService service, ActionsView view) : super(service, ActionsViewModel(), view);
+  ActionsPresenter(ApplicationService service, ActionsView view)
+      : super(service, ActionsViewModel(), view);
 
   List<SpongeConnectionViewModel> getConnections(
       bool isFilterByNetwork, NetworkStatus networkStatus) {
@@ -75,8 +76,8 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
     // Sort actions.
     if (service.settings.actionsOrder == ActionsOrder.alphabetical) {
       actionDataList.sort((a1, a2) =>
-          ModelUtils.getQualifiedActionDisplayLabel(a1.actionMeta)
-              .compareTo(ModelUtils.getQualifiedActionDisplayLabel(a2.actionMeta)));
+          ModelUtils.getQualifiedActionDisplayLabel(a1.actionMeta).compareTo(
+              ModelUtils.getQualifiedActionDisplayLabel(a2.actionMeta)));
     }
     return actionDataList;
   }
@@ -107,6 +108,7 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
     if (actionData.actionMeta.args.isNotEmpty) {
       ActionData newActionData = await view.showActionCallScreen(actionData);
       if (newActionData == null) {
+        // The action call has been cancelled.
         return;
       }
       actionData.args = newActionData.args;
@@ -114,6 +116,6 @@ class ActionsPresenter extends BasePresenter<ActionsViewModel, ActionsView> {
 
     service.spongeService
         .getActionCallBloc(actionData.actionMeta.name)
-        .add(actionData.args ?? []);
+        .add(actionData.args);
   }
 }

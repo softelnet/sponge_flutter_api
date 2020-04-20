@@ -17,6 +17,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/map_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/text_view_widget.dart';
 
 // Supports only viewing.
 class MapTypeWidget extends StatefulWidget {
@@ -49,6 +50,17 @@ class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
 
     MapType type = _presenter.type;
 
+    // Return widget for a null map in the read only mode.
+    if (valueMap == null) {
+      return TextViewWidget(
+        label: label,
+        text: null,
+        compact: true,
+      );
+    }
+
+    final TextStyle headerTextStyle = Theme.of(context).textTheme.bodyText1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -70,19 +82,20 @@ class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
               TableRow(children: [
                 Container(
                   margin: margin,
-                  child: Text(keyLabel),
+                  child: Text(
+                    keyLabel,
+                    style: headerTextStyle,
+                  ),
                 ),
                 Container(
                   margin: margin,
-                  child: Text(valueLabel),
+                  child: Text(
+                    valueLabel,
+                    style: headerTextStyle,
+                  ),
                 ),
               ]),
-            ...(valueMap ?? {})
-                .keys
-                .toList()
-                .asMap()
-                .entries
-                .map<TableRow>((entry) {
+            ...valueMap.keys.toList().asMap().entries.map<TableRow>((entry) {
               var index = entry.key;
               var key = entry.value;
               var keyContext = TypeViewerContext(

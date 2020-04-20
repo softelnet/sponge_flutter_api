@@ -107,7 +107,7 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
               ? 'Please tap here to activate\na Sponge connection'
               : 'Please tap here to add \na new Sponge connection',
           key: Key('tapToActivateConnection'),
-          style: Theme.of(context).textTheme.headline5,
+          style: Theme.of(context).textTheme.subtitle1,
           textAlign: TextAlign.center,
         ),
       ),

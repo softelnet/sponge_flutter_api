@@ -113,7 +113,8 @@ class _TextEditWidgetState extends State<TextEditWidget> {
         editorContext.onSave(widget.onGetValueFromString(value));
       },
       validator: (value) {
-        if (!editorContext.qualifiedType.type.nullable && value.isEmpty) {
+        if (!editorContext.qualifiedType.type.nullable &&
+            value.trim().isEmpty) {
           return '${editorContext.qualifiedType.type.label ?? "Value"} is required';
         }
 

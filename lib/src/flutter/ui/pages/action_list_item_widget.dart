@@ -199,5 +199,9 @@ class _ActionListItemState extends State<ActionListItem>
 
   Future<void> _onActionCall(BuildContext context) async {
     await _presenter.onActionCall();
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 }

@@ -117,18 +117,20 @@ class ActionCallSession {
     _getQualifiedTypes()
         .where((qType) => qType.path != null && qType.type.provided != null)
         .where((qType) =>
-            qType.type.provided.value && !qType.type.provided.overwrite)
+            qType.type.provided != null && !qType.type.provided.overwrite)
         .forEach((qType) {
       var value = actionData.getArgValueByName(qType.path,
           unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
-      if (!DataTypeUtils.isValueNotSet(value)) {
-        ProvidedValue oldProvidedValue = actionData.providedValues[qType.path];
 
+      ProvidedValue oldProvidedValue = actionData.providedValues[qType.path];
+
+      // If a value has been provided and set earlier, reuse the merged provided value.
+      if (!DataTypeUtils.isValueNotSet(value) && oldProvidedValue != null) {
         _providedArgs[qType.path] = ProvidedValue(
           value: value,
           valuePresent: true,
-          annotatedValueSet: oldProvidedValue?.annotatedValueSet,
-          annotatedElementValueSet: oldProvidedValue?.annotatedElementValueSet,
+          annotatedValueSet: oldProvidedValue.annotatedValueSet,
+          annotatedElementValueSet: oldProvidedValue.annotatedElementValueSet,
         );
       }
     });
@@ -296,6 +298,9 @@ class ActionCallSession {
 
     // Clear globally saved action args and result.
     spongeService.getCachedAction(actionMeta.name).clear();
+
+    // Clear action bloc.
+    spongeService.getActionCallBloc(actionMeta.name)?.clear();
 
     _anyArgSavedOrUpdated = true;
   }

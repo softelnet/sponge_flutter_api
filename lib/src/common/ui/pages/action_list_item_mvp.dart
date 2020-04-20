@@ -31,7 +31,7 @@ abstract class ActionListItemView extends BaseView {}
 
 class ActionListItemPresenter
     extends BasePresenter<ActionListItemViewModel, ActionListItemView> {
-  ActionListItemPresenter(ApplicationService service, 
+  ActionListItemPresenter(ApplicationService service,
       ActionListItemViewModel model, ActionListItemView view)
       : super(service, model, view);
 
@@ -45,7 +45,8 @@ class ActionListItemPresenter
 
   String get label => ModelUtils.getActionMetaDisplayLabel(actionMeta);
 
-  String get qualifiedLabel => ModelUtils.getQualifiedActionDisplayLabel(actionMeta);
+  String get qualifiedLabel =>
+      ModelUtils.getQualifiedActionDisplayLabel(actionMeta);
 
   String get tooltip =>
       actionMeta.description ?? actionMeta.label ?? actionMeta.name;
