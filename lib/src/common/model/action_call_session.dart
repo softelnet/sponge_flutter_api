@@ -138,7 +138,7 @@ class ActionCallSession {
 
   Stream<ProvideActionArgsState> _provideArgs(
     ProvideArgsFilterCallback filter, {
-    Map<String, Map<String, Object>> features,
+    Map<String, Map<String, Object>> argFeatures,
   }) async* {
     _dependencies ??= ActionArgDependencies(actionData);
     _dependencies.rebuild();
@@ -146,7 +146,7 @@ class ActionCallSession {
     _logger
         .finest('Reverse dependencies: ${_dependencies.reverseDependencies}');
 
-    features ??= {};
+    argFeatures ??= {};
 
     List<String> namesToProvide;
 
@@ -178,7 +178,7 @@ class ActionCallSession {
       }
 
       // Set pageable info if necessary.
-      _setupPageableListsFeatures(newNamesToProvide, features);
+      _setupPageableListsFeatures(newNamesToProvide, argFeatures);
 
       namesToProvide = newNamesToProvide;
 
@@ -212,7 +212,7 @@ class ActionCallSession {
       yield ProvideActionArgsStateBeforeInvocation(loading: loading);
 
       _logger.finer(
-          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, features: $features, loading: $loading');
+          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, argFeatures: $argFeatures, loading: $loading');
 
       Map<String, ProvidedValue> newProvidedArgs =
           await spongeService.client.provideActionArgs(
@@ -221,7 +221,7 @@ class ActionCallSession {
         submit: List.of(actualArgsToSubmit.keys),
         current: current,
         dynamicTypes: dynamicTypes,
-        features: features,
+        argFeatures: argFeatures,
         initial: _initialProvideArgs,
       );
 
@@ -398,7 +398,7 @@ class ActionCallSession {
   }
 
   void _setupPageableListsFeatures(
-      List<String> argNames, Map<String, Map<String, Object>> features) {
+      List<String> argNames, Map<String, Map<String, Object>> argFeatures) {
     Set<String> pageableListArgTypes = argNames
         .where((argName) => actionData.isArgPageableList(argName))
         .toSet()
@@ -409,36 +409,36 @@ class ActionCallSession {
       if (pageableList != null) {
         if (!pageableList.initialized) {
           int offset = _getProvideFeature(
-              features, argName, Features.PROVIDE_VALUE_OFFSET);
+              argFeatures, argName, Features.PROVIDE_VALUE_OFFSET);
           if (offset == null) {
             _setProvideFeature(
-                features, argName, Features.PROVIDE_VALUE_OFFSET, 0);
+                argFeatures, argName, Features.PROVIDE_VALUE_OFFSET, 0);
           }
 
           int limit = _getProvideFeature(
-              features, argName, Features.PROVIDE_VALUE_LIMIT);
+              argFeatures, argName, Features.PROVIDE_VALUE_LIMIT);
           if (limit == null) {
-            _setProvideFeature(features, argName, Features.PROVIDE_VALUE_LIMIT,
-                _defaultPageableListPageSize);
+            _setProvideFeature(argFeatures, argName,
+                Features.PROVIDE_VALUE_LIMIT, _defaultPageableListPageSize);
           }
         } else {
           int offset = _getProvideFeature(
-              features, argName, Features.PROVIDE_VALUE_OFFSET);
+              argFeatures, argName, Features.PROVIDE_VALUE_OFFSET);
           if (offset == null) {
             _setProvideFeature(
-                features, argName, Features.PROVIDE_VALUE_OFFSET, 0);
+                argFeatures, argName, Features.PROVIDE_VALUE_OFFSET, 0);
           }
 
           // A hack to fetch one big page to preserve a consistency of the list state from the server. Can be resource consuming!
           int limit = _getProvideFeature(
-              features, argName, Features.PROVIDE_VALUE_LIMIT);
+              argFeatures, argName, Features.PROVIDE_VALUE_LIMIT);
           if (limit == null) {
             limit = pageableList.limit != null &&
                     pageableList.limit > pageableList.length
                 ? pageableList.limit
                 : pageableList.length;
             _setProvideFeature(
-                features, argName, Features.PROVIDE_VALUE_LIMIT, limit);
+                argFeatures, argName, Features.PROVIDE_VALUE_LIMIT, limit);
           }
         }
       }
@@ -483,7 +483,7 @@ class ActionCallSession {
   Future<void> fetchPageableListPage(QualifiedDataType listQType) async {
     var pageableList = actionData.getPageableList(listQType.path);
     if (pageableList.hasMorePages) {
-      await _provideArgs((qType) => qType.path == listQType.path, features: {
+      await _provideArgs((qType) => qType.path == listQType.path, argFeatures: {
         listQType.path: {
           Features.PROVIDE_VALUE_OFFSET: (pageableList.length ?? 0),
           Features.PROVIDE_VALUE_LIMIT:
