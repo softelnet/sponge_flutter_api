@@ -111,7 +111,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
           ActionCallResultInfo resultInfo) async {
         await spongeService.clearActions();
         ApplicationProvider.of(mainBuildContext)
-            .updateConnection(spongeService.connection);
+            .updateConnection(spongeService.connection, force: true);
       },
       onCallError: (ActionMeta actionMeta, List args) async {
         // In case of error, set the connection to anonymous.

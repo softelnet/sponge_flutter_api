@@ -140,6 +140,10 @@ class _ActionsPageState extends State<ActionsPage>
           }
         }
 
+        if (!_useTabs && _isDone(snapshot)) {
+          _initialTabIndex = 0;
+        }
+
         _lastConnectionName = _presenter.connectionName;
 
         var tabBar = _useTabs
