@@ -58,7 +58,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
       appBar: AppBar(
         title: Text(
           _presenter.editing
-              ? 'Edit connection: ${_presenter.originalConnection.name}'
+              ? 'Connection: ${_presenter.originalConnection.name}'
               : 'Create a new connection',
           softWrap: true,
           overflow: TextOverflow.visible,

@@ -132,9 +132,6 @@ Color getFloatingButtonBackgroudColor(BuildContext context) =>
 
 Color getSecondaryColor(BuildContext context) => Colors.orange[300];
 
-Color getTextColor(BuildContext context) =>
-    Theme.of(context).primaryTextTheme.bodyText2.color;
-
 Color getThemedBackgroundColor(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark
         ? Theme.of(context).canvasColor
@@ -172,7 +169,7 @@ IconData getPopupMenuIconData(BuildContext context) {
     case TargetPlatform.fuchsia:
       return Icons.more_vert;
     case TargetPlatform.iOS:
-    case TargetPlatform.macOS:
+      // TODO Uncomment after Flutter upgrade: case TargetPlatform.macOS:
       return Icons.more_horiz;
       break;
     default:

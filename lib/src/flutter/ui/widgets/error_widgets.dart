@@ -89,6 +89,9 @@ class ErrorCircleWidget extends StatelessWidget {
   }
 }
 
+TextStyle getTapHereMessageStyle(BuildContext context) =>
+    Theme.of(context).textTheme.subhead;
+
 class ConnectionNotInitializedWidget extends StatelessWidget {
   ConnectionNotInitializedWidget({Key key, @required this.hasConnections})
       : super(key: key);
@@ -107,7 +110,7 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
               ? 'Please tap here to activate\na Sponge connection'
               : 'Please tap here to add \na new Sponge connection',
           key: Key('tapToActivateConnection'),
-          style: Theme.of(context).textTheme.subtitle1,
+          style: getTapHereMessageStyle(context),
           textAlign: TextAlign.center,
         ),
       ),
@@ -127,7 +130,10 @@ class UsernamePasswordNotSetWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: Center(
-        child: Text('Please tap here to login to $connectionName'),
+        child: Text(
+          'Please tap here to login to\n$connectionName',
+          style: getTapHereMessageStyle(context),
+        ),
       ),
       onTap: () async => await showLoginPage(context, connectionName),
     );
