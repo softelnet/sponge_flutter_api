@@ -262,11 +262,11 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
             editorContext.onSave,
           ),
           absorbing:
-              qFieldType.type.provided.readOnly || !_presenter.isRecordEnabled,
+              qFieldType.type.readOnly || !_presenter.isRecordEnabled,
         );
       }
 
-      var isFieldReadOnly = qFieldType.type.provided?.readOnly ?? false;
+      var isFieldReadOnly = qFieldType.type.readOnly;
 
       // Switch to a viewer for a record field if necessary.
       if (_presenter.isRecordReadOnly ||

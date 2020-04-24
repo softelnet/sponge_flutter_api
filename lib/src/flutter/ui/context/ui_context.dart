@@ -185,7 +185,7 @@ class TypeEditorContext extends UiContext {
     super._doSetup();
 
     enabled = enabled && (features[Features.ENABLED] ?? true);
-    readOnly = readOnly || (qualifiedType.type.provided?.readOnly ?? false);
+    readOnly = readOnly || qualifiedType.type.readOnly;
   }
 
   TypeEditorContext clone() => TypeEditorContext(

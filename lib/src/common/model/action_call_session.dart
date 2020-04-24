@@ -266,7 +266,7 @@ class ActionCallSession {
   }
 
   bool _isArgForRefreshAllowedProvidedArgs(QualifiedDataType qType) =>
-      qType.type.provided.readOnly || qType.type.provided.overwrite;
+      qType.type.readOnly || qType.type.provided.overwrite;
 
   Stream<ProvideActionArgsState> provideArgs() async* {
     yield* _provideArgs((qType) => !_providedArgs.containsKey(qType.path));
@@ -498,7 +498,7 @@ class ActionCallSession {
 
   bool get hasRefreshableArgs => actionMeta.args.any((argType) =>
       DataTypeUtils.isProvidedRead(argType) &&
-      (argType.provided.readOnly || argType.provided.overwrite));
+      (argType.readOnly || argType.provided.overwrite));
 
   // Events,
   void _initEventSubscription() {
