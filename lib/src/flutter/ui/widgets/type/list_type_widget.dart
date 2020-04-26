@@ -32,11 +32,13 @@ class ListTypeWidget extends StatefulWidget {
     @required this.uiContext,
     @required this.guiProvider,
     this.useScrollableIndexedList = false,
+    this.showBorders = false,
   }) : super(key: key);
 
   final UiContext uiContext;
   final ListTypeGuiProvider guiProvider;
   final bool useScrollableIndexedList;
+  final bool showBorders;
 
   @override
   _ListTypeWidgetState createState() => _ListTypeWidgetState();
@@ -313,8 +315,13 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
       margin: verticalMargin != null
           ? EdgeInsets.only(bottom: verticalMargin)
           : EdgeInsets.zero,
-      shape: BeveledRectangleBorder(),
+      shape: widget.showBorders
+          ? BeveledRectangleBorder(
+              side: BorderSide(
+                  style: BorderStyle.solid, color: getBorderColor(context)))
+          : BeveledRectangleBorder(),
       child: child,
+      color: widget.showBorders ? getThemedBackgroundColor(context) : null,
     );
   }
 
@@ -375,7 +382,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
             : null,
         contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       ),
-      verticalMargin: verticalMargin,
+      verticalMargin:
+          widget.showBorders ? (verticalMargin ?? 0) + 5 : verticalMargin,
     );
   }
 
