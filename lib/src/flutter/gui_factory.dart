@@ -21,17 +21,21 @@ class SpongeGuiFactory {
     WidgetBuilder onCreateDrawer,
     OnCreateConnectionsPageMenuItemsCallback onCreateConnectionsPageMenuItems,
     OnCreateRoutesCallback onCreateRoutes,
+    OnCreateNetworkImageCallback onCreateNetworkImage,
   })  : _onCreateDrawer = onCreateDrawer,
         _onCreateConnectionsPageMenuItems = onCreateConnectionsPageMenuItems,
-        _onCreateRoutes = onCreateRoutes;
+        _onCreateRoutes = onCreateRoutes,
+        _onCreateNetworkImage = onCreateNetworkImage {
+    _onCreateNetworkImage ??= (src) => Image.network(src);
+  }
 
   final WidgetBuilder _onCreateDrawer;
   final OnCreateConnectionsPageMenuItemsCallback
       _onCreateConnectionsPageMenuItems;
   final OnCreateRoutesCallback _onCreateRoutes;
+  OnCreateNetworkImageCallback _onCreateNetworkImage;
 
-  Widget createDrawer(BuildContext context) =>
-      _onCreateDrawer != null ? _onCreateDrawer(context) : null;
+  Widget createDrawer(BuildContext context) => _onCreateDrawer?.call(context);
 
   List<ConnectionsPageMenuItemConfiguration> createConnectionsPageMenuItems(
           BuildContext context) =>
@@ -41,6 +45,8 @@ class SpongeGuiFactory {
 
   Map<String, WidgetBuilder> createRoutes() =>
       _onCreateRoutes != null ? _onCreateRoutes() : {};
+
+  Widget createNetworkImage(String src) => _onCreateNetworkImage?.call(src);
 }
 
 typedef OnCreateConnectionsPageMenuItemsCallback
@@ -50,6 +56,8 @@ typedef OnCreateConnectionsPageMenuItemCallback = PopupMenuEntry<String>
     Function(ConnectionsPresenter connectionsPresenter, BuildContext context);
 
 typedef OnCreateRoutesCallback = Map<String, WidgetBuilder> Function();
+
+typedef OnCreateNetworkImageCallback = Widget Function(String src);
 
 class ConnectionsPageMenuItemConfiguration {
   ConnectionsPageMenuItemConfiguration({

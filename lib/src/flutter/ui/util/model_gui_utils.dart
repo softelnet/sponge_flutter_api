@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:recase/recase.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/type/generic_type.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/compatibility/generic_type_conversions.dart';
+import 'package:sponge_flutter_api/src/flutter/gui_factory.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
@@ -82,13 +84,30 @@ Icon getActionIcon(BuildContext context, FlutterApplicationService service,
   );
 }
 
-Icon getIcon(
+Widget getIcon(
   BuildContext context,
   FlutterApplicationService service,
   IconInfo iconInfo, {
   IconData Function() orIconData,
   double forcedSize,
+  EdgeInsetsGeometry imagePadding,
 }) {
+  if (iconInfo?.url != null) {
+    var image =
+        Provider.of<SpongeGuiFactory>(context).createNetworkImage(iconInfo.url);
+
+    var box = forcedSize != null
+        ? SizedBox(child: image, width: forcedSize, height: forcedSize)
+        : image;
+
+    return imagePadding != null
+        ? Padding(
+            child: box,
+            padding: imagePadding,
+          )
+        : box;
+  }
+
   var iconData = getIconData(service, iconInfo?.name) ?? orIconData?.call();
 
   if (iconData == null) {

@@ -16,6 +16,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
@@ -748,54 +749,99 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
           ),
         );
         break;
-      default:
-        bool multiline = Features.getOptional(
-            editorContext.features, Features.STRING_MULTILINE, () => false);
-        int maxLines = Features.getOptional(editorContext.features,
-            Features.STRING_MAX_LINES, () => multiline ? null : 1);
-        var inputType = (multiline || maxLines > 1)
-            ? TextInputType.multiline
-            : TextInputType.text;
-
-        switch (TypeGuiProviderUtils.getFormat(editorContext)) {
-          case Formats.STRING_FORMAT_PHONE:
-            inputType = TextInputType.phone;
-            break;
-          case Formats.STRING_FORMAT_EMAIL:
-            inputType = TextInputType.emailAddress;
-            break;
-          case Formats.STRING_FORMAT_URL:
-            inputType = TextInputType.url;
-            break;
+      case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
+        if (editorContext.readOnly) {
+          return _createImageCharacteristicViewer(editorContext);
         }
-        return TextEditWidget(
-          editorContext: editorContext,
-          inputType: inputType,
-          validator: (value) {
-            if (minLength != null && value.length < minLength) {
-              return 'The text is shorter than $minLength';
-            }
-
-            if (maxLength != null && value.length > maxLength) {
-              return 'The text is longer than $maxLength';
-            }
-
-            return editorContext.validator?.call(value);
-          },
-          maxLines: maxLines,
-          onGetValueFromString: (String value) =>
-              CommonUtils.normalizeString(value),
-        );
+        break;
+      default:
+        break;
     }
+
+    // A default widget.
+    bool multiline = Features.getOptional(
+        editorContext.features, Features.STRING_MULTILINE, () => false);
+    int maxLines = Features.getOptional(editorContext.features,
+        Features.STRING_MAX_LINES, () => multiline ? null : 1);
+    var inputType = (multiline || maxLines > 1)
+        ? TextInputType.multiline
+        : TextInputType.text;
+
+    switch (TypeGuiProviderUtils.getFormat(editorContext)) {
+      case Formats.STRING_FORMAT_PHONE:
+        inputType = TextInputType.phone;
+        break;
+      case Formats.STRING_FORMAT_EMAIL:
+        inputType = TextInputType.emailAddress;
+        break;
+      case Formats.STRING_FORMAT_URL:
+        inputType = TextInputType.url;
+        break;
+    }
+
+    return TextEditWidget(
+      editorContext: editorContext,
+      inputType: inputType,
+      validator: (value) {
+        if (minLength != null && value.length < minLength) {
+          return 'The text is shorter than $minLength';
+        }
+
+        if (maxLength != null && value.length > maxLength) {
+          return 'The text is longer than $maxLength';
+        }
+
+        return editorContext.validator?.call(value);
+      },
+      maxLines: maxLines,
+      onGetValueFromString: (String value) =>
+          CommonUtils.normalizeString(value),
+    );
+  }
+
+  Widget _createImageCharacteristicViewer(UiContext uiContext) {
+    if (uiContext.value != null) {
+      var image = Provider.of<SpongeGuiFactory>(uiContext.context)
+          .createNetworkImage(uiContext.value);
+
+      if (image != null) {
+        return Container(
+          child: image,
+          padding: EdgeInsets.symmetric(vertical: 5),
+        );
+      }
+    }
+
+    return null;
   }
 
   @override
-  Widget createCompactViewer(TypeViewerContext viewerContext) =>
-      TypeGuiProviderUtils.createTextBasedCompactViewer(viewerContext);
+  Widget createCompactViewer(TypeViewerContext viewerContext) {
+    switch (Features.getCharacteristic(viewerContext.features)) {
+      // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
+      case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
+        return _createImageCharacteristicViewer(viewerContext);
+        break;
+      default:
+        break;
+    }
+
+    return TypeGuiProviderUtils.createTextBasedCompactViewer(viewerContext);
+  }
 
   @override
-  Widget createViewer(TypeViewerContext viewerContext) =>
-      TypeGuiProviderUtils.createTextBasedViewer(viewerContext);
+  Widget createViewer(TypeViewerContext viewerContext) {
+    switch (Features.getCharacteristic(viewerContext.features)) {
+      // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
+      case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
+        return _createImageCharacteristicViewer(viewerContext);
+        break;
+      default:
+        break;
+    }
+
+    return TypeGuiProviderUtils.createTextBasedViewer(viewerContext);
+  }
 
   @override
   Widget createExtendedViewer(TypeViewerContext viewerContext) {

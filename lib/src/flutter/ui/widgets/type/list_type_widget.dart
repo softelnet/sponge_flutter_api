@@ -318,6 +318,17 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
     );
   }
 
+  Widget _getIcon(UiContext subUiContext) {
+    var elementIconInfo = Features.getIcon(subUiContext.features);
+
+    return getIcon(
+      context,
+      _presenter.service,
+      elementIconInfo,
+      imagePadding: const EdgeInsets.symmetric(vertical: 2),
+    );
+  }
+
   Widget _createElementWidget(
     int index,
     QualifiedDataType qElementType,
@@ -336,12 +347,10 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
 
     var elementTypeProvider = widget.guiProvider.getElementTypeProvider();
 
-    var elementIconInfo = Features.getIcon(subUiContext.features);
-
     return _createElementCard(
       ListTile(
         key: Key('list-element-$index'),
-        leading: getIcon(context, _presenter.service, elementIconInfo),
+        leading: _getIcon(subUiContext),
         title: elementTypeProvider.createCompactViewer(subUiContext),
         subtitle: subUiContext.valueDescription != null
             ? Text(subUiContext.valueDescription)
