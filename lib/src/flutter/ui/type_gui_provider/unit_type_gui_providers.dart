@@ -716,20 +716,11 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
 
   @override
   Widget createEditor(TypeEditorContext editorContext) {
-    int minLength = DataTypeUtils.getFeatureOrProperty(
-        type,
-        editorContext.value,
-        StringType.FEATURE_MIN_LENGTH,
-        () => type.minLength);
-    int maxLength = DataTypeUtils.getFeatureOrProperty(
-        type,
-        editorContext.value,
-        StringType.FEATURE_MAX_LENGTH,
-        () => type.maxLength);
+    Widget editor;
 
     switch (Features.getCharacteristic(editorContext.features)) {
       case Features.TYPE_CHARACTERISTIC_COLOR:
-        return Container(
+        editor = Container(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -751,14 +742,28 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
         break;
       case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
         if (editorContext.readOnly) {
-          return _createImageCharacteristicViewer(editorContext);
+          editor = _createImageCharacteristicViewer(editorContext);
         }
         break;
       default:
         break;
     }
 
-    // A default widget.
+    return editor ?? _createDefaultEditor(editorContext);
+  }
+
+  Widget _createDefaultEditor(TypeEditorContext editorContext) {
+    int minLength = DataTypeUtils.getFeatureOrProperty(
+        type,
+        editorContext.value,
+        StringType.FEATURE_MIN_LENGTH,
+        () => type.minLength);
+    int maxLength = DataTypeUtils.getFeatureOrProperty(
+        type,
+        editorContext.value,
+        StringType.FEATURE_MAX_LENGTH,
+        () => type.maxLength);
+
     bool multiline = Features.getOptional(
         editorContext.features, Features.STRING_MULTILINE, () => false);
     int maxLines = Features.getOptional(editorContext.features,
@@ -817,30 +822,35 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
 
   @override
   Widget createCompactViewer(TypeViewerContext viewerContext) {
+    Widget viewer;
+
     switch (Features.getCharacteristic(viewerContext.features)) {
       // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
       case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
-        return _createImageCharacteristicViewer(viewerContext);
+        viewer = _createImageCharacteristicViewer(viewerContext);
         break;
       default:
         break;
     }
 
-    return TypeGuiProviderUtils.createTextBasedCompactViewer(viewerContext);
+    return viewer ??
+        TypeGuiProviderUtils.createTextBasedCompactViewer(viewerContext);
   }
 
   @override
   Widget createViewer(TypeViewerContext viewerContext) {
+    Widget viewer;
+
     switch (Features.getCharacteristic(viewerContext.features)) {
       // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
       case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
-        return _createImageCharacteristicViewer(viewerContext);
+        viewer = _createImageCharacteristicViewer(viewerContext);
         break;
       default:
         break;
     }
 
-    return TypeGuiProviderUtils.createTextBasedViewer(viewerContext);
+    return viewer ?? TypeGuiProviderUtils.createTextBasedViewer(viewerContext);
   }
 
   @override

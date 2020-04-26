@@ -77,10 +77,14 @@ class _TextEditWidgetState extends State<TextEditWidget> {
   Widget build(BuildContext context) {
     var editorContext = widget.editorContext;
 
+    var decorationLabel = editorContext.getDecorationLabel();
+
     var decoration = InputDecoration(
       border: InputBorder.none,
-      labelText: editorContext.getDecorationLabel() +
-          (widget.labelSuffix != null ? ' ${widget.labelSuffix}' : ''),
+      labelText: decorationLabel != null
+          ? decorationLabel +
+              (widget.labelSuffix != null ? ' ${widget.labelSuffix}' : '')
+          : null,
       hintText: editorContext.hintText,
       suffixIcon: editorContext.enabled && !editorContext.readOnly
           ? InkResponse(
