@@ -295,13 +295,13 @@ class SubActionsController extends BaseActionsController {
             state is ActionCallStateEnded &&
             state.resultInfo != null &&
             state.resultInfo.isSuccess) {
-          var parentType = resultSubstitutionTarget == DataTypeUtils.THIS
+          var parentType = resultSubstitutionTarget == DataTypeConstants.PATH_THIS
               ? uiContext.qualifiedType
               : uiContext.qualifiedType.createChild(
                   recordType.getFieldType(resultSubstitutionTarget));
 
           var value = state.resultInfo.result;
-          if (resultSubstitutionTarget != DataTypeUtils.THIS ||
+          if (resultSubstitutionTarget != DataTypeConstants.PATH_THIS ||
               !DataTypeUtils.isNull(value)) {
             uiContext.callbacks.onSave(parentType, value);
           }
@@ -330,7 +330,7 @@ class SubActionsController extends BaseActionsController {
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
-            Validate.isTrue(resultSubstitutionTarget == DataTypeUtils.THIS,
+            Validate.isTrue(resultSubstitutionTarget == DataTypeConstants.PATH_THIS,
                 'Only result substitution to \'this\' is supported for a list element');
             Validate.notNull(index, 'The list element index cannot be null');
 
