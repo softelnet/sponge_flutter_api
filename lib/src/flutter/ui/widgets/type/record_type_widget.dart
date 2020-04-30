@@ -209,7 +209,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
     groupWidget = Padding(
       padding: _presenter.isThisRootRecordSingleLeadingField
           ? const EdgeInsets.all(0)
-          : const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          : EdgeInsets.only(left: 10, right: widget.showBorder ? 10 : 0),
       child: Align(
         child: groupWidget,
         alignment: Alignment.centerLeft,
@@ -261,8 +261,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
             widget.uiContext.callbacks.onGetProvidedArg,
             editorContext.onSave,
           ),
-          absorbing:
-              qFieldType.type.readOnly || !_presenter.isRecordEnabled,
+          absorbing: qFieldType.type.readOnly || !_presenter.isRecordEnabled,
         );
       }
 
