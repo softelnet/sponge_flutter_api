@@ -388,8 +388,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
   }
 
   bool _isOnActivateSubmit(dynamic rawElement) =>
-      _subActionsController
-          .getFeatures(rawElement)[Features.SUB_ACTION_ACTIVATE_ACTION] ==
+      Features.getSubAction(_subActionsController.getFeatures(rawElement),
+              Features.SUB_ACTION_ACTIVATE_ACTION)
+          ?.name ==
       Features.TYPE_LIST_ACTIVATE_ACTION_VALUE_SUBMIT;
 
   bool _isOnElementTap(dynamic rawElement) =>

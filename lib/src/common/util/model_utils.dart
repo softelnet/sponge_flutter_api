@@ -56,56 +56,41 @@ class ModelUtils {
         spongeService.getCachedAction(subActionSpec.actionName).actionMeta;
     var subActionData = ActionData(subActionMeta);
 
-    bool showActionCallWidget = subActionMeta.args.length >
-        (subActionSpec.argSubstitutions?.length ?? 1);
+    // TODO Use a new feature to set a non-default value of this flag, e.g. `visible`.
+    bool showActionCallWidget =
+        subActionMeta.args.length > (subActionSpec.subAction.args?.length ?? 1);
 
-    if (subActionSpec.argSubstitutions == null) {
-      // The default behavior that sets the first arg of the sub-action, if any.
-      if (subActionMeta.args.isNotEmpty) {
+    // Substitute arguments.
+    if (subActionSpec.hasArgSubstitutions) {
+      subActionSpec.subAction.args.forEach((substitution) {
         try {
-          // TODO More strict sub-action arg validation.
-          Validate.isTrue(subActionMeta.args[0].kind == sourceType.kind,
-              'The first argument of ${subActionMeta.name} action should be ${sourceType.kind}');
-          subActionData.args[0] = DataTypeUtils.cloneValue(sourceValue);
+          var value = DataTypeUtils.getSubValue(
+              sourceValue, substitution.source,
+              unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+
+          subActionData.setArgValueByName(substitution.target, value);
         } catch (e) {
           if (!bestEffort) {
             rethrow;
           }
         }
-      }
-    } else {
-      for (var i = 0; i < subActionData.args.length; i++) {
-        var subArgType = subActionMeta.args[i];
-
-        var subActionArgSpec = subActionSpec.argSubstitutions.firstWhere(
-            (substitution) => substitution.target == subArgType.name,
-            orElse: () => null);
-        if (subActionArgSpec != null) {
-          try {
-            subActionData.args[i] = DataTypeUtils.cloneValue(
-                DataTypeUtils.getSubValue(sourceValue, subActionArgSpec.source,
-                    unwrapAnnotatedTarget: false, unwrapDynamicTarget: false));
-          } catch (e) {
-            if (!bestEffort) {
-              rethrow;
-            }
-          }
-        }
-      }
+      });
     }
 
+    // Validate sub-action arguments.
     if (!bestEffort) {
       for (var i = 0; i < subActionData.args.length; i++) {
         var subArgType = subActionMeta.args[i];
 
-        var subActionArgSpec = subActionSpec.argSubstitutions?.firstWhere(
+        var subActionArgSpec = subActionSpec.subAction.args?.firstWhere(
             (substitution) => substitution.target == subArgType.name,
             orElse: () => null);
 
+        bool visibleArg = Features.getOptional(
+            subArgType.features, Features.VISIBLE, () => true);
+
         Validate.isTrue(
-            Features.getOptional(
-                        subArgType.features, Features.VISIBLE, () => true) &&
-                    showActionCallWidget ||
+            visibleArg && showActionCallWidget ||
                 subArgType.nullable ||
                 DataTypeUtils.hasAllNotNullValuesSet(
                     subArgType, subActionData.args[i]),
@@ -117,6 +102,7 @@ class ModelUtils {
     }
 
     // Do not propagate context actions to sub-actions.
+    // TODO Why 'Do not propagate context actions to sub-actions.'?
     subActionData.args = subActionData.args.map((arg) {
       if (arg is AnnotatedValue && !propagateContextActions) {
         arg = AnnotatedValue.of(arg)

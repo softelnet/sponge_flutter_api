@@ -243,12 +243,12 @@ class BaseActionsController {
     ..addAll(element is AnnotatedValue ? element.features : {});
 
   SubActionSpec getSubActionSpec(
-      String expression, SubActionType subActionType) {
-    if (expression == null) {
+      SubAction subAction, SubActionType subActionType) {
+    if (subAction == null) {
       return null;
     }
 
-    var subActionSpec = SubActionSpec.parse(expression, subActionType);
+    var subActionSpec = SubActionSpec(subAction, subActionType);
     var subActionMeta = spongeService.getCachedAction(subActionSpec.actionName,
         required: false);
     if (subActionMeta == null) {
@@ -288,19 +288,20 @@ class SubActionsController extends BaseActionsController {
         await uiContext.callbacks.onBeforeSubActionCall();
       },
       onAfterCall: (subActionSpec, state, index) async {
+        var resultSubstitutionTarget = subActionSpec.subAction.result?.target;
+
         // Handle sub-action result substitution.
-        if (subActionSpec.resultSubstitution != null &&
+        if (resultSubstitutionTarget != null &&
             state is ActionCallStateEnded &&
             state.resultInfo != null &&
             state.resultInfo.isSuccess) {
-          var parentType = subActionSpec.resultSubstitution ==
-                  DataTypeUtils.THIS
+          var parentType = resultSubstitutionTarget == DataTypeUtils.THIS
               ? uiContext.qualifiedType
               : uiContext.qualifiedType.createChild(
-                  recordType.getFieldType(subActionSpec.resultSubstitution));
+                  recordType.getFieldType(resultSubstitutionTarget));
 
           var value = state.resultInfo.result;
-          if (subActionSpec.resultSubstitution != DataTypeUtils.THIS ||
+          if (resultSubstitutionTarget != DataTypeUtils.THIS ||
               !DataTypeUtils.isNull(value)) {
             uiContext.callbacks.onSave(parentType, value);
           }
@@ -323,12 +324,13 @@ class SubActionsController extends BaseActionsController {
           await uiContext.callbacks.onBeforeSubActionCall();
         },
         onAfterCall: (subActionSpec, state, index) async {
-          if (subActionSpec.resultSubstitution != null &&
+          var resultSubstitutionTarget = subActionSpec.subAction.result?.target;
+
+          if (resultSubstitutionTarget != null &&
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
-            Validate.isTrue(
-                subActionSpec.resultSubstitution == DataTypeUtils.THIS,
+            Validate.isTrue(resultSubstitutionTarget == DataTypeUtils.THIS,
                 'Only result substitution to \'this\' is supported for a list element');
             Validate.notNull(index, 'The list element index cannot be null');
 
@@ -355,9 +357,9 @@ class SubActionsController extends BaseActionsController {
       _getContextActions(element).isNotEmpty;
 
   List<SubActionSpec> _getContextActions(dynamic element) =>
-      Features.getStringList(getFeatures(element), Features.CONTEXT_ACTIONS)
-          .map((actionSpecString) =>
-              getSubActionSpec(actionSpecString, SubActionType.context))
+      Features.getSubActions(getFeatures(element), Features.CONTEXT_ACTIONS)
+          .map(
+              (subAction) => getSubActionSpec(subAction, SubActionType.context))
           .where((subActionSpec) => subActionSpec != null)
           .toList();
 
@@ -586,7 +588,7 @@ class SubActionsController extends BaseActionsController {
               readOnly: readOnly,
               bloc: bloc,
               callImmediately: true,
-              showResultDialog: subActionSpec.resultSubstitution == null,
+              showResultDialog: !subActionSpec.hasResultSubstitution,
               showResultDialogIfNoResult: showResultDialogIfNoResult,
               verifyIsActive: false,
               header: header,
@@ -607,7 +609,7 @@ class SubActionsController extends BaseActionsController {
           bloc.add(actionData.args);
 
           if (!autoClosing) {
-            if (subActionSpec.resultSubstitution == null) {
+            if (!subActionSpec.hasResultSubstitution) {
               await showActionResultDialog(
                 context: context,
                 actionData: actionData,
