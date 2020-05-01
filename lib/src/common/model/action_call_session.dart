@@ -86,6 +86,8 @@ class ActionCallSession {
 
     _initEventSubscription();
 
+    _dependencies = ActionArgDependencies(actionData)..rebuild();
+
     _running = true;
   }
 
@@ -140,7 +142,6 @@ class ActionCallSession {
     ProvideArgsFilterCallback filter, {
     Map<String, Map<String, Object>> argFeatures,
   }) async* {
-    _dependencies ??= ActionArgDependencies(actionData);
     _dependencies.rebuild();
 
     _logger

@@ -68,6 +68,14 @@ class ModelUtils {
               sourceValue, substitution.source,
               unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
 
+          // Do not propagate annotated value sub-actions to a sub-action.
+          if (!propagateContextActions && value is AnnotatedValue) {
+            value = AnnotatedValue.of(value);
+
+            Features.SUB_ACTION_FEATURES.forEach((feature) =>
+                (value as AnnotatedValue).features.remove(feature));
+          }
+
           subActionData.setArgValueByName(substitution.target, value);
         } catch (e) {
           if (!bestEffort) {
@@ -100,18 +108,6 @@ class ModelUtils {
                 : 'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
       }
     }
-
-    // Do not propagate context actions to sub-actions.
-    // TODO Why 'Do not propagate context actions to sub-actions.'?
-    subActionData.args = subActionData.args.map((arg) {
-      if (arg is AnnotatedValue && !propagateContextActions) {
-        arg = AnnotatedValue.of(arg)
-          ..features
-              .removeWhere((name, value) => name == Features.CONTEXT_ACTIONS);
-      }
-
-      return arg;
-    }).toList();
 
     return subActionData.args;
   }
