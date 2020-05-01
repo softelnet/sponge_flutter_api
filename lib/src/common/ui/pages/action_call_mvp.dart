@@ -38,7 +38,8 @@ abstract class ActionCallView extends BaseView {
 
 class ActionCallPresenter
     extends BasePresenter<ActionCallViewModel, ActionCallView> {
-  ActionCallPresenter(ApplicationService service, ActionCallViewModel viewModel, ActionCallView view)
+  ActionCallPresenter(ApplicationService service, ActionCallViewModel viewModel,
+      ActionCallView view)
       : super(service, viewModel, view);
 
   bool busy = false;
@@ -50,9 +51,11 @@ class ActionCallPresenter
 
   bool get anyArgSavedOrUpdated => _session.anyArgSavedOrUpdated;
 
+  String _title;
+
   dynamic error;
 
-  void init({bool verifyIsActive = true}) {
+  void init({bool verifyIsActive = true, String title}) {
     var postFrameRefreshCallback =
         () => WidgetsBinding.instance.addPostFrameCallback(
               (_) => view.refreshArgs(
@@ -75,6 +78,8 @@ class ActionCallPresenter
     );
 
     _session.open();
+
+    _title = title;
   }
 
   void ensureRunning() {
@@ -94,8 +99,8 @@ class ActionCallPresenter
 
   ActionMeta get actionMeta => actionData.actionMeta;
 
-  String get actionLabel =>
-      ModelUtils.getActionMetaDisplayLabel(actionData.actionMeta);
+  String get title =>
+      _title ?? ModelUtils.getActionMetaDisplayLabel(actionData.actionMeta);
 
   void clearArgs() {
     _session.clearArgs();

@@ -219,7 +219,8 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       value: subActionRuntimeSpec.spec,
       child: ListTile(
         leading: getActionIcon(context, service, actionMeta),
-        title: Text(ModelUtils.getActionMetaDisplayLabel(actionMeta)),
+        title: Text(subActionRuntimeSpec.spec.subAction.label ??
+            ModelUtils.getActionMetaDisplayLabel(actionMeta)),
         enabled: subActionRuntimeSpec.active,
       ),
       enabled: subActionRuntimeSpec.active,
@@ -295,10 +296,11 @@ class SubActionsController extends BaseActionsController {
             state is ActionCallStateEnded &&
             state.resultInfo != null &&
             state.resultInfo.isSuccess) {
-          var parentType = resultSubstitutionTarget == DataTypeConstants.PATH_THIS
-              ? uiContext.qualifiedType
-              : uiContext.qualifiedType.createChild(
-                  recordType.getFieldType(resultSubstitutionTarget));
+          var parentType =
+              resultSubstitutionTarget == DataTypeConstants.PATH_THIS
+                  ? uiContext.qualifiedType
+                  : uiContext.qualifiedType.createChild(
+                      recordType.getFieldType(resultSubstitutionTarget));
 
           var value = state.resultInfo.result;
           if (resultSubstitutionTarget != DataTypeConstants.PATH_THIS ||
@@ -330,7 +332,8 @@ class SubActionsController extends BaseActionsController {
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
-            Validate.isTrue(resultSubstitutionTarget == DataTypeConstants.PATH_THIS,
+            Validate.isTrue(
+                resultSubstitutionTarget == DataTypeConstants.PATH_THIS,
                 'Only result substitution to \'this\' is supported for a list element');
             Validate.notNull(index, 'The list element index cannot be null');
 
@@ -592,6 +595,7 @@ class SubActionsController extends BaseActionsController {
               showResultDialogIfNoResult: showResultDialogIfNoResult,
               verifyIsActive: false,
               header: header,
+              title: subActionSpec.subAction.label,
             ),
           );
           callState = newActionData != null

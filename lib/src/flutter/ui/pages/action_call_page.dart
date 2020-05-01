@@ -42,6 +42,7 @@ class ActionCallPage extends StatefulWidget {
     this.verifyIsActive = true,
     @required this.bloc,
     this.header,
+    this.title,
   }) : super(key: key);
 
   final ActionData actionData;
@@ -52,6 +53,7 @@ class ActionCallPage extends StatefulWidget {
   final bool verifyIsActive;
   final ActionCallBloc bloc;
   final String header;
+  final String title;
 
   @override
   _ActionCallPageState createState() => _ActionCallPageState();
@@ -78,6 +80,7 @@ class _ActionCallPageState extends State<ActionCallPage>
       this,
     )..init(
         verifyIsActive: widget.verifyIsActive,
+        title: widget.title,
       );
 
     _presenter.ensureRunning();
@@ -94,8 +97,8 @@ class _ActionCallPageState extends State<ActionCallPage>
         child: Scaffold(
           appBar: AppBar(
             title: Tooltip(
-              message: _presenter.actionLabel,
-              child: Text('${_presenter.actionLabel}'),
+              message: _presenter.title,
+              child: Text('${_presenter.title}'),
             ),
             actions:
                 subActionsWidget != null ? <Widget>[subActionsWidget] : null,
@@ -138,7 +141,7 @@ class _ActionCallPageState extends State<ActionCallPage>
                     ? _buildProvideArgsWidget(context)
                     : Center(
                         child: NotificationPanelWidget(
-                        notification: '${_presenter.actionLabel} is inactive.',
+                        notification: '${_presenter.title} is inactive.',
                         type: NotificationPanelType.info,
                       ));
               } else if (snapshot.hasError) {
