@@ -68,6 +68,7 @@ class SubActionsWidget extends StatefulWidget {
   factory SubActionsWidget.forRecord(
     UiContext uiContext,
     SpongeService spongeService, {
+    Key key,
     Widget menuIcon,
     Widget menuWidget,
     Widget header,
@@ -77,6 +78,7 @@ class SubActionsWidget extends StatefulWidget {
 
     if (uiContext.enabled && controller.hasSubActions(uiContext.value)) {
       return SubActionsWidget(
+        key: key,
         controller: controller,
         value: uiContext.value,
         beforeSelectedSubAction: (ActionData subActionData,
@@ -103,6 +105,7 @@ class SubActionsWidget extends StatefulWidget {
   factory SubActionsWidget.forListElement(
     UiContext uiContext,
     SpongeService spongeService, {
+    Key key,
     @required SubActionsController controller,
     @required dynamic element,
     @required int index,
@@ -112,7 +115,7 @@ class SubActionsWidget extends StatefulWidget {
     String tooltip,
   }) {
     return SubActionsWidget(
-      key: Key('sub-actions'),
+      key: key ?? Key('sub-actions'),
       controller: controller,
       value: element,
       index: index,
