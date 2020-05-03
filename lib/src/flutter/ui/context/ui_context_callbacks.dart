@@ -30,6 +30,7 @@ abstract class UiContextCallbacks {
   PageableList getPageableList(QualifiedDataType qType);
   Future<void> fetchPageableListPage(QualifiedDataType qType);
   String getKey(String code);
+  dynamic getRawValue(String path);
 
   void setAdditionalData(
       QualifiedDataType qType, String additionalDataKey, dynamic value);
@@ -82,6 +83,9 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
 
   @override
   String getKey(String code) => null;
+
+  @override
+  dynamic getRawValue(String path) => null;
 
   @override
   dynamic getAdditionalData(

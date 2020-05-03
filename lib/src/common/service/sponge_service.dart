@@ -256,10 +256,15 @@ class SpongeService<AD extends ActionData> {
     return result;
   }
 
-  void setupSubActionSpec(SubActionSpec subActionSpec, DataType sourceType) {
+  void setupSubActionSpec(
+    SubActionSpec subActionSpec,
+    DataType sourceType, {
+    DataType sourceParentType,
+  }) {
     subActionSpec.setup(
         getCachedAction(subActionSpec.actionName, required: true).actionMeta,
-        sourceType);
+        sourceType,
+        sourceParentType: sourceParentType);
   }
 
   Future<String> getVersion() => _client.getVersion();

@@ -49,6 +49,8 @@ class SubActionsWidget extends StatefulWidget {
     @required this.value,
     @required this.beforeSelectedSubAction,
     this.index,
+    this.parentType,
+    this.parentValue,
     this.menuIcon,
     this.menuWidget,
     this.header,
@@ -58,6 +60,8 @@ class SubActionsWidget extends StatefulWidget {
   final SubActionsController controller;
   final dynamic value;
   final int index;
+  final DataType parentType;
+  final dynamic parentValue;
   final BeforeSelectedSubActionCallback beforeSelectedSubAction;
 
   final Widget menuIcon;
@@ -109,6 +113,8 @@ class SubActionsWidget extends StatefulWidget {
     @required SubActionsController controller,
     @required dynamic element,
     @required int index,
+    @required DataType parentType,
+    @required dynamic parentValue,
     Widget menuIcon,
     Widget menuWidget,
     Widget header,
@@ -119,6 +125,8 @@ class SubActionsWidget extends StatefulWidget {
       controller: controller,
       value: element,
       index: index,
+      parentType: parentType,
+      parentValue: parentValue,
       beforeSelectedSubAction: (ActionData subActionData,
           SubActionType subActionType, dynamic contextValue) async {
         if (subActionData.needsRunConfirmation) {
@@ -185,8 +193,8 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
         }
       }
 
-      await widget.controller.onSelectedSubAction(
-          context, subActionSpec, widget.value, widget.index);
+      await widget.controller.onSelectedSubAction(context, subActionSpec,
+          widget.value, widget.index, widget.parentType, widget.parentValue);
     } catch (e) {
       await handleError(context, e);
     }
@@ -194,8 +202,9 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
 
   Future<List<PopupMenuEntry<SubActionSpec>>> _buildSubActionsMenuItems(
       BuildContext context) async {
-    List<SubActionRuntimeSpec> runtimeSpecs =
-        await widget.controller.getSubActionsRuntimeSpecs(widget.value);
+    List<SubActionRuntimeSpec> runtimeSpecs = await widget.controller
+        .getSubActionsRuntimeSpecs(
+            widget.value, widget.index, widget.parentType, widget.parentValue);
     return [
       if (widget.header != null)
         PopupMenuItem<SubActionSpec>(
@@ -231,16 +240,18 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
   }
 }
 
-class BaseActionsController {
+abstract class BaseActionsController {
   BaseActionsController({
     @required this.spongeService,
     @required this.parentFeatures,
     @required this.elementType,
+    @required this.parentType,
   });
 
   final SpongeService spongeService;
   final Map<String, Object> parentFeatures;
   final DataType elementType;
+  final DataType parentType;
 
   Map<String, Object> getFeatures(dynamic element) => {}
     ..addAll(parentFeatures ?? {})
@@ -258,7 +269,8 @@ class BaseActionsController {
     if (subActionMeta == null) {
       return null;
     }
-    spongeService.setupSubActionSpec(subActionSpec, elementType);
+    spongeService.setupSubActionSpec(subActionSpec, elementType,
+        sourceParentType: parentType);
     return subActionSpec;
   }
 }
@@ -268,13 +280,16 @@ class SubActionsController extends BaseActionsController {
     @required SpongeService spongeService,
     @required Map<String, Object> parentFeatures,
     @required DataType elementType,
+    DataType parentType,
     @required this.onBeforeInstantCall,
     @required this.onAfterCall,
     this.propagateContextActions = false,
   }) : super(
-            spongeService: spongeService,
-            parentFeatures: parentFeatures,
-            elementType: elementType);
+          spongeService: spongeService,
+          parentFeatures: parentFeatures,
+          elementType: elementType,
+          parentType: parentType,
+        );
 
   final AsyncCallback onBeforeInstantCall;
   final AfterSubActionCallCallback onAfterCall;
@@ -325,6 +340,7 @@ class SubActionsController extends BaseActionsController {
         spongeService: spongeService,
         parentFeatures: uiContext.features,
         elementType: elementType,
+        parentType: uiContext.qualifiedType.type,
         onBeforeInstantCall: () async {
           await uiContext.callbacks.onBeforeSubActionCall();
         },
@@ -335,17 +351,30 @@ class SubActionsController extends BaseActionsController {
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
-            Validate.isTrue(
-                resultSubstitutionTarget == DataTypeConstants.PATH_THIS,
-                'Only result substitution to \'this\' is supported for a list element');
-            Validate.notNull(index, 'The list element index cannot be null');
+            switch (resultSubstitutionTarget) {
+              case DataTypeConstants.PATH_THIS:
+                Validate.notNull(
+                    index, 'The list element index cannot be null');
 
-            var value = state.resultInfo.result;
-            if (!DataTypeUtils.isNull(value)) {
-              (uiContext.value as List)[index] = value;
-              // Save the whole list.
-              uiContext.callbacks
-                  .onSave(uiContext.qualifiedType, uiContext.value);
+                var value = state.resultInfo.result;
+                if (!DataTypeUtils.isNull(value)) {
+                  (uiContext.value as List)[index] = value;
+                  // Save the whole list.
+                  uiContext.callbacks
+                      .onSave(uiContext.qualifiedType, uiContext.value);
+                }
+                break;
+              case DataTypeConstants.PATH_PARENT:
+                var value = state.resultInfo.result;
+                if (!DataTypeUtils.isNull(value)) {
+                  // Save the whole list.
+                  uiContext.callbacks.onSave(uiContext.qualifiedType, value);
+                }
+                break;
+              default:
+                throw Exception(
+                    'The result substitution target $resultSubstitutionTarget is not supported for a list');
+                break;
             }
           }
 
@@ -370,12 +399,20 @@ class SubActionsController extends BaseActionsController {
           .toList();
 
   Future<List<SubActionRuntimeSpec>> getSubActionRuntimeSpecs(
-      List<SubActionSpec> specs, dynamic element) async {
+    List<SubActionSpec> specs,
+    dynamic element, {
+    @required int index,
+    @required DataType parentType,
+    @required dynamic parentValue,
+  }) async {
     var entries = specs
         .map((spec) => IsActionActiveEntry(
             name: spec.actionName,
             args: ModelUtils.substituteSubActionArgs(
                 spongeService, spec, elementType, element,
+                sourceIndex: index,
+                sourceParentType: parentType,
+                sourceParent: parentValue,
                 propagateContextActions: propagateContextActions,
                 bestEffort: true),
             qualifiedVersion: spongeService
@@ -424,32 +461,46 @@ class SubActionsController extends BaseActionsController {
           SubActionType.create)
       ?.actionName;
 
-  Future<void> onSelectedSubAction(BuildContext context,
-      SubActionSpec selectedValue, dynamic element, int index) async {
+  Future<void> onSelectedSubAction(
+      BuildContext context,
+      SubActionSpec selectedValue,
+      dynamic element,
+      int index,
+      DataType parentType,
+      dynamic parentValue) async {
     switch (selectedValue.type) {
       case SubActionType.create:
         break;
       case SubActionType.read:
-        await onReadElement(context, element, index: index);
+        await onReadElement(context, element,
+            index: index, parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.update:
-        await onUpdateElement(context, element, index: index);
+        await onUpdateElement(context, element,
+            index: index, parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.delete:
-        await onDeleteElement(context, element, index: index);
+        await onDeleteElement(context, element,
+            index: index, parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.activate:
-        await onActivateElement(context, element, index: index);
+        await onActivateElement(context, element,
+            index: index, parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.context:
         await onElementContextAction(context, selectedValue, element,
-            index: index);
+            index: index, parentType: parentType, parentValue: parentValue);
         break;
     }
   }
 
   void setupSubAction(
-      ActionData actionData, SubActionSpec subActionSpec, dynamic sourceValue) {
+      ActionData actionData,
+      SubActionSpec subActionSpec,
+      dynamic sourceValue,
+      int sourceIndex,
+      DataType parentType,
+      dynamic parentValue) {
     if (subActionSpec.hasArgSubstitutions) {
       if (!actionData.hasCacheableContextArgs) {
         actionData.clear();
@@ -457,23 +508,33 @@ class SubActionsController extends BaseActionsController {
 
       actionData.args = ModelUtils.substituteSubActionArgs(
           spongeService, subActionSpec, elementType, sourceValue,
+          sourceIndex: sourceIndex,
+          sourceParentType: parentType,
+          sourceParent: parentValue,
           propagateContextActions: propagateContextActions);
     }
   }
 
-  Future<void> onCreateElement(BuildContext context) async {
+  Future<void> onCreateElement(BuildContext context,
+      {DataType parentType, dynamic parentValue}) async {
     var createAction = getSubActionSpec(
         parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
         SubActionType.create);
-    // A create CRUD action doesn't support arg substitutions.
     await _onElementSubAction(
       context: context,
       subActionSpec: createAction,
+      setupCallback: (actionData) => setupSubAction(
+          actionData, createAction, null, null, parentType, parentValue),
     );
   }
 
-  Future<void> onReadElement(BuildContext context, dynamic value,
-      {int index}) async {
+  Future<void> onReadElement(
+    BuildContext context,
+    dynamic value, {
+    int index,
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     var readAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_READ_ACTION],
         SubActionType.read);
@@ -481,16 +542,21 @@ class SubActionsController extends BaseActionsController {
       await _onElementSubAction(
         context: context,
         subActionSpec: readAction,
-        setupCallback: (actionData) =>
-            setupSubAction(actionData, readAction, value),
+        setupCallback: (actionData) => setupSubAction(
+            actionData, readAction, value, index, parentType, parentValue),
         index: index,
         readOnly: true,
       );
     }
   }
 
-  Future<void> onUpdateElement(BuildContext context, dynamic value,
-      {int index}) async {
+  Future<void> onUpdateElement(
+    BuildContext context,
+    dynamic value, {
+    int index,
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     var updateAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_UPDATE_ACTION],
         SubActionType.update);
@@ -498,15 +564,20 @@ class SubActionsController extends BaseActionsController {
       await _onElementSubAction(
         context: context,
         subActionSpec: updateAction,
-        setupCallback: (actionData) =>
-            setupSubAction(actionData, updateAction, value),
+        setupCallback: (actionData) => setupSubAction(
+            actionData, updateAction, value, index, parentType, parentValue),
         index: index,
       );
     }
   }
 
-  Future<void> onDeleteElement(BuildContext context, dynamic value,
-      {int index}) async {
+  Future<void> onDeleteElement(
+    BuildContext context,
+    dynamic value, {
+    int index,
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     var deleteAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_DELETE_ACTION],
         SubActionType.delete);
@@ -514,15 +585,20 @@ class SubActionsController extends BaseActionsController {
       await _onElementSubAction(
         context: context,
         subActionSpec: deleteAction,
-        setupCallback: (actionData) =>
-            setupSubAction(actionData, deleteAction, value),
+        setupCallback: (actionData) => setupSubAction(
+            actionData, deleteAction, value, index, parentType, parentValue),
         index: index,
       );
     }
   }
 
-  Future<void> onActivateElement(BuildContext context, dynamic value,
-      {int index}) async {
+  Future<void> onActivateElement(
+    BuildContext context,
+    dynamic value, {
+    int index,
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     var activateAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_ACTIVATE_ACTION],
         SubActionType.activate);
@@ -531,21 +607,26 @@ class SubActionsController extends BaseActionsController {
       await _onElementSubAction(
         context: context,
         subActionSpec: activateAction,
-        setupCallback: (actionData) =>
-            setupSubAction(actionData, activateAction, value),
+        setupCallback: (actionData) => setupSubAction(
+            actionData, activateAction, value, index, parentType, parentValue),
         index: index,
       );
     }
   }
 
   Future<void> onElementContextAction(
-      BuildContext context, SubActionSpec subActionSpec, dynamic value,
-      {int index}) async {
+    BuildContext context,
+    SubActionSpec subActionSpec,
+    dynamic value, {
+    int index,
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     await _onElementSubAction(
       context: context,
       subActionSpec: subActionSpec,
-      setupCallback: (actionData) =>
-          setupSubAction(actionData, subActionSpec, value),
+      setupCallback: (actionData) => setupSubAction(
+          actionData, subActionSpec, value, index, parentType, parentValue),
       index: index,
       header: value is AnnotatedValue ? value.valueLabel : null,
     );
@@ -664,14 +745,19 @@ class SubActionsController extends BaseActionsController {
     return crudActionSpecs;
   }
 
-  Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(
-      dynamic value) async {
+  Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(dynamic value,
+      int index, DataType parentType, dynamic parentValue) async {
     List<SubActionSpec> crudActionSpecs = _getCrudActions(value);
     List<SubActionSpec> contextActionSpecs = _getContextActions(value);
 
     // Check actions for active/inactive.
     List<SubActionRuntimeSpec> runtimeSpecs = await getSubActionRuntimeSpecs(
-        crudActionSpecs + contextActionSpecs, value);
+      crudActionSpecs + contextActionSpecs,
+      value,
+      index: index,
+      parentType: parentType,
+      parentValue: parentValue,
+    );
 
     if (crudActionSpecs.isNotEmpty && contextActionSpecs.isNotEmpty) {
       // Insert a separator between CRUD actions and context actions.

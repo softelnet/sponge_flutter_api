@@ -49,6 +49,9 @@ class ModelUtils {
     SubActionSpec subActionSpec,
     DataType sourceType,
     dynamic sourceValue, {
+    @required int sourceIndex,
+    @required DataType sourceParentType,
+    @required dynamic sourceParent,
     @required bool propagateContextActions,
     bool bestEffort = false,
   }) {
@@ -64,9 +67,23 @@ class ModelUtils {
     if (subActionSpec.hasArgSubstitutions) {
       subActionSpec.subAction.args.forEach((substitution) {
         try {
-          var value = DataTypeUtils.getSubValue(
-              sourceValue, substitution.source,
-              unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+          dynamic value;
+
+          switch (substitution.source) {
+            case DataTypeConstants.PATH_INDEX:
+              value = Validate.notNull(
+                  sourceIndex, 'The list element index is unknown');
+              break;
+            case DataTypeConstants.PATH_PARENT:
+              value =
+                  Validate.notNull(sourceParent, 'The parent list is unknown');
+              break;
+            default:
+              value = DataTypeUtils.getSubValue(
+                  sourceValue, substitution.source,
+                  unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+              break;
+          }
 
           // Do not propagate annotated value sub-actions to a sub-action.
           if (!propagateContextActions && value is AnnotatedValue) {
@@ -90,22 +107,33 @@ class ModelUtils {
       for (var i = 0; i < subActionData.args.length; i++) {
         var subArgType = subActionMeta.args[i];
 
-        var subActionArgSpec = subActionSpec.subAction.args?.firstWhere(
-            (substitution) => substitution.target == subArgType.name,
+        var substitution = subActionSpec.subAction.args?.firstWhere(
+            (s) => s.target == subArgType.name,
             orElse: () => null);
 
-        bool visibleArg = Features.getOptional(
-            subArgType.features, Features.VISIBLE, () => true);
+        if (substitution != null) {
+          bool visibleArg = Features.getOptional(
+              subArgType.features, Features.VISIBLE, () => true);
 
-        Validate.isTrue(
-            visibleArg && showActionCallWidget ||
-                subArgType.nullable ||
-                DataTypeUtils.hasAllNotNullValuesSet(
-                    subArgType, subActionData.args[i]),
-            // TODO Support context actions in dynamic types.
-            subActionArgSpec != null
-                ? 'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceType, subActionArgSpec.source, null))}\' is not set properly'
-                : 'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
+          bool predicate =
+              visibleArg && showActionCallWidget || subArgType.nullable;
+
+          switch (substitution.source) {
+            case DataTypeConstants.PATH_INDEX:
+            case DataTypeConstants.PATH_PARENT:
+              Validate.isTrue(predicate || subActionData.args[i] != null,
+                  'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
+              break;
+            default:
+              Validate.isTrue(
+                  predicate ||
+                      DataTypeUtils.hasAllNotNullValuesSet(
+                          subArgType, subActionData.args[i]),
+                  // TODO Support context actions in dynamic types.
+                  'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceType, substitution.source, null))}\' is not set properly');
+              break;
+          }
+        }
       }
     }
 

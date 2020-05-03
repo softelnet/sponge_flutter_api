@@ -60,6 +60,9 @@ class ListTypePresenter extends BasePresenter<ListTypeViewModel, ListTypeView> {
 
   ListType get listType => uiContext.qualifiedType.type as ListType;
 
+  dynamic get rawListValue =>
+      uiContext.callbacks.getRawValue(uiContext.qualifiedType.path);
+
   DataType get elementType => listType.elementType;
 
   QualifiedDataType createElementQualifiedType() =>
@@ -95,7 +98,7 @@ class ListTypePresenter extends BasePresenter<ListTypeViewModel, ListTypeView> {
 
   bool get enabled => uiContext.enabled;
 
-    Future<void> onRefresh() async {
+  Future<void> onRefresh() async {
     await uiContext?.callbacks?.onRefreshArgs();
   }
 }

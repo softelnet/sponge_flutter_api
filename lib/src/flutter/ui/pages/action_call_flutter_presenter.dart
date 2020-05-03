@@ -101,6 +101,10 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   }
 
   @override
+  dynamic getRawValue(String path) => actionData.getArgValueByName(path,
+      unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+
+  @override
   dynamic getAdditionalData(
           QualifiedDataType qType, String additionalDataKey) =>
       session.getAdditionalData(qType.path, additionalDataKey);

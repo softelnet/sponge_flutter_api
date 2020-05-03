@@ -179,7 +179,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
             ),
         padding: EdgeInsets.zero,
         onPressed: () => _subActionsController
-            .onCreateElement(context)
+            .onCreateElement(context,
+                parentType: _presenter.listType,
+                parentValue: _presenter.rawListValue)
             .catchError((e) => handleError(context, e)),
       ));
     }
@@ -370,6 +372,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
                     controller: _subActionsController,
                     element: element,
                     index: index,
+                    parentType: _presenter.listType,
+                    parentValue: _presenter.rawListValue,
                     header: subUiContext.valueLabel != null
                         ? Text(subUiContext.valueLabel)
                         : null,
@@ -406,15 +410,15 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
       subUiContext.callbacks.onActivate(subUiContext.qualifiedType, rawElement);
     } else if (_subActionsController.isActivateEnabled(rawElement)) {
       await _subActionsController.onActivateElement(context, rawElement,
-          index: index);
+          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
     } else if (_presenter.service.settings.argumentListElementTapBehavior ==
             'update' &&
         _subActionsController.isUpdateEnabled(rawElement)) {
       await _subActionsController.onUpdateElement(context, rawElement,
-          index: index);
+          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
     } else if (_subActionsController.isReadEnabled(rawElement)) {
       await _subActionsController.onReadElement(context, rawElement,
-          index: index);
+          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
     }
   }
 
