@@ -39,6 +39,7 @@ abstract class UiContext {
     @required bool enabled,
     @required bool readOnly,
     @required this.rootRecordSingleLeadingField,
+    bool isRootUiContext,
   })  : features = features != null ? Map.from(features) : {},
         markNullable = markNullable ?? true {
     this.typeLabel = typeLabel ?? qualifiedType.type.label;
@@ -47,6 +48,8 @@ abstract class UiContext {
     this.loading = loading ?? [];
     this.enabled = enabled;
     this.readOnly = readOnly;
+
+    this.isRootUiContext = isRootUiContext ?? false;
 
     _setup();
   }
@@ -69,6 +72,9 @@ abstract class UiContext {
   bool enabled;
   bool readOnly;
   String rootRecordSingleLeadingField;
+
+  // Should not be cloned.
+  bool isRootUiContext;
 
   bool _isSetUp = false;
 
@@ -156,6 +162,7 @@ class TypeEditorContext extends UiContext {
     bool showLabel,
     @required List<String> loading,
     String rootRecordSingleLeadingField,
+    bool isRootUiContext,
   }) : super(
           name,
           context,
@@ -173,6 +180,7 @@ class TypeEditorContext extends UiContext {
           enabled: enabled ?? true,
           readOnly: readOnly ?? false,
           rootRecordSingleLeadingField: rootRecordSingleLeadingField,
+          isRootUiContext: isRootUiContext,
         );
 
   String hintText;
@@ -248,6 +256,7 @@ class TypeViewerContext extends UiContext {
     bool showLabel,
     @required List<String> loading,
     String rootRecordSingleLeadingField,
+    bool isRootUiContext,
   }) : super(
           name,
           context,
@@ -265,6 +274,7 @@ class TypeViewerContext extends UiContext {
           enabled: false,
           readOnly: true,
           rootRecordSingleLeadingField: rootRecordSingleLeadingField,
+          isRootUiContext: isRootUiContext,
         );
 
   TypeViewerContext clone() => TypeViewerContext(

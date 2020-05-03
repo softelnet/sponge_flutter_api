@@ -303,6 +303,7 @@ class _ActionCallPageState extends State<ActionCallPage>
                   _presenter.actionData)
               ?.qType
               ?.path,
+      isRootUiContext: true,
     );
   }
 

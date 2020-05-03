@@ -101,9 +101,12 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
                     : null,
               ),
             if (label != null)
-              Text(
-                label,
-                style: getArgLabelTextStyle(context),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  label,
+                  style: getArgLabelTextStyle(context),
+                ),
               ),
           ],
         ),
@@ -209,7 +212,11 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
     groupWidget = Padding(
       padding: _presenter.isThisRootRecordSingleLeadingField
           ? const EdgeInsets.all(0)
-          : EdgeInsets.only(left: 10, right: widget.showBorder ? 10 : 0),
+          : EdgeInsets.only(
+              left: 10,
+              right: (widget.showBorder || _presenter.uiContext.isRootUiContext)
+                  ? 10
+                  : 0),
       child: Align(
         child: groupWidget,
         alignment: Alignment.centerLeft,
