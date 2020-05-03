@@ -410,15 +410,21 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
       subUiContext.callbacks.onActivate(subUiContext.qualifiedType, rawElement);
     } else if (_subActionsController.isActivateEnabled(rawElement)) {
       await _subActionsController.onActivateElement(context, rawElement,
-          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
+          index: index,
+          parentType: _presenter.listType,
+          parentValue: _presenter.rawListValue);
     } else if (_presenter.service.settings.argumentListElementTapBehavior ==
             'update' &&
         _subActionsController.isUpdateEnabled(rawElement)) {
       await _subActionsController.onUpdateElement(context, rawElement,
-          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
+          index: index,
+          parentType: _presenter.listType,
+          parentValue: _presenter.rawListValue);
     } else if (_subActionsController.isReadEnabled(rawElement)) {
       await _subActionsController.onReadElement(context, rawElement,
-          index: index, parentType: _presenter.listType, parentValue: _presenter.rawListValue);
+          index: index,
+          parentType: _presenter.listType,
+          parentValue: _presenter.rawListValue);
     }
   }
 

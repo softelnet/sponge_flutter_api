@@ -27,12 +27,12 @@ import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
-typedef BeforeSelectedSubActionCallback = Future<bool> Function(
+typedef OnBeforeSelectedSubActionCallback = Future<bool> Function(
     ActionData subActionData,
     SubActionType subActionType,
     dynamic contextValue);
 
-typedef AfterSubActionCallCallback = Future<void> Function(
+typedef OnAfterSubActionCallCallback = Future<void> Function(
     SubActionSpec subActionSpec, ActionCallState actionCallState, int index);
 
 class SubActionRuntimeSpec {
@@ -47,7 +47,6 @@ class SubActionsWidget extends StatefulWidget {
     Key key,
     @required this.controller,
     @required this.value,
-    @required this.beforeSelectedSubAction,
     this.index,
     this.parentType,
     this.parentValue,
@@ -62,7 +61,6 @@ class SubActionsWidget extends StatefulWidget {
   final int index;
   final DataType parentType;
   final dynamic parentValue;
-  final BeforeSelectedSubActionCallback beforeSelectedSubAction;
 
   final Widget menuIcon;
   final Widget menuWidget;
@@ -85,17 +83,6 @@ class SubActionsWidget extends StatefulWidget {
         key: key,
         controller: controller,
         value: uiContext.value,
-        beforeSelectedSubAction: (ActionData subActionData,
-            SubActionType subActionType, dynamic contextValue) async {
-          if (subActionData.needsRunConfirmation) {
-            if (!(await showConfirmationDialog(uiContext.context,
-                'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
-              return false;
-            }
-          }
-
-          return true;
-        },
         menuIcon: menuIcon,
         menuWidget: menuWidget,
         header: header,
@@ -127,27 +114,6 @@ class SubActionsWidget extends StatefulWidget {
       index: index,
       parentType: parentType,
       parentValue: parentValue,
-      beforeSelectedSubAction: (ActionData subActionData,
-          SubActionType subActionType, dynamic contextValue) async {
-        if (subActionData.needsRunConfirmation) {
-          String contextValueLabel =
-              contextValue is AnnotatedValue ? contextValue.valueLabel : null;
-          var confirmationQuestion;
-          if (subActionType == SubActionType.delete) {
-            confirmationQuestion =
-                'Do you want to remove ${contextValueLabel ?? " the element"}?';
-          } else {
-            confirmationQuestion =
-                'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?';
-          }
-          if (!(await showConfirmationDialog(
-              uiContext.context, confirmationQuestion))) {
-            return false;
-          }
-        }
-
-        return true;
-      },
       menuIcon: menuIcon,
       menuWidget: menuWidget,
       header: header,
@@ -180,24 +146,8 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
   }
 
   Future<void> _onSelectedSubAction(SubActionSpec subActionSpec) async {
-    try {
-      if (widget.beforeSelectedSubAction != null) {
-        var service = ApplicationProvider.of(context).service;
-
-        if (!(await widget.beforeSelectedSubAction(
-            service.spongeService
-                .getCachedAction(subActionSpec.actionName, required: true),
-            subActionSpec.type,
-            widget.value))) {
-          return;
-        }
-      }
-
-      await widget.controller.onSelectedSubAction(context, subActionSpec,
-          widget.value, widget.index, widget.parentType, widget.parentValue);
-    } catch (e) {
-      await handleError(context, e);
-    }
+    await widget.controller.onSelectedSubAction(context, subActionSpec,
+        widget.value, widget.index, widget.parentType, widget.parentValue);
   }
 
   Future<List<PopupMenuEntry<SubActionSpec>>> _buildSubActionsMenuItems(
@@ -281,6 +231,7 @@ class SubActionsController extends BaseActionsController {
     @required Map<String, Object> parentFeatures,
     @required DataType elementType,
     DataType parentType,
+    @required this.onBeforeSelectedSubAction,
     @required this.onBeforeInstantCall,
     @required this.onAfterCall,
     this.propagateContextActions = false,
@@ -291,8 +242,9 @@ class SubActionsController extends BaseActionsController {
           parentType: parentType,
         );
 
+  final OnBeforeSelectedSubActionCallback onBeforeSelectedSubAction;
   final AsyncCallback onBeforeInstantCall;
-  final AfterSubActionCallCallback onAfterCall;
+  final OnAfterSubActionCallCallback onAfterCall;
   final bool propagateContextActions;
 
   factory SubActionsController.forRecord(
@@ -303,6 +255,17 @@ class SubActionsController extends BaseActionsController {
       spongeService: spongeService,
       parentFeatures: uiContext.features,
       elementType: recordType,
+      onBeforeSelectedSubAction: (ActionData subActionData,
+          SubActionType subActionType, dynamic contextValue) async {
+        if (subActionData.needsRunConfirmation) {
+          if (!(await showConfirmationDialog(uiContext.context,
+              'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?'))) {
+            return false;
+          }
+        }
+
+        return true;
+      },
       onBeforeInstantCall: () async {
         await uiContext.callbacks.onBeforeSubActionCall();
       },
@@ -314,7 +277,7 @@ class SubActionsController extends BaseActionsController {
             state is ActionCallStateEnded &&
             state.resultInfo != null &&
             state.resultInfo.isSuccess) {
-          var parentType =
+          var targetType =
               resultSubstitutionTarget == DataTypeConstants.PATH_THIS
                   ? uiContext.qualifiedType
                   : uiContext.qualifiedType.createChild(
@@ -323,7 +286,7 @@ class SubActionsController extends BaseActionsController {
           var value = state.resultInfo.result;
           if (resultSubstitutionTarget != DataTypeConstants.PATH_THIS ||
               !DataTypeUtils.isNull(value)) {
-            uiContext.callbacks.onSave(parentType, value);
+            uiContext.callbacks.onSave(targetType, value);
           }
         }
 
@@ -341,6 +304,27 @@ class SubActionsController extends BaseActionsController {
         parentFeatures: uiContext.features,
         elementType: elementType,
         parentType: uiContext.qualifiedType.type,
+        onBeforeSelectedSubAction: (ActionData subActionData,
+            SubActionType subActionType, dynamic contextValue) async {
+          if (subActionData.needsRunConfirmation) {
+            String contextValueLabel =
+                contextValue is AnnotatedValue ? contextValue.valueLabel : null;
+            var confirmationQuestion;
+            if (subActionType == SubActionType.delete) {
+              confirmationQuestion =
+                  'Do you want to remove ${contextValueLabel ?? " the element"}?';
+            } else {
+              confirmationQuestion =
+                  'Do you want to run ${ModelUtils.getActionMetaDisplayLabel(subActionData.actionMeta)}?';
+            }
+            if (!(await showConfirmationDialog(
+                uiContext.context, confirmationQuestion))) {
+              return false;
+            }
+          }
+
+          return true;
+        },
         onBeforeInstantCall: () async {
           await uiContext.callbacks.onBeforeSubActionCall();
         },
@@ -463,13 +447,15 @@ class SubActionsController extends BaseActionsController {
 
   Future<void> onSelectedSubAction(
       BuildContext context,
-      SubActionSpec selectedValue,
+      SubActionSpec subActionSpec,
       dynamic element,
       int index,
       DataType parentType,
       dynamic parentValue) async {
-    switch (selectedValue.type) {
+    switch (subActionSpec.type) {
       case SubActionType.create:
+        await onCreateElement(context,
+            parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.read:
         await onReadElement(context, element,
@@ -488,7 +474,7 @@ class SubActionsController extends BaseActionsController {
             index: index, parentType: parentType, parentValue: parentValue);
         break;
       case SubActionType.context:
-        await onElementContextAction(context, selectedValue, element,
+        await onElementContextAction(context, subActionSpec, element,
             index: index, parentType: parentType, parentValue: parentValue);
         break;
     }
@@ -515,17 +501,22 @@ class SubActionsController extends BaseActionsController {
     }
   }
 
-  Future<void> onCreateElement(BuildContext context,
-      {DataType parentType, dynamic parentValue}) async {
+  Future<void> onCreateElement(
+    BuildContext context, {
+    DataType parentType,
+    dynamic parentValue,
+  }) async {
     var createAction = getSubActionSpec(
         parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
         SubActionType.create);
-    await _onElementSubAction(
-      context: context,
-      subActionSpec: createAction,
-      setupCallback: (actionData) => setupSubAction(
-          actionData, createAction, null, null, parentType, parentValue),
-    );
+    if (createAction != null) {
+      await _onElementSubAction(
+        context: context,
+        subActionSpec: createAction,
+        setupCallback: (actionData) => setupSubAction(
+            actionData, createAction, null, null, parentType, parentValue),
+      );
+    }
   }
 
   Future<void> onReadElement(
@@ -544,6 +535,7 @@ class SubActionsController extends BaseActionsController {
         subActionSpec: readAction,
         setupCallback: (actionData) => setupSubAction(
             actionData, readAction, value, index, parentType, parentValue),
+        value: value,
         index: index,
         readOnly: true,
       );
@@ -566,6 +558,7 @@ class SubActionsController extends BaseActionsController {
         subActionSpec: updateAction,
         setupCallback: (actionData) => setupSubAction(
             actionData, updateAction, value, index, parentType, parentValue),
+        value: value,
         index: index,
       );
     }
@@ -587,6 +580,7 @@ class SubActionsController extends BaseActionsController {
         subActionSpec: deleteAction,
         setupCallback: (actionData) => setupSubAction(
             actionData, deleteAction, value, index, parentType, parentValue),
+        value: value,
         index: index,
       );
     }
@@ -609,6 +603,7 @@ class SubActionsController extends BaseActionsController {
         subActionSpec: activateAction,
         setupCallback: (actionData) => setupSubAction(
             actionData, activateAction, value, index, parentType, parentValue),
+        value: value,
         index: index,
       );
     }
@@ -627,6 +622,7 @@ class SubActionsController extends BaseActionsController {
       subActionSpec: subActionSpec,
       setupCallback: (actionData) => setupSubAction(
           actionData, subActionSpec, value, index, parentType, parentValue),
+      value: value,
       index: index,
       header: value is AnnotatedValue ? value.valueLabel : null,
     );
@@ -636,13 +632,28 @@ class SubActionsController extends BaseActionsController {
     @required BuildContext context,
     @required SubActionSpec subActionSpec,
     void Function(ActionData _) setupCallback,
+    dynamic value,
     int index,
     bool readOnly = false,
     String header,
     bool showResultDialogIfNoResult = false,
   }) async {
-    if (subActionSpec != null) {
+    try {
+      if (subActionSpec == null) {
+        return;
+      }
+
       var service = ApplicationProvider.of(context).service;
+
+      if (onBeforeSelectedSubAction != null) {
+        if (!(await onBeforeSelectedSubAction(
+            service.spongeService
+                .getCachedAction(subActionSpec.actionName, required: true),
+            subActionSpec.type,
+            value))) {
+          return;
+        }
+      }
 
       // Check if the action exists.
       ActionData actionData =
@@ -715,10 +726,13 @@ class SubActionsController extends BaseActionsController {
 
         await bloc.close();
       }
+    } catch (e) {
+      await handleError(context, e);
     }
   }
 
-  List<SubActionSpec> _getCrudActions(dynamic element) {
+  /// Read, Update, Delete.
+  List<SubActionSpec> _getRudActions(dynamic element) {
     var crudActionSpecs = <SubActionSpec>[];
 
     var readAction = getSubActionSpec(
@@ -747,7 +761,7 @@ class SubActionsController extends BaseActionsController {
 
   Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(dynamic value,
       int index, DataType parentType, dynamic parentValue) async {
-    List<SubActionSpec> crudActionSpecs = _getCrudActions(value);
+    List<SubActionSpec> crudActionSpecs = _getRudActions(value);
     List<SubActionSpec> contextActionSpecs = _getContextActions(value);
 
     // Check actions for active/inactive.
