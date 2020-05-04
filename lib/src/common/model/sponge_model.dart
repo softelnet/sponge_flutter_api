@@ -90,3 +90,11 @@ class RootRecordSingleLeadingField {
   dynamic fieldValue;
   Map<String, Object> features;
 }
+
+class LoginData {
+  LoginData({this.username, this.password, this.savePassword});
+
+  String username;
+  String password;
+  bool savePassword;
+}

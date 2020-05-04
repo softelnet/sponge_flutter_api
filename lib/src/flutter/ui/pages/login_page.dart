@@ -34,7 +34,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> implements LoginView {
   LoginPresenter _presenter;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  static const double PADDING = 10.0;
+  static const double margin = 10;
+  static const padding = EdgeInsets.only(left: margin, right: margin, top: 2);
   bool _busy = false;
 
   @override
@@ -60,7 +61,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
     return Builder(
       builder: (BuildContext context) => SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: PADDING),
+          padding: const EdgeInsets.only(top: margin),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -69,27 +70,27 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                 child: Column(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: PADDING, right: PADDING, top: 2.0),
+                      padding: padding,
                       child: TextFormField(
+                        key: Key('username'),
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          labelText: 'User name',
+                          labelText: 'Username',
                           prefixIcon: Icon(Icons.person),
                         ),
                         onSaved: (value) => setState(() => _presenter.username =
                             CommonUtils.normalizeString(value)),
                         initialValue: _presenter.username,
                         validator: (value) => (value?.trim()?.isEmpty ?? true)
-                            ? 'The user name must not be empty'
+                            ? 'The username must not be empty'
                             : null,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: PADDING, right: PADDING, top: 2.0),
+                      padding: padding,
                       child: TextFormField(
+                        key: Key('password'),
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
@@ -103,6 +104,23 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                             ? 'The password must not be empty'
                             : null,
                         obscureText: true,
+                      ),
+                    ),
+                    Padding(
+                      padding: padding,
+                      child: Row(
+                        children: <Widget>[
+                          Text('Save password'),
+                          Checkbox(
+                            key: Key('save-password'),
+                            value: _presenter.savePassword,
+                            onChanged: (bool value) {
+                              setState(() {
+                                _presenter.savePassword = value;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -137,8 +155,6 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
       setState(() => _busy = true);
       try {
         await _presenter.logIn();
-      } catch (e) {
-        await handleError(context, e);
       } finally {
         setState(() => _busy = false);
       }
@@ -146,13 +162,3 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   }
 }
 
-Future<LoginData> showLoginPage(
-    BuildContext context, String connectionName) async {
-  return await Navigator.push(
-      context,
-      MaterialPageRoute<LoginData>(
-        builder: (BuildContext context) =>
-            LoginPage(connectionName: connectionName),
-        fullscreenDialog: true,
-      ));
-}

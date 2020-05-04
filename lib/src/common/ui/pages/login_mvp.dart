@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
-
-class LoginData {
-  LoginData({this.username, this.password});
-
-  String username;
-  String password;
-}
 
 class LoginViewModel extends BaseViewModel {
   LoginViewModel(this.connectionName);
@@ -31,11 +25,12 @@ class LoginViewModel extends BaseViewModel {
 abstract class LoginView extends BaseView {}
 
 class LoginPresenter extends BasePresenter<LoginViewModel, LoginView> {
-  LoginPresenter(
-      ApplicationService service, LoginViewModel model, LoginView view)
-      : super(service, model, view);
+  LoginPresenter(ApplicationService service, LoginViewModel viewModel, LoginView view)
+      : super(service, viewModel, view) {
+    _init();
+  }
 
-  final _loginData = LoginData();
+  LoginData _loginData;
 
   String get username => _loginData.username;
   set username(String value) => _loginData.username = value;
@@ -43,13 +38,27 @@ class LoginPresenter extends BasePresenter<LoginViewModel, LoginView> {
   String get password => _loginData.password;
   set password(String value) => _loginData.password = value;
 
+  bool get savePassword => _loginData.savePassword;
+  set savePassword(bool value) => _loginData.savePassword = value;
+
   String get title => 'Log in to ${viewModel.connectionName}';
 
   LoginData get loginData => _loginData;
 
+  void _init() {
+    _loginData = LoginData(
+      username: service.activeConnection?.username,
+      password: service.activeConnection?.password,
+      savePassword: service.activeConnection?.savePassword ?? false,
+    );
+  }
+
   Future<void> logIn() async {
-    service.spongeService.connection.username = _loginData.username;
-    service.spongeService.connection.password = _loginData.password;
+    await service.changeActiveConnectionCredentials(
+      _loginData.username,
+      _loginData.password,
+      savePassword: _loginData.savePassword,
+    );
 
     await service.spongeService.getVersion();
   }

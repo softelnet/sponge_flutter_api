@@ -31,6 +31,8 @@ import 'package:sponge_flutter_api/src/flutter/compatibility/type_converter.dart
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_sponge_service.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/pages/login_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 
@@ -91,6 +93,17 @@ class FlutterApplicationService<S extends FlutterSpongeService,
   void _initActionIntentHandlers() {
     _actionIntentHandlers[Features.ACTION_INTENT_VALUE_LOGIN] =
         ActionIntentHandler(
+      onPrepare: (ActionMeta actionMeta, List args) {
+        args[_getLoginUsernameActionArgIndex(actionMeta)] =
+            activeConnection?.username;
+        args[_getLoginPasswordActionArgIndex(actionMeta)] =
+            activeConnection?.password;
+
+        var savePasswordIndex = _getLoginSavePasswordActionArgIndex(actionMeta);
+        if (savePasswordIndex != null) {
+          args[savePasswordIndex] = activeConnection?.savePassword;
+        }
+      },
       onBeforeCall: (ActionMeta actionMeta, List args) async {
         var usernameArg = ModelUtils.getActionArgByIntent(
             actionMeta, Features.TYPE_INTENT_VALUE_USERNAME);
@@ -102,10 +115,16 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         Validate.notNull(passwordArg,
             'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the password argument');
 
-        var username = args[actionMeta.getArgIndex(usernameArg.name)];
-        var password = args[actionMeta.getArgIndex(passwordArg.name)];
+        var savePasswordArg = ModelUtils.getActionArgByIntent(
+            actionMeta, Features.TYPE_INTENT_VALUE_SAVE_PASSWORD);
 
-        await changeActiveConnectionCredentials(username, password);
+        await changeActiveConnectionCredentials(
+          args[actionMeta.getArgIndex(usernameArg.name)],
+          args[actionMeta.getArgIndex(passwordArg.name)],
+          savePassword: savePasswordArg != null
+              ? args[actionMeta.getArgIndex(savePasswordArg.name)]
+              : null,
+        );
       },
       onAfterCall: (ActionMeta actionMeta, List args,
           ActionCallResultInfo resultInfo) async {
@@ -200,6 +219,36 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         .updateConnection(spongeService.connection, force: true);
   }
 
+  int _getLoginUsernameActionArgIndex(ActionMeta actionMeta) {
+    DataType usernameType = ModelUtils.getActionArgByIntent(
+        actionMeta, Features.TYPE_INTENT_VALUE_USERNAME);
+    Validate.notNull(usernameType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_USERNAME} argument');
+    Validate.isTrue(usernameType is StringType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_USERNAME} argument type should be a string');
+    return actionMeta.getArgIndex(usernameType.name);
+  }
+
+  int _getLoginPasswordActionArgIndex(ActionMeta actionMeta) {
+    DataType passwordType = ModelUtils.getActionArgByIntent(
+        actionMeta, Features.TYPE_INTENT_VALUE_PASSWORD);
+    Validate.notNull(passwordType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_PASSWORD} argument');
+    Validate.isTrue(passwordType is StringType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_PASSWORD} argument type should be a string');
+    return actionMeta.getArgIndex(passwordType.name);
+  }
+
+  int _getLoginSavePasswordActionArgIndex(ActionMeta actionMeta) {
+    DataType savePasswordType = ModelUtils.getActionArgByIntent(
+        actionMeta, Features.TYPE_INTENT_VALUE_SAVE_PASSWORD);
+    Validate.notNull(savePasswordType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} should have the ${Features.TYPE_INTENT_VALUE_SAVE_PASSWORD} argument');
+    Validate.isTrue(savePasswordType is BooleanType,
+        'The action ${ModelUtils.getActionMetaDisplayLabel(actionMeta)} ${Features.TYPE_INTENT_VALUE_SAVE_PASSWORD} argument type should be a boolean');
+    return actionMeta.getArgIndex(savePasswordType.name);
+  }
+
   int _getSubscribeEventNamesActionArgIndex(ActionMeta actionMeta) {
     DataType eventNamesType = ModelUtils.getActionArgByIntent(
         actionMeta, Features.TYPE_INTENT_VALUE_EVENT_NAMES);
@@ -262,8 +311,10 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
   @override
   Future<void> changeActiveConnectionCredentials(
-      String username, String password) async {
-    await super.changeActiveConnectionCredentials(username, password);
+      String username, String password,
+      {bool savePassword}) async {
+    await super.changeActiveConnectionCredentials(username, password,
+        savePassword: savePassword);
 
     // Resubscribe.
     await subscribe(spongeService);
@@ -273,7 +324,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
     _subscriptionWatchdog?.cancel();
     _subscriptionWatchdog = null;
 
-    if (activeConnection.subscribe) {
+    if (activeConnection.subscribe && spongeService.isGrpcEnabled) {
       try {
         try {
           var subscription = await spongeService.subscribe();
@@ -333,4 +384,34 @@ class FlutterApplicationService<S extends FlutterSpongeService,
   }
 
   Future<void> showEventNotification(EventData eventData) async {}
+
+  Future<void> showLoginPage(
+      BuildContext context, String connectionName) async {
+    var service = ApplicationProvider.of(context).service;
+
+    var loginActionData = await service.spongeService?.findLoginAction();
+
+    if (loginActionData != null) {
+      await showActionCall(
+        context,
+        loginActionData,
+        builder: (context) => ActionCallPage(
+          actionData: loginActionData,
+          bloc: service.spongeService
+              .getActionCallBloc(loginActionData.actionMeta.name),
+          callImmediately: true,
+          showResultDialogIfNoResult: false,
+        ),
+      );
+    } else {
+      return await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) =>
+              LoginPage(connectionName: connectionName),
+          fullscreenDialog: true,
+        ),
+      );
+    }
+  }
 }

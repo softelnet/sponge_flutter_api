@@ -223,12 +223,16 @@ abstract class ApplicationService<S extends SpongeService,
       .getConnection(_connectionsConfiguration.getActiveConnectionName());
 
   Future<void> changeActiveConnectionCredentials(
-      String username, String password) async {
+      String username, String password, {bool savePassword}) async {
     var connection = activeConnection;
     connection
       ..username = username
       ..password = password
       ..anonymous = username == null;
+
+    if (savePassword != null) {
+      connection.savePassword = savePassword;
+    }
 
     await _connectionsConfiguration.updateConnection(connection);
 

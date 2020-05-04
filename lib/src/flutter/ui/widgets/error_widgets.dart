@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/default_routes.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/login_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
 enum NotificationPanelType { error, info }
@@ -127,6 +127,8 @@ class UsernamePasswordNotSetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var service = ApplicationProvider.of(context).service;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: Center(
@@ -135,7 +137,7 @@ class UsernamePasswordNotSetWidget extends StatelessWidget {
           style: getTapHereMessageStyle(context),
         ),
       ),
-      onTap: () async => await showLoginPage(context, connectionName),
+      onTap: () async => await service.showLoginPage(context, connectionName),
     );
   }
 }

@@ -360,6 +360,10 @@ class SpongeService<AD extends ActionData> {
     return await findIntentAction(Features.ACTION_INTENT_VALUE_SUBSCRIPTION);
   }
 
+  Future<ActionData> findLoginAction() async {
+    return await findIntentAction(Features.ACTION_INTENT_VALUE_LOGIN);
+  }
+
   Future<ActionData> findDefaultEventHandlerAction() async {
     return await findIntentAction(Features.ACTION_INTENT_DEFAULT_EVENT_HANDLER);
   }
