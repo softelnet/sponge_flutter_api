@@ -18,6 +18,10 @@ Future<void> showErrorDialog(BuildContext context, String message) async {
   await showModalDialog(context, 'Error', Text(message));
 }
 
+Future<void> showWarningDialog(BuildContext context, String message) async {
+  await showModalDialog(context, 'Warning', Text(message));
+}
+
 Future<void> showModalDialog(BuildContext context, String title, Widget child,
     {String closeButtonLabel = 'OK'}) async {
   await showDialog(

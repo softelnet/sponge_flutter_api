@@ -38,6 +38,17 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   static const padding = EdgeInsets.only(left: margin, right: margin, top: 2);
   bool _busy = false;
 
+  TextEditingController _usernameController;
+  TextEditingController _passwordController;
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _usernameController?.dispose();
+    _passwordController?.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     _presenter ??= LoginPresenter(
@@ -46,14 +57,32 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
       this,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_presenter.title),
+    _usernameController ??= TextEditingController(text: _presenter.username)
+      ..addListener(() {
+        _presenter.username =
+            CommonUtils.normalizeString(_usernameController.text);
+      });
+
+    _passwordController ??= TextEditingController(text: _presenter.password)
+      ..addListener(() {
+        _presenter.password =
+            CommonUtils.normalizeString(_passwordController.text);
+      });
+
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_presenter.title),
+        ),
+        body: ModalProgressHUD(
+          child: _buildMainWidget(),
+          inAsyncCall: _busy,
+        ),
       ),
-      body: ModalProgressHUD(
-        child: _buildMainWidget(),
-        inAsyncCall: _busy,
-      ),
+      onWillPop: () async {
+        _onClose();
+        return true;
+      },
     );
   }
 
@@ -77,11 +106,13 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                         decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
                           labelText: 'Username',
-                          prefixIcon: Icon(Icons.person),
+                          //prefixIcon: Icon(Icons.person),
+                          suffixIcon: createClearableTextFieldSuffixIcon(
+                              context, _usernameController),
                         ),
+                        controller: _usernameController,
                         onSaved: (value) => setState(() => _presenter.username =
                             CommonUtils.normalizeString(value)),
-                        initialValue: _presenter.username,
                         validator: (value) => (value?.trim()?.isEmpty ?? true)
                             ? 'The username must not be empty'
                             : null,
@@ -95,11 +126,13 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                         decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
                           labelText: 'Password',
-                          prefixIcon: Icon(Icons.verified_user),
+                          suffixIcon: createClearableTextFieldSuffixIcon(
+                              context, _passwordController),
+                          //prefixIcon: Icon(Icons.verified_user),
                         ),
+                        controller: _passwordController,
                         onSaved: (value) => setState(() => _presenter.password =
                             CommonUtils.normalizeString(value)),
-                        initialValue: _presenter.password,
                         validator: (value) => (value?.trim()?.isEmpty ?? true)
                             ? 'The password must not be empty'
                             : null,
@@ -128,16 +161,16 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
               ),
               ButtonBar(
                 children: [
-                  RaisedButton(
-                    onPressed: () => _logIn(context)
-                        .then(
-                            (_) => Navigator.pop(context, _presenter.loginData))
-                        .catchError((e) => handleError(context, e)),
-                    child: Text('LOG IN'),
+                  FlatButton(
+                    onPressed: () async => await _logIn(context),
+                    child: Text('LOG IN', style: getButtonTextStyle(context)),
                   ),
-                  RaisedButton(
-                    onPressed: () => Navigator.pop(context, null),
-                    child: Text('CANCEL'),
+                  FlatButton(
+                    onPressed: () {
+                      _onClose();
+                      Navigator.pop(context, null);
+                    },
+                    child: Text('CANCEL', style: getButtonTextStyle(context)),
                   ),
                 ],
               ),
@@ -149,16 +182,25 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   }
 
   Future<void> _logIn(BuildContext context) async {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
+    try {
+      if (_formKey.currentState.validate()) {
+        _formKey.currentState.save();
 
-      setState(() => _busy = true);
-      try {
-        await _presenter.logIn();
-      } finally {
-        setState(() => _busy = false);
+        setState(() => _busy = true);
+        try {
+          await _presenter.logIn();
+        } finally {
+          setState(() => _busy = false);
+        }
+
+        Navigator.pop(context, _presenter.loginData);
       }
+    } catch (e) {
+      await handleError(context, e);
     }
   }
-}
 
+  void _onClose() {
+    _presenter.onCancel();
+  }
+}

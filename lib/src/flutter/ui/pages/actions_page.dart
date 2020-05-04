@@ -104,10 +104,7 @@ class _ActionsPageState extends State<ActionsPage>
               return _buildScaffold(
                 context,
                 child: Center(
-                  child: NotificationPanelWidget(
-                    notification: state.error,
-                    type: NotificationPanelType.error,
-                  ),
+                  child: _buildErrorWidget(state.error),
                 ),
               );
             } else {
@@ -389,20 +386,24 @@ class _ActionsPageState extends State<ActionsPage>
           itemCount: actions.length,
         );
       } else if (snapshot.hasError) {
-        if (snapshot.error is UsernamePasswordNotSetException) {
-          return UsernamePasswordNotSetWidget(
-              connectionName: _presenter.connectionName);
-        } else {
-          return NotificationPanelWidget(
-            notification: snapshot.error,
-            type: NotificationPanelType.error,
-          );
-        }
+        return _buildErrorWidget(snapshot.error);
       }
     }
 
     // By default, show a loading spinner.
     return CircularProgressIndicator();
+  }
+
+  Widget _buildErrorWidget(dynamic error) {
+    if (error is UsernamePasswordNotSetException ||
+        error is InvalidUsernamePasswordException) {
+      return LoginRequiredWidget(connectionName: _presenter.connectionName);
+    } else {
+      return NotificationPanelWidget(
+        notification: error,
+        type: NotificationPanelType.error,
+      );
+    }
   }
 
   @override

@@ -121,7 +121,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
           trailing: InkResponse(
             child: Icon(Icons.edit, color: getIconColor(context)),
             onTap: () => _editConnection(context, connection)
-                .catchError((e) => handleError(context, e)),
+                .catchError((e) => handleConnectionError(context, e)),
           ),
           title: InkResponse(
             child: Text(connection.name),
@@ -147,7 +147,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
   void _onConnectionTap(SpongeConnection connection) {
     _toggleActiveConnection(connection)
-        .catchError((e) => handleError(context, e));
+        .catchError((e) => handleConnectionError(context, e));
   }
 
   List<Widget> _buildMenu(BuildContext context) {

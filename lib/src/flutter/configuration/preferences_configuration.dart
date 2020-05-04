@@ -81,10 +81,6 @@ class SharedPreferencesConnectionsConfiguration
 
     await _prefs.setStringList(_KEY_CONNECTIONS, connectionNameList);
 
-    if (connection.anonymous) {
-      connection.username = connection.password = null;
-    }
-
     await _saveConnection(connection);
 
     await _baseConfiguration.addConnection(connection);

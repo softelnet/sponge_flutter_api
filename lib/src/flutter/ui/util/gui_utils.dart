@@ -17,7 +17,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/service/exceptions.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
@@ -41,6 +43,14 @@ Future<void> handleError(
     } finally {
       _showingModalDialogContext.remove(context);
     }
+  }
+}
+
+Future<void> handleConnectionError(BuildContext context, dynamic error) async {
+  if (error is UsernamePasswordNotSetException) {
+    await showWarningDialog(context, error.toString());
+  } else {
+    await handleError(context, error);
   }
 }
 
@@ -185,3 +195,17 @@ Icon getPopupMenuIcon(BuildContext context) {
 
 typedef GetProvidedArgCallback = ProvidedValue Function(
     QualifiedDataType qType);
+
+Widget createClearableTextFieldSuffixIcon(
+    BuildContext context, TextEditingController controller) {
+  return InkResponse(
+    key: Key('text-clear'),
+    child: Icon(
+      MdiIcons.close,
+      color: Colors.grey,
+      size: getArgLabelTextStyle(context).fontSize * 1.5,
+    ),
+    onTap: () =>
+        WidgetsBinding.instance.addPostFrameCallback((_) => controller.clear()),
+  );
+}

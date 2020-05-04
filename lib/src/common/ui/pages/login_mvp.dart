@@ -25,7 +25,8 @@ class LoginViewModel extends BaseViewModel {
 abstract class LoginView extends BaseView {}
 
 class LoginPresenter extends BasePresenter<LoginViewModel, LoginView> {
-  LoginPresenter(ApplicationService service, LoginViewModel viewModel, LoginView view)
+  LoginPresenter(
+      ApplicationService service, LoginViewModel viewModel, LoginView view)
       : super(service, viewModel, view) {
     _init();
   }
@@ -47,19 +48,28 @@ class LoginPresenter extends BasePresenter<LoginViewModel, LoginView> {
 
   void _init() {
     _loginData = LoginData(
-      username: service.activeConnection?.username,
-      password: service.activeConnection?.password,
-      savePassword: service.activeConnection?.savePassword ?? false,
+      username: service.activeConnection.username,
+      password: service.activeConnection.password,
+      savePassword: service.activeConnection.savePassword ?? false,
     );
   }
 
   Future<void> logIn() async {
-    await service.changeActiveConnectionCredentials(
-      _loginData.username,
-      _loginData.password,
-      savePassword: _loginData.savePassword,
-    );
+    service.activeConnection
+      ..username = _loginData.username
+      ..password = _loginData.password
+      ..anonymous = false
+      ..savePassword = _loginData.savePassword;
 
-    await service.spongeService.getVersion();
+    await service.setActiveConnection(service.activeConnection.name,
+        connectSynchronously: true, forceRefresh: true);
+  }
+
+  void onCancel() {
+    service.activeConnection
+      ..username = _loginData.username
+      ..password = _loginData.password
+      ..anonymous = false
+      ..savePassword = _loginData.savePassword;
   }
 }

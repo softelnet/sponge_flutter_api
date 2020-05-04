@@ -31,7 +31,6 @@ import 'package:sponge_flutter_api/src/flutter/compatibility/type_converter.dart
 import 'package:sponge_flutter_api/src/flutter/configuration/preferences_configuration.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_sponge_service.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/pages/login_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
@@ -121,6 +120,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         await changeActiveConnectionCredentials(
           args[actionMeta.getArgIndex(usernameArg.name)],
           args[actionMeta.getArgIndex(passwordArg.name)],
+          false,
           savePassword: savePasswordArg != null
               ? args[actionMeta.getArgIndex(savePasswordArg.name)]
               : null,
@@ -134,7 +134,8 @@ class FlutterApplicationService<S extends FlutterSpongeService,
       },
       onCallError: (ActionMeta actionMeta, List args) async {
         // In case of error, set the connection to anonymous.
-        await changeActiveConnectionCredentials(null, null);
+        await changeActiveConnectionCredentials(
+            activeConnection?.username, activeConnection?.password, true);
       },
       onIsAllowed: (ActionMeta actionMeta) => !logged,
     );
@@ -143,19 +144,21 @@ class FlutterApplicationService<S extends FlutterSpongeService,
         ActionIntentHandler(
       onAfterCall: (ActionMeta actionMeta, List args,
           ActionCallResultInfo resultInfo) async {
-        await changeActiveConnectionCredentials(null, null);
+        await changeActiveConnectionCredentials(
+            activeConnection?.username, activeConnection?.password, true);
 
         await spongeService.clearActions();
         ApplicationProvider.of(mainBuildContext)
-            .updateConnection(spongeService.connection);
+            .updateConnection(spongeService.connection, force: true);
       },
       onCallError: (ActionMeta actionMeta, List args) async {
         await spongeService.clearActions();
         // In case of error, set the connection to anonymous.
-        await changeActiveConnectionCredentials(null, null);
+        await changeActiveConnectionCredentials(
+            activeConnection?.username, activeConnection?.password, true);
 
         ApplicationProvider.of(mainBuildContext)
-            .updateConnection(spongeService.connection);
+            .updateConnection(spongeService.connection, force: true);
       },
       onIsAllowed: (ActionMeta actionMeta) => logged,
     );
@@ -311,9 +314,9 @@ class FlutterApplicationService<S extends FlutterSpongeService,
 
   @override
   Future<void> changeActiveConnectionCredentials(
-      String username, String password,
+      String username, String password, bool anonymous,
       {bool savePassword}) async {
-    await super.changeActiveConnectionCredentials(username, password,
+    await super.changeActiveConnectionCredentials(username, password, anonymous,
         savePassword: savePassword);
 
     // Resubscribe.
@@ -389,29 +392,17 @@ class FlutterApplicationService<S extends FlutterSpongeService,
       BuildContext context, String connectionName) async {
     var service = ApplicationProvider.of(context).service;
 
-    var loginActionData = await service.spongeService?.findLoginAction();
-
-    if (loginActionData != null) {
-      await showActionCall(
-        context,
-        loginActionData,
-        builder: (context) => ActionCallPage(
-          actionData: loginActionData,
-          bloc: service.spongeService
-              .getActionCallBloc(loginActionData.actionMeta.name),
-          callImmediately: true,
-          showResultDialogIfNoResult: false,
-        ),
-      );
-    } else {
-      return await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) =>
-              LoginPage(connectionName: connectionName),
-          fullscreenDialog: true,
-        ),
-      );
+    if (service.activeConnection == null) {
+      return;
     }
+
+    return await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            LoginPage(connectionName: connectionName),
+        fullscreenDialog: true,
+      ),
+    );
   }
 }

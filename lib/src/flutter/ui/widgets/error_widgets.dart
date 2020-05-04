@@ -119,8 +119,8 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
   }
 }
 
-class UsernamePasswordNotSetWidget extends StatelessWidget {
-  UsernamePasswordNotSetWidget({Key key, @required this.connectionName})
+class LoginRequiredWidget extends StatelessWidget {
+  LoginRequiredWidget({Key key, @required this.connectionName})
       : super(key: key);
 
   final String connectionName;
@@ -131,13 +131,17 @@ class UsernamePasswordNotSetWidget extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: Center(
+      child: Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.all(10),
         child: Text(
           'Please tap here to login to\n$connectionName',
+          key: Key('tapToLogin'),
           style: getTapHereMessageStyle(context),
+          textAlign: TextAlign.center,
         ),
       ),
-      onTap: () async => await service.showLoginPage(context, connectionName),
+      onTap: () => service.showLoginPage(context, connectionName),
     );
   }
 }

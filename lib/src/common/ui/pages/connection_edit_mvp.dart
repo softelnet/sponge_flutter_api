@@ -18,22 +18,27 @@ import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 
 class ConnectionEditViewModel extends BaseViewModel {
-  ConnectionEditViewModel(this.originalConnection)
-      : connection = originalConnection == null
+  ConnectionEditViewModel(
+    this.originalConnection, {
+    this.credentialsRequired = false,
+  }) : connection = originalConnection == null
             ? SpongeConnection(anonymous: true)
             : SpongeConnection.of(originalConnection);
 
   final SpongeConnection originalConnection;
-  SpongeConnection connection;
+  final SpongeConnection connection;
+  final bool credentialsRequired;
 }
 
 abstract class ConnectionEditView extends BaseView {}
 
 class ConnectionEditPresenter
     extends BasePresenter<ConnectionEditViewModel, ConnectionEditView> {
-  ConnectionEditPresenter(ApplicationService service, 
+  ConnectionEditPresenter(ApplicationService service,
       ConnectionEditViewModel viewModel, ConnectionEditView view)
-      : super(service, viewModel, view);
+      : super(service, viewModel, view) {
+    viewModel.connection.url ??= SpongeServiceConstants.URL_TEMPLATE;
+  }
 
   bool busy = false;
 
@@ -44,7 +49,8 @@ class ConnectionEditPresenter
   SpongeConnection get connection => viewModel.connection;
 
   String get name => viewModel.connection.name;
-  set name(String value) => viewModel.connection.name = CommonUtils.normalizeString(value);
+  set name(String value) =>
+      viewModel.connection.name = CommonUtils.normalizeString(value);
   String validateName(String value) {
     value = value?.trim();
 
@@ -65,7 +71,8 @@ class ConnectionEditPresenter
   }
 
   String get url => viewModel.connection.url;
-  set url(String value) => viewModel.connection.url = CommonUtils.normalizeString(value);
+  set url(String value) =>
+      viewModel.connection.url = CommonUtils.normalizeString(value);
   String validateUrl(String value) => (value == null || value.isEmpty)
       ? 'The Sponge address must not be empty'
       : null;
@@ -82,18 +89,20 @@ class ConnectionEditPresenter
   String get username => viewModel.connection.username;
   set username(String value) =>
       viewModel.connection.username = CommonUtils.normalizeString(value);
-  String validateUsername(String value) =>
-      !anonymous && (value == null || value.isEmpty)
-          ? 'The user name must not be empty'
-          : null;
+  String validateUsername(String value) => viewModel.credentialsRequired &&
+          !anonymous &&
+          (value == null || value.isEmpty)
+      ? 'The username must not be empty'
+      : null;
 
   String get password => viewModel.connection.password;
   set password(String value) =>
       viewModel.connection.password = CommonUtils.normalizeString(value);
-  String validatePassword(String value) =>
-      !anonymous && (value == null || value.isEmpty)
-          ? 'The user password must not be empty'
-          : null;
+  String validatePassword(String value) => viewModel.credentialsRequired &&
+          !anonymous &&
+          (value == null || value.isEmpty)
+      ? 'The user password must not be empty'
+      : null;
 
   bool get savePassword => viewModel.connection.savePassword;
   set savePassword(bool value) => viewModel.connection.savePassword = value;

@@ -17,7 +17,6 @@ import 'package:logging/logging.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
-import 'package:sponge_flutter_api/src/common/sponge_service_constants.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/connection_edit_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
@@ -39,9 +38,21 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static const double PADDING = 10.0;
 
+  TextEditingController _nameController;
+  TextEditingController _urlController;
+  TextEditingController _networkController;
+  TextEditingController _usernameController;
+  TextEditingController _passwordController;
+
   @override
   void dispose() {
     _presenter.unbound();
+
+    _nameController?.dispose();
+    _urlController?.dispose();
+    _networkController?.dispose();
+    _usernameController?.dispose();
+    _passwordController?.dispose();
 
     super.dispose();
   }
@@ -53,6 +64,31 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
       ConnectionEditViewModel(widget.originalConnection),
       this,
     );
+
+    _nameController ??= TextEditingController(text: _presenter.name)
+      ..addListener(() {
+        _presenter.name = _nameController.text;
+      });
+
+    _urlController ??= TextEditingController(text: _presenter.url)
+      ..addListener(() {
+        _presenter.url = _urlController.text;
+      });
+
+    _networkController ??= TextEditingController(text: _presenter.network)
+      ..addListener(() {
+        _presenter.network = _networkController.text;
+      });
+
+    _usernameController ??= TextEditingController(text: _presenter.username)
+      ..addListener(() {
+        _presenter.username = _usernameController.text;
+      });
+
+    _passwordController ??= TextEditingController(text: _presenter.password)
+      ..addListener(() {
+        _presenter.password = _passwordController.text;
+      });
 
     return Scaffold(
       appBar: AppBar(
@@ -95,7 +131,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       onSaved: (String value) {
                         setState(() => _presenter.name = value);
                       },
-                      initialValue: _presenter.name,
+                      controller: _nameController,
                       validator: _presenter.validateName,
                       autofocus: !_presenter.editing,
                     ),
@@ -107,8 +143,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       onSaved: (String value) {
                         setState(() => _presenter.url = value);
                       },
-                      initialValue:
-                          _presenter.url ?? SpongeServiceConstants.URL_TEMPLATE,
+                      controller: _urlController,
                       validator: _presenter.validateUrl,
                     ),
                     _buildConnectionFieldWidget(
@@ -119,7 +154,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       onSaved: (String value) {
                         setState(() => _presenter.network = value);
                       },
-                      initialValue: _presenter.network,
+                      controller: _networkController,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: PADDING),
@@ -141,12 +176,12 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                     _buildConnectionFieldWidget(
                       key: Key('username'),
                       keyboardType: TextInputType.text,
-                      labelText: 'User name',
+                      labelText: 'Username',
                       icon: Icon(Icons.person),
                       onSaved: (String value) {
                         setState(() => _presenter.username = value);
                       },
-                      initialValue: _presenter.username,
+                      controller: _usernameController,
                       enabled: !_presenter.anonymous,
                       validator: _presenter.validateUsername,
                     ),
@@ -156,7 +191,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       labelText: 'Password',
                       icon: Icon(Icons.verified_user),
                       onSaved: (String value) => _presenter.password = value,
-                      initialValue: _presenter.password,
+                      controller: _passwordController,
                       obscureText: true,
                       enabled: !_presenter.anonymous,
                       validator: _presenter.validatePassword,
@@ -188,12 +223,12 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                   children: [
                     FlatButton(
                       onPressed: () => _saveConnection(context)
-                          .catchError((e) => handleError(context, e)),
+                          .catchError((e) => handleConnectionError(context, e)),
                       child: Text('OK', style: getButtonTextStyle(context)),
                     ),
                     FlatButton(
                       onPressed: () => _verifyConnection(context)
-                          .catchError((e) => handleError(context, e)),
+                          .catchError((e) => handleConnectionError(context, e)),
                       child: Text('VERIFY', style: getButtonTextStyle(context)),
                     ),
                     FlatButton(
@@ -215,7 +250,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
     TextInputType keyboardType,
     String labelText,
     FormFieldSetter<String> onSaved,
-    String initialValue,
+    TextEditingController controller,
     FormFieldValidator<String> validator,
     Widget icon,
     bool obscureText = false,
@@ -230,9 +265,10 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           labelText: labelText,
+          suffixIcon: createClearableTextFieldSuffixIcon(context, controller),
         ),
         onSaved: onSaved,
-        initialValue: initialValue,
+        controller: controller,
         validator: validator,
         obscureText: obscureText,
         enabled: enabled,

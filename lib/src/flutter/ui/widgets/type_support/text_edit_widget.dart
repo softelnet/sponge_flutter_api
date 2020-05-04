@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
@@ -87,17 +86,7 @@ class _TextEditWidgetState extends State<TextEditWidget> {
           : null,
       hintText: editorContext.hintText,
       suffixIcon: editorContext.enabled && !editorContext.readOnly
-          ? InkResponse(
-              key: Key('text-clear'),
-              child: Icon(
-                MdiIcons.close,
-                //Icons.cancel,
-                color: Colors.grey,
-                size:
-                    getArgLabelTextStyle(editorContext.context).fontSize * 1.5,
-              ),
-              onTap: () => WidgetsBinding.instance
-                  .addPostFrameCallback((_) => _controller.clear()))
+          ? createClearableTextFieldSuffixIcon(context, _controller)
           : null,
     );
 

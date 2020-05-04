@@ -192,9 +192,10 @@ abstract class ApplicationService<S extends SpongeService,
   bool get hasConnections => _connectionsConfiguration.hasConnections;
 
   Future<void> setActiveConnection(String connectionName,
-      {bool forceRefresh = false}) async {
+      {bool connectSynchronously = true, bool forceRefresh = false}) async {
     await _connectionsConfiguration.setActiveConnection(connectionName);
-    await _setupActiveConnection(connectionName, forceRefresh: forceRefresh);
+    await _setupActiveConnection(connectionName,
+        connectSynchronously: connectSynchronously, forceRefresh: forceRefresh);
   }
 
   Future<void> clearSettings() async {
@@ -223,12 +224,13 @@ abstract class ApplicationService<S extends SpongeService,
       .getConnection(_connectionsConfiguration.getActiveConnectionName());
 
   Future<void> changeActiveConnectionCredentials(
-      String username, String password, {bool savePassword}) async {
+      String username, String password, bool anonymous,
+      {bool savePassword}) async {
     var connection = activeConnection;
     connection
       ..username = username
       ..password = password
-      ..anonymous = username == null;
+      ..anonymous = anonymous;
 
     if (savePassword != null) {
       connection.savePassword = savePassword;
@@ -239,8 +241,8 @@ abstract class ApplicationService<S extends SpongeService,
     _spongeService.connection.setFrom(connection);
 
     _spongeService.client.configuration
-      ..username = connection.username
-      ..password = connection.password;
+      ..username = connection.anonymous ? null : connection.username
+      ..password = connection.anonymous ? null : connection.password;
 
     await _spongeService.client.clearSession();
   }
