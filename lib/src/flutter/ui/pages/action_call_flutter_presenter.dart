@@ -128,5 +128,14 @@ class FlutterActionCallPresenter extends ActionCallPresenter
 
   void rebindActionData(ActionData target) {
     target.rebind(actionData);
+
+    if (anyArgSavedOrUpdated) {
+      if (callImmediately) {
+        target.resultInfo = actionData.resultInfo;
+      } else {
+        target.resultInfo = null;
+        bloc.clear();
+      }
+    }
   }
 }

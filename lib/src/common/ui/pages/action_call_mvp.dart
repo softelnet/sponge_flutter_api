@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
@@ -40,7 +41,10 @@ class ActionCallPresenter
     extends BasePresenter<ActionCallViewModel, ActionCallView> {
   ActionCallPresenter(ApplicationService service, ActionCallViewModel viewModel,
       ActionCallView view)
-      : super(service, viewModel, view);
+      : super(service, viewModel, view) {
+    // Use a copy of the action data.
+    viewModel.actionData = viewModel.actionData.clone();
+  }
 
   bool busy = false;
   bool get callable => actionMeta.callable ?? true;
@@ -53,9 +57,20 @@ class ActionCallPresenter
 
   String _title;
 
+  ActionCallBloc _bloc;
+  ActionCallBloc get bloc => _bloc;
+
+  bool _callImmediately;
+  bool get callImmediately => _callImmediately;
+
   dynamic error;
 
-  void init({bool verifyIsActive = true, String title}) {
+  void init({
+    @required bool verifyIsActive,
+    @required String title,
+    @required ActionCallBloc bloc,
+    @required bool callImmediately,
+  }) {
     var postFrameRefreshCallback =
         () => WidgetsBinding.instance.addPostFrameCallback(
               (_) => view.refreshArgs(
@@ -80,6 +95,8 @@ class ActionCallPresenter
     _session.open();
 
     _title = title;
+    _bloc = bloc;
+    _callImmediately = callImmediately;
   }
 
   void ensureRunning() {

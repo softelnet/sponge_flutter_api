@@ -72,6 +72,7 @@ export 'src/flutter/ui/type_gui_provider/default_type_gui_provider.dart';
 export 'src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 export 'src/flutter/ui/type_gui_provider/type_gui_providers_utils.dart';
 export 'src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
+export 'src/flutter/ui/util/action_call_utils.dart';
 export 'src/flutter/ui/util/drawing_utils.dart';
 export 'src/flutter/ui/util/gui_utils.dart';
 export 'src/flutter/ui/util/model_gui_utils.dart';
