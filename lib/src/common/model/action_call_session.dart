@@ -312,14 +312,14 @@ class ActionCallSession {
         yield* _provideArgs((qType) => !_providedArgs.containsKey(qType.path));
 
         if (_isRefreshAllowedProvidedArgsPending) {
-          // TODO Errors aren't propagated to GUI.
+          // TODO refreshAllowedProvidedArgs errors aren't propagated to GUI.
           await refreshAllowedProvidedArgsSilently(supressErrors: true);
 
           yield ProvideActionArgsStateAfterInvocation();
         }
         break;
       case ProvideActionArgsDemand.refreshAllowedProvidedArgs:
-        // TODO Errors aren't propagated to GUI.
+        // TODO refreshAllowedProvidedArgs errors aren't propagated to GUI.
         await refreshAllowedProvidedArgsSilently(supressErrors: true);
 
         yield ProvideActionArgsStateAfterInvocation();
@@ -397,6 +397,8 @@ class ActionCallSession {
   bool activate(QualifiedDataType qType, value) {
     if ((qType.type.provided?.submittable != null) && qType.path != null) {
       _argsToSubmit[qType.path] = value;
+      _provideArgsBloc.provideArgs();
+
       return true;
     }
 
@@ -566,12 +568,12 @@ class ActionCallSession {
       _eventSubscription = spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
         if (await _isRunningAndActive()) {
-          provideArgsBloc.refreshAllowedProvidedArgs();
+          _provideArgsBloc.refreshAllowedProvidedArgs();
         }
       }, onError: (e) async {
         if (await _isRunningAndActive()) {
           _logger.severe('Event subscription error', e);
-          provideArgsBloc.refreshAllowedProvidedArgs();
+          _provideArgsBloc.refreshAllowedProvidedArgs();
         }
       });
     }
@@ -591,7 +593,7 @@ class ActionCallSession {
 
       _isRefreshAllowedProvidedArgsPending = true;
 
-      provideArgsBloc.refreshAllowedProvidedArgs();
+      _provideArgsBloc.refreshAllowedProvidedArgs();
 
       _initEventSubscription();
     }

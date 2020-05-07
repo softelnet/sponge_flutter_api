@@ -248,10 +248,12 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
       ApplicationProvider.of(context)
           .updateConnection(connection, refresh: false);
-    } finally {
+    } catch (e) {
       setState(() {
         _presenter.busy = false;
       });
+
+      rethrow;
     }
 
     if (activated) {

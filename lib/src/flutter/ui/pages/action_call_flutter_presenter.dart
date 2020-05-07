@@ -42,9 +42,7 @@ class FlutterActionCallPresenter extends ActionCallPresenter
 
   @override
   void onActivate(QualifiedDataType qType, value) {
-    if (session.activate(qType, value)) {
-      provideArgsBloc.provideArgs();
-    }
+    session.activate(qType, value);
   }
 
   @override

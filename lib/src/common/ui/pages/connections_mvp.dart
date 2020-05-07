@@ -33,7 +33,8 @@ abstract class ConnectionsView extends BaseView {
 
 class ConnectionsPresenter
     extends BasePresenter<ConnectionsViewModel, ConnectionsView> {
-  ConnectionsPresenter(ApplicationService service, ConnectionsViewModel viewModel, ConnectionsView view)
+  ConnectionsPresenter(ApplicationService service,
+      ConnectionsViewModel viewModel, ConnectionsView view)
       : super(service, viewModel, view);
 
   bool busy = false;
@@ -59,16 +60,13 @@ class ConnectionsPresenter
       service.isConnectionActive(connectionName);
 
   Future<bool> toggleActiveConnection(SpongeConnection connection) async {
-    if (connection != null) {
-      viewModel.activeConnectionName =
-          viewModel.activeConnectionName != connection.name
-              ? connection.name
-              : null;
-    }
+    bool activate = viewModel.activeConnectionName != connection.name;
+
+    viewModel.activeConnectionName = activate ? connection.name : null;
 
     await service.setActiveConnection(viewModel.activeConnectionName);
 
-    return viewModel.activeConnectionName == connection.name;
+    return activate;
   }
 
   Future<void> _commitData() async {
