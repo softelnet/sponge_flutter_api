@@ -52,6 +52,7 @@ class ProvideActionArgsBloc
 
   void provideArgs() => add(ProvideActionArgsDemand.provideArgs);
 
+  // Emits a state in the provide args BLoC.
   void refreshAllowedProvidedArgs() =>
       add(ProvideActionArgsDemand.refreshAllowedProvidedArgs);
 }
@@ -312,14 +313,14 @@ class ActionCallSession {
 
         if (_isRefreshAllowedProvidedArgsPending) {
           // TODO Errors aren't propagated to GUI.
-          await refreshAllowedProvidedArgs(supressErrors: true);
+          await refreshAllowedProvidedArgsSilently(supressErrors: true);
 
           yield ProvideActionArgsStateAfterInvocation();
         }
         break;
       case ProvideActionArgsDemand.refreshAllowedProvidedArgs:
         // TODO Errors aren't propagated to GUI.
-        await refreshAllowedProvidedArgs(supressErrors: true);
+        await refreshAllowedProvidedArgsSilently(supressErrors: true);
 
         yield ProvideActionArgsStateAfterInvocation();
 
@@ -327,7 +328,9 @@ class ActionCallSession {
     }
   }
 
-  Future<bool> refreshAllowedProvidedArgs({bool supressErrors = false}) async {
+  // Doesn't emit any state in the provide args BLoC.
+  Future<bool> refreshAllowedProvidedArgsSilently(
+      {bool supressErrors = false}) async {
     _isRefreshAllowedProvidedArgsPending = false;
 
     await _provideArgs((qType) => _isArgForRefreshAllowedProvidedArgs(qType),

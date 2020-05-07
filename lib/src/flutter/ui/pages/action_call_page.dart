@@ -336,10 +336,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   @override
-  Future<void> refreshArgs({
-    bool modal = true,
-    bool showDialogOnError,
-  }) async {
+  Future<void> refreshArgs() async {
     if (!mounted) {
       return;
     }
@@ -347,13 +344,11 @@ class _ActionCallPageState extends State<ActionCallPage>
     await doInCallbackAsync(
       context,
       () async {
-        if (modal) {
-          setState(() {
-            _presenter.busy = true;
-          });
-        }
+        setState(() {
+          _presenter.busy = true;
+        });
         try {
-          await _refreshArgs();
+          await _presenter.refreshAllowedProvidedArgsSilently();
         } finally {
           if (mounted) {
             setState(() {
@@ -362,15 +357,10 @@ class _ActionCallPageState extends State<ActionCallPage>
           }
         }
       },
-      showDialogOnError:
-          (showDialogOnError ?? true) && _presenter.error == null,
+      showDialogOnError: _presenter.error == null,
       logStackTrace: _presenter.error == null,
       rethrowError: false,
     );
-  }
-
-  Future<void> _refreshArgs() async {
-    await _presenter.refreshAllowedProvidedArgs();
   }
 
   @override
@@ -416,7 +406,7 @@ class _ActionCallPageState extends State<ActionCallPage>
         await showErrorDialog(context, error);
       }
 
-      await _refreshArgs();
+      await _presenter.refreshAllowedProvidedArgsSilently();
     } finally {
       setState(() {
         _presenter.busy = false;

@@ -29,8 +29,7 @@ class ActionCallViewModel extends BaseViewModel {
 }
 
 abstract class ActionCallView extends BaseView {
-  // TODO Is refreshArgs necessary?
-  Future<void> refreshArgs({bool modal, bool showDialogOnError});
+  Future<void> refreshArgs();
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
   Future<void> onAfterSubActionCall(ActionCallState state);
@@ -90,9 +89,8 @@ class ActionCallPresenter
 
   ProvideActionArgsBloc get provideArgsBloc => _session.provideArgsBloc;
 
-  // TODO Is refreshAllowedProvidedArgs necessary?
-  Future<bool> refreshAllowedProvidedArgs() async =>
-      await _session.refreshAllowedProvidedArgs();
+  Future<bool> refreshAllowedProvidedArgsSilently() async =>
+      await _session.refreshAllowedProvidedArgsSilently();
 
   String get connectionName => service.spongeService?.connection?.name;
 
