@@ -241,8 +241,10 @@ class _ConnectionsPageState extends State<ConnectionsPage>
       _presenter.busy = true;
     });
 
+    bool activated = false;
+
     try {
-      await _presenter.toggleActiveConnection(connection);
+      activated = await _presenter.toggleActiveConnection(connection);
 
       ApplicationProvider.of(context)
           .updateConnection(connection, refresh: false);
@@ -250,6 +252,10 @@ class _ConnectionsPageState extends State<ConnectionsPage>
       setState(() {
         _presenter.busy = false;
       });
+    }
+
+    if (activated) {
+      Navigator.pop(context);
     }
   }
 

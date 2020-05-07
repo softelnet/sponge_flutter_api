@@ -58,7 +58,7 @@ class ConnectionsPresenter
   bool isConnectionActive(String connectionName) =>
       service.isConnectionActive(connectionName);
 
-  Future<void> toggleActiveConnection(SpongeConnection connection) async {
+  Future<bool> toggleActiveConnection(SpongeConnection connection) async {
     if (connection != null) {
       viewModel.activeConnectionName =
           viewModel.activeConnectionName != connection.name
@@ -67,6 +67,8 @@ class ConnectionsPresenter
     }
 
     await service.setActiveConnection(viewModel.activeConnectionName);
+
+    return viewModel.activeConnectionName == connection.name;
   }
 
   Future<void> _commitData() async {
