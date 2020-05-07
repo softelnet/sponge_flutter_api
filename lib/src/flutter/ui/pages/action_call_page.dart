@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
+import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
@@ -153,22 +155,22 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   Widget _buildProvideArgsWidget(BuildContext context) {
     return _presenter.hasProvidedArgs
-        ? StreamBuilder<ProvideActionArgsState>(
-            stream: _presenter.provideArgs(),
-            builder: (context, snapshot) {
+        ? BlocBuilder<ProvideActionArgsBloc, ProvideActionArgsState>(
+            bloc: _presenter.provideArgsBloc,
+            builder: (BuildContext context, ProvideActionArgsState state) {
               _presenter.error = null;
-              if (snapshot.hasData) {
-                return _buildActionCallWidget(context, snapshot.data);
-              } else if (snapshot.hasError) {
-                _presenter.error = snapshot.error;
+              if (state is ProvideActionArgsStateInitialize) {
+                return Center(child: CircularProgressIndicator());
+              } else if (state is ProvideActionArgsStateError) {
+                _presenter.error = state.error;
                 return Center(
                   child: NotificationPanelWidget(
-                    notification: snapshot.error,
+                    notification: state.error,
                     type: NotificationPanelType.error,
                   ),
                 );
               } else {
-                return Center(child: CircularProgressIndicator());
+                return _buildActionCallWidget(context, state);
               }
             },
           )
@@ -289,7 +291,7 @@ class _ActionCallPageState extends State<ActionCallPage>
       _presenter.actionData.argsAsRecord,
       readOnly: widget.readOnly,
       enabled: true,
-      loading: state != null ? state.loading : [],
+      loading: state?.loading ?? [],
       rootRecordSingleLeadingField:
           ModelUtils.getRootRecordSingleLeadingFieldByAction(
                   _presenter.actionData)
@@ -390,9 +392,6 @@ class _ActionCallPageState extends State<ActionCallPage>
       });
     });
   }
-
-  @override
-  void refresh() => setState(() {});
 
   @override
   Future<void> onBeforeSubActionCall() async {

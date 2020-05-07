@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
-import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
@@ -30,7 +29,7 @@ class ActionCallViewModel extends BaseViewModel {
 }
 
 abstract class ActionCallView extends BaseView {
-  void refresh();
+  // TODO Is refreshArgs necessary?
   Future<void> refreshArgs({bool modal, bool showDialogOnError});
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
@@ -71,23 +70,9 @@ class ActionCallPresenter
     @required ActionCallBloc bloc,
     @required bool callImmediately,
   }) {
-    var postFrameRefreshCallback =
-        () => WidgetsBinding.instance.addPostFrameCallback(
-              (_) => view.refreshArgs(
-                modal: false,
-                showDialogOnError: false,
-              ),
-            );
     _session = ActionCallSession(
       service.spongeService,
       viewModel.actionData,
-      onEventReceived: (event) => view.refreshArgs(
-        modal: false,
-        // TODO Is preventing error dialog in an event subscription OK? Maybe a snackbar should be shown.
-        showDialogOnError: false,
-      ),
-      onEventError: postFrameRefreshCallback,
-      onEventSubscriptionRenew: postFrameRefreshCallback,
       defaultPageableListPageSize: service.settings.defaultPageableListPageSize,
       verifyIsActive: verifyIsActive,
     );
@@ -103,10 +88,9 @@ class ActionCallPresenter
     _session.ensureRunning();
   }
 
-  Stream<ProvideActionArgsState> provideArgs() async* {
-    yield* _session.provideArgs();
-  }
+  ProvideActionArgsBloc get provideArgsBloc => _session.provideArgsBloc;
 
+  // TODO Is refreshAllowedProvidedArgs necessary?
   Future<bool> refreshAllowedProvidedArgs() async =>
       await _session.refreshAllowedProvidedArgs();
 
@@ -170,7 +154,7 @@ class ActionCallPresenter
       QualifiedDataType qType, dynamic value, bool refreshView) {
     if (_session.saveOrUpdate(qType, value)) {
       if (refreshView) {
-        view.refresh();
+        provideArgsBloc.provideArgs();
       }
     }
   }

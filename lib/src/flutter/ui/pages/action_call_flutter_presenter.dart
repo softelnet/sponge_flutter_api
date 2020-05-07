@@ -43,7 +43,7 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   @override
   void onActivate(QualifiedDataType qType, value) {
     if (session.activate(qType, value)) {
-      view.refresh();
+      provideArgsBloc.provideArgs();
     }
   }
 
@@ -56,7 +56,7 @@ class FlutterActionCallPresenter extends ActionCallPresenter
       session.shouldBeEnabled(qType);
 
   @override
-  Future<void> onRefresh() async => view.refresh();
+  Future<void> onRefresh() async => provideArgsBloc.provideArgs();
 
   @override
   Future<void> onRefreshArgs() async {

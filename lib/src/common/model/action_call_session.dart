@@ -14,9 +14,10 @@
 
 import 'dart:async';
 
-import 'package:collection/collection.dart';
+import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:pedantic/pedantic.dart';
+import 'package:meta/meta.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
@@ -27,19 +28,41 @@ import 'package:sponge_grpc_client_dart/sponge_grpc_client_dart.dart';
 typedef ProvideArgsFilterCallback = bool Function(QualifiedDataType qType);
 typedef OnEventReceivedCallback = FutureOr<void> Function(RemoteEvent event);
 
+enum ProvideActionArgsDemand { provideArgs, refreshAllowedProvidedArgs }
+
+class ProvideActionArgsBloc
+    extends Bloc<ProvideActionArgsDemand, ProvideActionArgsState> {
+  ProvideActionArgsBloc({
+    @required ActionCallSession session,
+    ProvideActionArgsState initialState,
+  })  : _session = session,
+        _initialState = initialState ?? ProvideActionArgsStateInitialize();
+
+  final ActionCallSession _session;
+  final ProvideActionArgsState _initialState;
+
+  @override
+  ProvideActionArgsState get initialState => _initialState;
+
+  @override
+  Stream<ProvideActionArgsState> mapEventToState(
+      ProvideActionArgsDemand demand) {
+    return _session.provideArgs(demand);
+  }
+
+  void provideArgs() => add(ProvideActionArgsDemand.provideArgs);
+
+  void refreshAllowedProvidedArgs() =>
+      add(ProvideActionArgsDemand.refreshAllowedProvidedArgs);
+}
+
 class ActionCallSession {
   ActionCallSession(
     this.spongeService,
     this.actionData, {
-    OnEventReceivedCallback onEventReceived,
-    VoidFutureOrCallback onEventError,
-    VoidFutureOrCallback onEventSubscriptionRenew,
     int defaultPageableListPageSize,
     bool verifyIsActive,
-  })  : _onEventReceived = onEventReceived,
-        _onEventError = onEventError,
-        _onEventSubscriptionRenew = onEventSubscriptionRenew,
-        _defaultPageableListPageSize = defaultPageableListPageSize ?? 20,
+  })  : _defaultPageableListPageSize = defaultPageableListPageSize ?? 20,
         _verifyIsActive = verifyIsActive ?? true;
 
   static final Logger _logger = Logger('ActionCallSession');
@@ -56,6 +79,9 @@ class ActionCallSession {
   final bool _verifyIsActive;
   bool _isActive;
 
+  ProvideActionArgsBloc _provideArgsBloc;
+  ProvideActionArgsBloc get provideArgsBloc => _provideArgsBloc;
+
   bool _initialProvideArgs = true;
   Map<String, ProvidedValue> _providedArgs;
 
@@ -64,9 +90,6 @@ class ActionCallSession {
   bool _anyArgSavedOrUpdated = false;
   bool get anyArgSavedOrUpdated => _anyArgSavedOrUpdated;
 
-  final OnEventReceivedCallback _onEventReceived;
-  final VoidFutureOrCallback _onEventError;
-  final VoidFutureOrCallback _onEventSubscriptionRenew;
   List<String> _refreshEvents;
   ClientSubscription _eventSubscription;
 
@@ -87,6 +110,11 @@ class ActionCallSession {
     _initEventSubscription();
 
     _dependencies = ActionArgDependencies(actionData)..rebuild();
+
+    _provideArgsBloc = ProvideActionArgsBloc(session: this);
+
+    // Initially provide args.
+    _provideArgsBloc.provideArgs();
 
     _running = true;
   }
@@ -141,116 +169,123 @@ class ActionCallSession {
   Stream<ProvideActionArgsState> _provideArgs(
     ProvideArgsFilterCallback filter, {
     Map<String, Map<String, Object>> argFeatures,
+    bool errorsAsStates = true,
   }) async* {
-    _dependencies.rebuild();
-
-    _logger
-        .finest('Reverse dependencies: ${_dependencies.reverseDependencies}');
-
-    argFeatures ??= {};
-
-    List<String> namesToProvide;
-
-    bool emitted = false;
-    // Try to get all available provided values including that with dependencies.
-    while (true) {
-      var newNamesToProvide = <String>[];
-
-      _getQualifiedTypes().forEach((qType) {
-        if (DataTypeUtils.isProvidedRead(qType.type) &&
-            _dependencies.hasDependenciesResolved(qType,
-                unresolvedPaths: newNamesToProvide) &&
-            qType.type.provided.mode != ProvidedMode.IMPLICIT &&
-            filter(qType)) {
-          if (qType.path != null) {
-            newNamesToProvide.add(qType.path);
-          }
-        }
-      });
-
-      if ((newNamesToProvide.isEmpty ||
-              ListEquality().equals(newNamesToProvide, namesToProvide)) &&
-          _argsToSubmit.isEmpty) {
-        if (!emitted) {
-          yield ProvideActionArgsStateNoInvocation();
-        }
-
-        return;
-      }
-
-      // Set pageable info if necessary.
-      _setupPageableListsFeatures(newNamesToProvide, argFeatures);
-
-      namesToProvide = newNamesToProvide;
-
-      Set<String> currentNames = namesToProvide.expand((argName) {
-        var arg = actionData.getArgType(argName);
-
-        return arg.provided.current
-            ? arg.provided.dependencies + [argName]
-            : arg.provided.dependencies;
-      }).toSet()
-        ..addAll(_getCurrentArgNamesForSubmit());
-
-      // Save a copy and clear the original before a network call.
-      var actualArgsToSubmit = Map.of(_argsToSubmit);
-      _argsToSubmit.clear();
-
-      // TODO The predefined doesn't support Dynamic values.
-      var current =
-          actionData.getArgMap(currentNames, predefined: actualArgsToSubmit);
-      var dynamicTypes = actionData.getDynamicTypeNestedTypes(
-          List.of(namesToProvide)..addAll(currentNames));
-
-      // Arguments influenced by the submitted arguments (their values can be provided not explicitly).
-      var influencedBySummitted = actualArgsToSubmit.keys
-          .expand((submit) =>
-              actionData.getArgType(submit).provided.submittable.influences)
-          .toList();
-
-      var loading = namesToProvide + influencedBySummitted;
-
-      yield ProvideActionArgsStateBeforeInvocation(loading: loading);
-
-      _logger.finer(
-          'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, argFeatures: $argFeatures, loading: $loading');
-
-      Map<String, ProvidedValue> newProvidedArgs =
-          await spongeService.client.provideActionArgs(
-        actionData.actionMeta.name,
-        provide: namesToProvide,
-        submit: List.of(actualArgsToSubmit.keys),
-        current: current,
-        dynamicTypes: dynamicTypes,
-        argFeatures: argFeatures,
-        initial: _initialProvideArgs,
-      );
-
-      _initialProvideArgs = false;
-
-      _logger.finest('\t-> provided: ${newProvidedArgs.keys}');
-
-      _providedArgs.addAll(newProvidedArgs);
-
-      // Update provided values in the ActionData as well.
-      actionData.providedValues.addAll(newProvidedArgs);
-
-      var preserveDependencies = Set.of(newProvidedArgs.keys);
-      newProvidedArgs.forEach((name, argValue) {
-        var argType = actionData.getArgType(name);
-        if (argType.provided != null && (argValue?.valuePresent ?? false)) {
-          _setArg(name, argValue.value,
-              preserveDependencies: preserveDependencies);
-        }
-      });
-
+    try {
       _dependencies.rebuild();
 
-      // Update pageable lists.
-      _updatePageableLists(newProvidedArgs);
+      argFeatures ??= {};
 
-      yield ProvideActionArgsStateAfterInvocation();
-      emitted = true;
+      Set<String> namesProvided = {};
+
+      bool stateEmitted = false;
+      // Try to get all available provided values including that with dependencies.
+      while (true) {
+        var namesToProvide = <String>[];
+
+        _getQualifiedTypes().forEach((qType) {
+          if (!namesProvided.contains(qType.path) &&
+              DataTypeUtils.isProvidedRead(qType.type) &&
+              _dependencies.hasDependenciesResolved(qType,
+                  unresolvedPaths: namesToProvide) &&
+              qType.type.provided.mode != ProvidedMode.IMPLICIT &&
+              filter(qType)) {
+            if (qType.path != null) {
+              namesToProvide.add(qType.path);
+            }
+          }
+        });
+
+        if (namesToProvide.isEmpty && _argsToSubmit.isEmpty) {
+          if (!stateEmitted) {
+            yield ProvideActionArgsStateNoInvocation();
+          }
+
+          return;
+        }
+
+        // Set pageable info if necessary.
+        _setupPageableListsFeatures(namesToProvide, argFeatures);
+
+        Set<String> currentNames = namesToProvide.expand((argName) {
+          var arg = actionData.getArgType(argName);
+
+          return arg.provided.current
+              ? arg.provided.dependencies + [argName]
+              : arg.provided.dependencies;
+        }).toSet()
+          ..addAll(_getCurrentArgNamesForSubmit());
+
+        // Save a copy and clear the original before a network call.
+        var actualArgsToSubmit = Map.of(_argsToSubmit);
+        _argsToSubmit.clear();
+
+        // TODO The predefined doesn't support Dynamic values.
+        var current =
+            actionData.getArgMap(currentNames, predefined: actualArgsToSubmit);
+        var dynamicTypes = actionData.getDynamicTypeNestedTypes(
+            List.of(namesToProvide)..addAll(currentNames));
+
+        // Arguments influenced by the submitted arguments (their values can be provided not explicitly).
+        var influencedBySummitted = actualArgsToSubmit.keys
+            .expand((submit) =>
+                actionData.getArgType(submit).provided.submittable.influences)
+            .toList();
+
+        var loading = namesToProvide + influencedBySummitted;
+
+        yield ProvideActionArgsStateBeforeInvocation(loading: loading);
+
+        _logger.finer(
+            'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, argFeatures: $argFeatures, loading: $loading');
+
+        Map<String, ProvidedValue> newProvidedArgs =
+            await spongeService.client.provideActionArgs(
+          actionData.actionMeta.name,
+          provide: namesToProvide,
+          submit: List.of(actualArgsToSubmit.keys),
+          current: current,
+          dynamicTypes: dynamicTypes,
+          argFeatures: argFeatures,
+          initial: _initialProvideArgs,
+        );
+
+        _initialProvideArgs = false;
+
+        _logger.finest('\t-> provided: ${newProvidedArgs.keys}');
+
+        _providedArgs.addAll(newProvidedArgs);
+
+        // Update provided values in the ActionData as well.
+        actionData.providedValues.addAll(newProvidedArgs);
+
+        var preserveDependencies = Set.of(newProvidedArgs.keys);
+        newProvidedArgs.forEach((name, argValue) {
+          namesProvided.add(name);
+
+          var argType = actionData.getArgType(name);
+          if (argType.provided != null && (argValue?.valuePresent ?? false)) {
+            _setArg(name, argValue.value,
+                preserveDependencies: preserveDependencies);
+          }
+        });
+
+        _dependencies.rebuild();
+
+        // Update pageable lists.
+        _updatePageableLists(newProvidedArgs);
+
+        yield ProvideActionArgsStateAfterInvocation();
+        stateEmitted = true;
+      }
+    } catch (e) {
+      _logger.severe('Provide args error', e);
+
+      if (errorsAsStates) {
+        yield ProvideActionArgsStateError(e);
+      } else {
+        rethrow;
+      }
     }
   }
 
@@ -269,20 +304,34 @@ class ActionCallSession {
   bool _isArgForRefreshAllowedProvidedArgs(QualifiedDataType qType) =>
       qType.type.readOnly || qType.type.provided.overwrite;
 
-  Stream<ProvideActionArgsState> provideArgs() async* {
-    yield* _provideArgs((qType) => !_providedArgs.containsKey(qType.path));
+  Stream<ProvideActionArgsState> provideArgs(
+      ProvideActionArgsDemand demand) async* {
+    switch (demand) {
+      case ProvideActionArgsDemand.provideArgs:
+        yield* _provideArgs((qType) => !_providedArgs.containsKey(qType.path));
 
-    if (_isRefreshAllowedProvidedArgsPending) {
-      await refreshAllowedProvidedArgs();
+        if (_isRefreshAllowedProvidedArgsPending) {
+          // TODO Errors aren't propagated to GUI.
+          await refreshAllowedProvidedArgs(supressErrors: true);
 
-      yield ProvideActionArgsStateAfterInvocation();
+          yield ProvideActionArgsStateAfterInvocation();
+        }
+        break;
+      case ProvideActionArgsDemand.refreshAllowedProvidedArgs:
+        // TODO Errors aren't propagated to GUI.
+        await refreshAllowedProvidedArgs(supressErrors: true);
+
+        yield ProvideActionArgsStateAfterInvocation();
+
+        break;
     }
   }
 
-  Future<bool> refreshAllowedProvidedArgs() async {
+  Future<bool> refreshAllowedProvidedArgs({bool supressErrors = false}) async {
     _isRefreshAllowedProvidedArgsPending = false;
 
-    await _provideArgs((qType) => _isArgForRefreshAllowedProvidedArgs(qType))
+    await _provideArgs((qType) => _isArgForRefreshAllowedProvidedArgs(qType),
+            errorsAsStates: supressErrors)
         .drain();
 
     return true;
@@ -304,6 +353,8 @@ class ActionCallSession {
     spongeService.getActionCallBloc(actionMeta.name)?.clear();
 
     _anyArgSavedOrUpdated = true;
+
+    _provideArgsBloc.provideArgs();
   }
 
   List<QualifiedDataType> _getQualifiedTypes() {
@@ -512,12 +563,12 @@ class ActionCallSession {
       _eventSubscription = spongeService.grpcClient.subscribe(_refreshEvents);
       _eventSubscription.eventStream.listen((event) async {
         if (await _isRunningAndActive()) {
-          unawaited(_onEventReceived?.call(event));
+          provideArgsBloc.refreshAllowedProvidedArgs();
         }
       }, onError: (e) async {
         if (await _isRunningAndActive()) {
           _logger.severe('Event subscription error', e);
-          unawaited(_onEventError?.call());
+          provideArgsBloc.refreshAllowedProvidedArgs();
         }
       });
     }
@@ -537,7 +588,7 @@ class ActionCallSession {
 
       _isRefreshAllowedProvidedArgsPending = true;
 
-      _onEventSubscriptionRenew?.call();
+      provideArgsBloc.refreshAllowedProvidedArgs();
 
       _initEventSubscription();
     }

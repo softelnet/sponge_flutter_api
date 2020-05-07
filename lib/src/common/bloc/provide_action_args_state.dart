@@ -22,6 +22,8 @@ class ProvideActionArgsState {
   final List<String> loading;
 }
 
+class ProvideActionArgsStateInitialize extends ProvideActionArgsState {}
+
 class ProvideActionArgsStateBeforeInvocation extends ProvideActionArgsState {
   ProvideActionArgsStateBeforeInvocation({
     @required List<String> loading,
@@ -31,3 +33,9 @@ class ProvideActionArgsStateBeforeInvocation extends ProvideActionArgsState {
 class ProvideActionArgsStateAfterInvocation extends ProvideActionArgsState {}
 
 class ProvideActionArgsStateNoInvocation extends ProvideActionArgsState {}
+
+class ProvideActionArgsStateError extends ProvideActionArgsState {
+  ProvideActionArgsStateError(this.error);
+
+  final dynamic error;
+}
