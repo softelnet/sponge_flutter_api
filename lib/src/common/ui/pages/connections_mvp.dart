@@ -33,13 +33,14 @@ abstract class ConnectionsView extends BaseView {
 
 class ConnectionsPresenter
     extends BasePresenter<ConnectionsViewModel, ConnectionsView> {
-  ConnectionsPresenter(ApplicationService service,
-      ConnectionsViewModel viewModel, ConnectionsView view)
-      : super(service, viewModel, view);
+  ConnectionsPresenter(ApplicationService service, ConnectionsView view)
+      : super(service, ConnectionsViewModel(), view) {
+    _init();
+  }
 
   bool busy = false;
 
-  void refreshModel() {
+  void _init() {
     viewModel.connections = service.connectionsConfiguration.getConnections();
     viewModel.activeConnectionName =
         service.connectionsConfiguration.getActiveConnectionName();
@@ -141,5 +142,20 @@ class ConnectionsPresenter
       viewModel.connections.addAll(connections);
       await _commitData();
     }
+  }
+
+  Future<void> clearConnections() async {
+    await service.clearConnections();
+    _init();
+  }
+
+  Future<void> updateDefaultConnections() async {
+    await service.updateDefaultConnections();
+    
+    // Refresh the local model.
+    _init();
+
+    // Resort connections.
+    await _commitData();
   }
 }

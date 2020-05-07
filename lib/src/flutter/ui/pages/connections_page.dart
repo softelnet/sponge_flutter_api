@@ -53,11 +53,8 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   Widget build(BuildContext context) {
     _presenter ??= ConnectionsPresenter(
       ApplicationProvider.of(context).service,
-      ConnectionsViewModel(),
       this,
     );
-
-    _presenter.refreshModel();
 
     return Scaffold(
       appBar: AppBar(
@@ -172,13 +169,10 @@ class _ConnectionsPageState extends State<ConnectionsPage>
                     !service.settings.filterConnectionsByNetwork);
                 setState(() {});
                 break;
-              case 'refreshConnections':
-                setState(() {});
-                break;
               case 'updateDefaultConnections':
                 setState(() => _presenter.busy = true);
                 try {
-                  await _presenter.service.updateDefaultConnections();
+                  await _presenter.updateDefaultConnections();
                 } finally {
                   setState(() => _presenter.busy = false);
                 }
@@ -202,15 +196,6 @@ class _ConnectionsPageState extends State<ConnectionsPage>
                 icon: Icons.filter_list,
                 text: 'Filter by network',
                 isOn: service.settings.filterConnectionsByNetwork,
-              ),
-            ),
-          if (widget.onGetNetworkStatus != null)
-            PopupMenuItem<String>(
-              key: Key('refreshConnections'),
-              value: 'refreshConnections',
-              child: IconTextPopupMenuItemWidget(
-                icon: Icons.refresh,
-                text: 'Refresh connections',
               ),
             ),
           if (widget.onGetNetworkStatus != null) PopupMenuDivider(),
@@ -237,9 +222,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
   }
 
   Future<void> _toggleActiveConnection(SpongeConnection connection) async {
-    setState(() {
-      _presenter.busy = true;
-    });
+    setState(() => _presenter.busy = true);
 
     bool activated = false;
 
@@ -248,12 +231,10 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
       ApplicationProvider.of(context)
           .updateConnection(connection, refresh: false);
-    } catch (e) {
-      setState(() {
-        _presenter.busy = false;
-      });
-
-      rethrow;
+    } finally {
+      if (!activated) {
+        setState(() => _presenter.busy = false);
+      }
     }
 
     if (activated) {
@@ -334,7 +315,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
     setState(() => _presenter.busy = true);
     try {
-      await _presenter.service.clearConnections();
+      await _presenter.clearConnections();
     } finally {
       setState(() => _presenter.busy = false);
     }
