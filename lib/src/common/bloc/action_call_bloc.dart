@@ -46,10 +46,6 @@ class ActionCallBloc extends Bloc<List, ActionCallState> {
     return _callAction(_spongeService, _actionName, actionArgs, _saveState);
   }
 
-  @override
-  Stream<ActionCallState> transformStates(Stream<ActionCallState> states) =>
-      super.transformStates(states).asBroadcastStream();
-
   Stream<ActionCallState> _callAction(SpongeService spongeService,
       String actionName, List args, bool saveState) async* {
     ActionData actionData;

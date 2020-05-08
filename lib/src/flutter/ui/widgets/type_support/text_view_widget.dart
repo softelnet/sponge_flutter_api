@@ -43,20 +43,6 @@ class TextViewWidget extends StatefulWidget {
 }
 
 class _TextViewWidgetState extends State<TextViewWidget> {
-  MarkdownBody _buildMarkdown(Key key, BuildContext context, String data) {
-    var theme = Theme.of(context);
-    var markdownTheme = MarkdownStyleSheet.fromTheme(theme);
-
-    return MarkdownBody(
-      key: key,
-      data: data,
-      styleSheet: markdownTheme.copyWith(
-          code: markdownTheme.code.apply(
-        color: Colors.black,
-      )),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget mainWidget;
@@ -68,10 +54,16 @@ class _TextViewWidgetState extends State<TextViewWidget> {
     if (text != null) {
       switch (widget.format) {
         case Formats.STRING_FORMAT_MARKDOWN:
-          mainWidget = _buildMarkdown(key, context, text);
+          mainWidget = MarkdownBody(
+            key: key,
+            data: text,
+          );
           break;
         case Formats.STRING_FORMAT_CONSOLE:
-          mainWidget = _buildMarkdown(key, context, '```\n$text\n```');
+          mainWidget = MarkdownBody(
+            key: key,
+            data: '```\n$text\n```',
+          );
           break;
       }
     }
@@ -162,4 +154,3 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
     );
   }
 }
-
