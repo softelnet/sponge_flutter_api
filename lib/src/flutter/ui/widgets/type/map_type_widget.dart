@@ -59,7 +59,7 @@ class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
       );
     }
 
-    final TextStyle headerTextStyle = Theme.of(context).textTheme.body2;
+    final TextStyle headerTextStyle = Theme.of(context).textTheme.bodyText1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

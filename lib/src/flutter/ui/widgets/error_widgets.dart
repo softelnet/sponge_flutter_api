@@ -90,7 +90,7 @@ class ErrorCircleWidget extends StatelessWidget {
 }
 
 TextStyle getTapHereMessageStyle(BuildContext context) =>
-    Theme.of(context).textTheme.subhead;
+    Theme.of(context).textTheme.subtitle1;
 
 class ConnectionNotInitializedWidget extends StatelessWidget {
   ConnectionNotInitializedWidget({Key key, @required this.hasConnections})
