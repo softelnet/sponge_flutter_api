@@ -146,9 +146,10 @@ class ActionCallSession {
     _providedArgs = {};
 
     _getQualifiedTypes()
-        .where((qType) => qType.path != null && qType.type.provided != null)
         .where((qType) =>
-            qType.type.provided != null && !qType.type.provided.overwrite)
+            qType.path != null &&
+            DataTypeUtils.isProvidedRead(qType.type) &&
+            !_isRefreshableArg(qType))
         .forEach((qType) {
       var value = actionData.getArgValueByName(qType.path,
           unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
@@ -302,8 +303,12 @@ class ActionCallSession {
     return currentNames;
   }
 
-  bool _isArgForRefreshAllowedProvidedArgs(QualifiedDataType qType) =>
-      qType.type.readOnly || qType.type.provided.overwrite;
+  bool _isRefreshableArg(QualifiedDataType qType) =>
+      _isRefreshableArgByType(qType.type);
+
+  bool _isRefreshableArgByType(DataType type) =>
+      DataTypeUtils.isProvidedRead(type) &&
+      (type.readOnly || type.provided.overwrite);
 
   Stream<ProvideActionArgsState> provideArgs(
       ProvideActionArgsDemand demand) async* {
@@ -333,7 +338,7 @@ class ActionCallSession {
       {bool supressErrors = false}) async {
     _isRefreshAllowedProvidedArgsPending = false;
 
-    await _provideArgs((qType) => _isArgForRefreshAllowedProvidedArgs(qType),
+    await _provideArgs((qType) => _isRefreshableArg(qType),
             errorsAsStates: supressErrors)
         .drain();
 
@@ -553,11 +558,9 @@ class ActionCallSession {
   bool get hasProvidedArgs =>
       actionMeta.args.any((argType) => argType.provided != null);
 
-  bool get hasRefreshableArgs => actionMeta.args.any((argType) =>
-      DataTypeUtils.isProvidedRead(argType) &&
-      (argType.readOnly || argType.provided.overwrite));
+  bool get hasRefreshableArgs =>
+      actionMeta.args.any((argType) => _isRefreshableArgByType(argType));
 
-  // Events,
   void _initEventSubscription() {
     _refreshEvents ??= Features.getStringList(
         actionData.actionMeta.features, Features.ACTION_REFRESH_EVENTS);
