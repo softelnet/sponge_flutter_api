@@ -74,6 +74,9 @@ class ActionCallPresenter
       viewModel.actionData,
       defaultPageableListPageSize: service.settings.defaultPageableListPageSize,
       verifyIsActive: verifyIsActive,
+      // Refresh args in the next build.
+      onEventError: () => WidgetsBinding.instance
+          .addPostFrameCallback((_) => view.refreshArgs()),
     );
 
     _session.open();

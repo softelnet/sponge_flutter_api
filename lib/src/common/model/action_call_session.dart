@@ -18,6 +18,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
@@ -63,8 +64,10 @@ class ActionCallSession {
     this.actionData, {
     int defaultPageableListPageSize,
     bool verifyIsActive,
+    VoidFutureOrCallback onEventError,
   })  : _defaultPageableListPageSize = defaultPageableListPageSize ?? 20,
-        _verifyIsActive = verifyIsActive ?? true;
+        _verifyIsActive = verifyIsActive ?? true,
+        _onEventError = onEventError;
 
   static final Logger _logger = Logger('ActionCallSession');
 
@@ -99,6 +102,8 @@ class ActionCallSession {
   bool _isRefreshAllowedProvidedArgsPending = false;
 
   ActionMeta get actionMeta => actionData.actionMeta;
+
+  final VoidFutureOrCallback _onEventError;
 
   void open() {
     if (_running) {
@@ -576,7 +581,8 @@ class ActionCallSession {
       }, onError: (e) async {
         if (await _isRunningAndActive()) {
           _logger.severe('Event subscription error', e);
-          _provideArgsBloc.refreshAllowedProvidedArgs();
+
+          unawaited(_onEventError?.call());
         }
       });
     }
