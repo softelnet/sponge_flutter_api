@@ -19,13 +19,11 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
-import 'package:sponge_flutter_api/src/external/async_popup_menu_button.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/action_call_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 
 typedef OnBeforeSelectedSubActionCallback = Future<bool> Function(
@@ -41,154 +39,6 @@ class SubActionRuntimeSpec {
 
   final SubActionSpec spec;
   final bool active;
-}
-
-class SubActionsWidget extends StatefulWidget {
-  SubActionsWidget({
-    Key key,
-    @required this.controller,
-    @required this.value,
-    this.index,
-    this.parentType,
-    this.parentValue,
-    this.menuIcon,
-    this.menuWidget,
-    this.header,
-    this.tooltip,
-  }) : super(key: key);
-
-  final SubActionsController controller;
-  final dynamic value;
-  final int index;
-  final DataType parentType;
-  final dynamic parentValue;
-
-  final Widget menuIcon;
-  final Widget menuWidget;
-  final Widget header;
-  final String tooltip;
-
-  factory SubActionsWidget.forRecord(
-    UiContext uiContext,
-    SpongeService spongeService, {
-    Key key,
-    Widget menuIcon,
-    Widget menuWidget,
-    Widget header,
-    String tooltip,
-  }) {
-    var controller = SubActionsController.forRecord(uiContext, spongeService);
-
-    if (uiContext.enabled && controller.hasSubActions(uiContext.value)) {
-      return SubActionsWidget(
-        key: key,
-        controller: controller,
-        value: uiContext.value,
-        menuIcon: menuIcon,
-        menuWidget: menuWidget,
-        header: header,
-        tooltip: tooltip,
-      );
-    } else {
-      return null;
-    }
-  }
-
-  factory SubActionsWidget.forListElement(
-    UiContext uiContext,
-    SpongeService spongeService, {
-    Key key,
-    @required SubActionsController controller,
-    @required dynamic element,
-    @required int index,
-    @required DataType parentType,
-    @required dynamic parentValue,
-    Widget menuIcon,
-    Widget menuWidget,
-    Widget header,
-    String tooltip,
-  }) {
-    return SubActionsWidget(
-      key: key ?? Key('sub-actions'),
-      controller: controller,
-      value: element,
-      index: index,
-      parentType: parentType,
-      parentValue: parentValue,
-      menuIcon: menuIcon,
-      menuWidget: menuWidget,
-      header: header,
-      tooltip: tooltip,
-    );
-  }
-
-  @override
-  _SubActionsWidgetState createState() => _SubActionsWidgetState();
-}
-
-class _SubActionsWidgetState extends State<SubActionsWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-          iconTheme: Theme.of(context)
-              .iconTheme
-              .copyWith(color: getButtonTextColor(context))),
-      child: AsyncPopupMenuButton<SubActionSpec>(
-        padding: EdgeInsets.zero,
-        itemBuilder: (BuildContext context) =>
-            _buildSubActionsMenuItems(context),
-        onSelected: _onSelectedSubAction,
-        icon: widget.menuIcon,
-        child: widget.menuWidget,
-        tooltip: widget.tooltip,
-      ),
-    );
-  }
-
-  Future<void> _onSelectedSubAction(SubActionSpec subActionSpec) async {
-    await widget.controller.onSelectedSubAction(context, subActionSpec,
-        widget.value, widget.index, widget.parentType, widget.parentValue);
-  }
-
-  Future<List<PopupMenuEntry<SubActionSpec>>> _buildSubActionsMenuItems(
-      BuildContext context) async {
-    List<SubActionRuntimeSpec> runtimeSpecs = await widget.controller
-        .getSubActionsRuntimeSpecs(
-            widget.value, widget.index, widget.parentType, widget.parentValue);
-    return [
-      if (widget.header != null)
-        PopupMenuItem<SubActionSpec>(
-          child: widget.header,
-          enabled: false,
-        ),
-      if (widget.header != null && runtimeSpecs.isNotEmpty) PopupMenuDivider(),
-      ...runtimeSpecs
-          .map((runtimeSpec) => runtimeSpec != null
-              ? _createSubActionMenuItem(context, runtimeSpec)
-              : PopupMenuDivider())
-          .toList(),
-    ];
-  }
-
-  PopupMenuEntry<SubActionSpec> _createSubActionMenuItem(
-      BuildContext context, SubActionRuntimeSpec subActionRuntimeSpec) {
-    var service = ApplicationProvider.of(context).service;
-    var actionMeta = service.spongeService
-        .getCachedAction(subActionRuntimeSpec.spec.actionName)
-        .actionMeta;
-
-    return PopupMenuItem<SubActionSpec>(
-      value: subActionRuntimeSpec.spec,
-      child: ListTile(
-        leading: getActionIcon(context, service, actionMeta),
-        title: Text(subActionRuntimeSpec.spec.subAction.label ??
-            ModelUtils.getActionMetaDisplayLabel(actionMeta)),
-        enabled: subActionRuntimeSpec.active,
-      ),
-      enabled: subActionRuntimeSpec.active,
-    );
-  }
 }
 
 abstract class BaseActionsController {
@@ -445,41 +295,6 @@ class SubActionsController extends BaseActionsController {
           parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
           SubActionType.create)
       ?.actionName;
-
-  Future<void> onSelectedSubAction(
-      BuildContext context,
-      SubActionSpec subActionSpec,
-      dynamic element,
-      int index,
-      DataType parentType,
-      dynamic parentValue) async {
-    switch (subActionSpec.type) {
-      case SubActionType.create:
-        await onCreateElement(context,
-            parentType: parentType, parentValue: parentValue);
-        break;
-      case SubActionType.read:
-        await onReadElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
-        break;
-      case SubActionType.update:
-        await onUpdateElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
-        break;
-      case SubActionType.delete:
-        await onDeleteElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
-        break;
-      case SubActionType.activate:
-        await onActivateElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
-        break;
-      case SubActionType.context:
-        await onElementContextAction(context, subActionSpec, element,
-            index: index, parentType: parentType, parentValue: parentValue);
-        break;
-    }
-  }
 
   void setupSubAction(
       ActionData actionData,

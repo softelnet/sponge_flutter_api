@@ -23,7 +23,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/list_type_mvp
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/sub_actions.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_action/sub_actions_controller.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_action/sub_actions_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 
 class ListTypeWidget extends StatefulWidget {

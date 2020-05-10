@@ -18,8 +18,8 @@ import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_action/sub_actions_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/provided_value_set_widget.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/sub_actions.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/text_view_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
 

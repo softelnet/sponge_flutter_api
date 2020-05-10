@@ -188,14 +188,18 @@ class _SwipeDetectorState extends State<SwipeDetector> {
 
 // This code is a copy from: https://github.com/flutter/flutter/blob/master/examples/flutter_gallery/lib/gallery/about.dart
 class LinkTextSpan extends TextSpan {
-  LinkTextSpan({TextStyle style, String url, String text})
-      : super(
-            style: style,
-            text: text ?? url,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                launch(url, forceSafariVC: false);
-              });
+  LinkTextSpan({
+    TextStyle style,
+    String url,
+    String text,
+  }) : super(
+          style: style,
+          text: text ?? url,
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              launch(url, forceSafariVC: false);
+            },
+        );
 }
 
 class OptionalScrollContainer extends InheritedWidget {

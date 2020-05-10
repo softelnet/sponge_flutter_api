@@ -102,6 +102,8 @@ class _ProvidedValueSetEditorWidgetState
           : dropdown;
     } else {
       // TODO Only String non-limited values are supported.
+      Validate.isTrue(widget.qType.type.kind == DataTypeKind.STRING,
+          'Non-limited value set is supported only for a String type');
 
       var items = _getNotLimitedMenuItems();
       return Row(
