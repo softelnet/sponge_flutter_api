@@ -24,7 +24,7 @@ import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_flutter_presenter.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/mvp/pages/action_call_flutter_presenter.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/type_gui_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/action_call_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
