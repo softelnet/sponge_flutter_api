@@ -55,6 +55,7 @@ export 'src/flutter/service/flutter_application_settings.dart';
 export 'src/flutter/service/flutter_sponge_service.dart';
 export 'src/flutter/ui/context/ui_context.dart';
 export 'src/flutter/ui/context/ui_context_callbacks.dart';
+export 'src/flutter/ui/mvp/pages/settings_mvp.dart';
 export 'src/flutter/ui/mvp/widgets/type/list_type_mvp.dart';
 export 'src/flutter/ui/mvp/widgets/type/map_type_mvp.dart';
 export 'src/flutter/ui/mvp/widgets/type/multi_choice_list_edit_mvp.dart';

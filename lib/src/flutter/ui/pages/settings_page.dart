@@ -14,8 +14,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
-import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_settings.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/mvp/pages/settings_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/dialogs.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/widgets.dart';
@@ -27,31 +27,18 @@ class SettingsPage extends StatefulWidget {
   _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  int _textViewerWidthSliderValue;
-  static const MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE = 10;
-  int _maxEventCountSliderValue;
-  static const MAX_MAX_EVENT_COUNT_SLIDER_VALUE = 10;
-  static const MAX_EVENT_COUNT_RATIO = 10;
+class _SettingsPageState extends State<SettingsPage> implements SettingsView {
+  SettingsPresenter _presenter;
 
   TextEditingController _subscriptionWatchdogIntervalController;
   TextEditingController _serviceDiscoveryTimeoutController;
 
-  FlutterApplicationSettings get settings =>
-      ApplicationProvider.of(context).service.settings;
+  FlutterApplicationSettings get settings => _presenter?.settings;
 
   @override
   Widget build(BuildContext context) {
-    _textViewerWidthSliderValue ??= settings.textViewerWidth ?? 0;
-    if (_textViewerWidthSliderValue > MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE) {
-      _textViewerWidthSliderValue = MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE;
-    }
-
-    _maxEventCountSliderValue ??=
-        (settings.maxEventCount ?? 0) ~/ MAX_EVENT_COUNT_RATIO;
-    if (_maxEventCountSliderValue > MAX_MAX_EVENT_COUNT_SLIDER_VALUE) {
-      _maxEventCountSliderValue = MAX_MAX_EVENT_COUNT_SLIDER_VALUE;
-    }
+    _presenter ??=
+        SettingsPresenter(ApplicationProvider.of(context).service, this);
 
     _subscriptionWatchdogIntervalController ??= TextEditingController(
       text: '${settings.subscriptionWatchdogInterval}',
@@ -87,9 +74,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: Text('Dark theme'),
                         trailing: Switch(
                           value: settings.isDarkMode,
-                          onChanged: (value) => _toggleTheme(context),
+                          onChanged: (value) => _presenter.toggleTheme(),
                         ),
-                        onTap: () => _toggleTheme(context),
+                        onTap: () => _presenter.toggleTheme(),
                       )
                     ],
                   ),
@@ -103,8 +90,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             'Show tabs for action categories and knowledge bases'),
                         trailing: Switch(
                             value: settings.tabsInActionList,
-                            onChanged: (value) => _toggleTabsInActionList()),
-                        onTap: () => _toggleTabsInActionList(),
+                            onChanged: (value) =>
+                                _presenter.toggleTabsInActionList()),
+                        onTap: () => _presenter.toggleTabsInActionList(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -112,8 +100,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             Text('Action call simplified by a tap on an item'),
                         trailing: Switch(
                             value: settings.actionCallOnTap,
-                            onChanged: (value) => _toggleActionCallOnTap()),
-                        onTap: () => _toggleActionCallOnTap(),
+                            onChanged: (value) =>
+                                _presenter.toggleActionCallOnTap()),
+                        onTap: () => _presenter.toggleActionCallOnTap(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -129,11 +118,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       child: Text(annotatedValue.valueLabel),
                                     ))
                                 .toList(),
-                            onChanged: (value) async {
-                              setState(() {});
-                              await settings
-                                  .setArgumentListElementTapBehavior(value);
-                            },
+                            onChanged: (value) async => _presenter
+                                .onArgumentListElementTapBehaviorChange(value),
                             isDense: true,
                           ),
                         ),
@@ -150,10 +136,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       child: Text(annotatedValue.valueLabel),
                                     ))
                                 .toList(),
-                            onChanged: (value) async {
-                              setState(() {});
-                              await settings.setActionIconsView(value);
-                            },
+                            onChanged: (value) async =>
+                                _presenter.onActionIconsViewChange(value),
                             isDense: true,
                           ),
                         ),
@@ -170,10 +154,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       child: Text(annotatedValue.valueLabel),
                                     ))
                                 .toList(),
-                            onChanged: (value) async {
-                              setState(() {});
-                              await settings.setActionsOrder(value);
-                            },
+                            onChanged: (value) async =>
+                                _presenter.onActionsOrderChange(value),
                             isDense: true,
                           ),
                         ),
@@ -184,8 +166,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             Text('Swipe to close action (from left to right)'),
                         trailing: Switch(
                             value: settings.actionSwipeToClose,
-                            onChanged: (value) => _toggleActionSwipeToClose()),
-                        onTap: () => _toggleActionSwipeToClose(),
+                            onChanged: (value) =>
+                                _presenter.toggleActionSwipeToClose()),
+                        onTap: () => _presenter.toggleActionSwipeToClose(),
                       ),
                     ],
                   ),
@@ -195,23 +178,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     initiallyExpanded: false,
                     children: [
                       ListTile(
-                        title: Text('Number of stored events ' +
-                            (_maxEventCountSliderValue > 0
-                                ? '(${_maxEventCountSliderValue * MAX_EVENT_COUNT_RATIO})'
-                                : '(infinite)')),
+                        title: Text(_presenter.maxEventCountTitle),
                         subtitle: Slider(
                           activeColor: Theme.of(context).accentColor,
-                          label: '$_maxEventCountSliderValue',
+                          label: _presenter.maxEventCountValueLabel,
                           min: 0,
-                          max: MAX_MAX_EVENT_COUNT_SLIDER_VALUE.roundToDouble(),
-                          value:
-                              _maxEventCountSliderValue?.roundToDouble() ?? 0,
-                          onChanged: (value) async {
-                            setState(() =>
-                                _maxEventCountSliderValue = value.toInt());
-                            await settings.setMaxEventCount(
-                                value.toInt() * MAX_EVENT_COUNT_RATIO);
-                          },
+                          max: _presenter.maxEventCountMaxValue,
+                          value: _presenter.maxEventCountValue,
+                          onChanged: (value) async =>
+                              _presenter.onMaxEventCountChange(value),
                         ),
                       ),
                       Divider(),
@@ -244,8 +219,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.showNewEventNotification,
                             onChanged: (value) =>
-                                _toggleShowNewEventNotification()),
-                        onTap: () => _toggleShowNewEventNotification(),
+                                _presenter.toggleShowNewEventNotification()),
+                        onTap: () =>
+                            _presenter.toggleShowNewEventNotification(),
                       ),
                     ],
                   ),
@@ -258,28 +234,21 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: Text('Use internal viewers if possible'),
                         trailing: Switch(
                             value: settings.useInternalViewers,
-                            onChanged: (value) => _toggleUseInternalViewers()),
-                        onTap: () => _toggleUseInternalViewers(),
+                            onChanged: (value) =>
+                                _presenter.toggleUseInternalViewers()),
+                        onTap: () => _presenter.toggleUseInternalViewers(),
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Text viewer width in pixels ' +
-                            (_textViewerWidthSliderValue > 0
-                                ? '(${_textViewerWidthSliderValue * GuiConstants.TEXT_VIEWER_WIDTH_SCALE})'
-                                : '(default)')),
+                        title: Text(_presenter.useInternalViewersTitle),
                         subtitle: Slider(
                           activeColor: Theme.of(context).accentColor,
-                          label: '$_textViewerWidthSliderValue',
+                          label: _presenter.useInternalViewersValueLabel,
                           min: 0,
-                          max: MAX_TEXT_VIEWER_WIDTH_SLIDER_VALUE
-                              .roundToDouble(),
-                          value:
-                              _textViewerWidthSliderValue?.roundToDouble() ?? 0,
-                          onChanged: (value) async {
-                            setState(() =>
-                                _textViewerWidthSliderValue = value.toInt());
-                            await settings.setTextViewerWidth(value.toInt());
-                          },
+                          max: _presenter.useInternalViewersMaxValue,
+                          value: _presenter.useInternalViewersValue,
+                          onChanged: (value) async =>
+                              _presenter.onUseInternalViewersChange(value),
                         ),
                       ),
                       _buildDivider(),
@@ -289,26 +258,25 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.useScrollableIndexedList,
                             onChanged: (value) =>
-                                _toggleUseScrollableIndexedList()),
-                        onTap: () => _toggleUseScrollableIndexedList(),
+                                _presenter.toggleUseScrollableIndexedList()),
+                        onTap: () =>
+                            _presenter.toggleUseScrollableIndexedList(),
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text(
-                            'Drawing stroke update delta threshold ratio (${settings.drawingStrokeUpdateDeltaThresholdRatio})'),
+                        title: Text(_presenter
+                            .drawingStrokeUpdateDeltaThresholdRatioTitle),
                         subtitle: Slider(
                           activeColor: Theme.of(context).accentColor,
-                          label:
-                              '${settings.drawingStrokeUpdateDeltaThresholdRatio}',
+                          label: _presenter
+                              .drawingStrokeUpdateDeltaThresholdRatioValueLabel,
                           value:
                               settings.drawingStrokeUpdateDeltaThresholdRatio,
-                          divisions: 20,
-                          onChanged: (value) async {
-                            await settings
-                                .setDrawingStrokeUpdateDeltaThresholdRatio(
-                                    value);
-                            setState(() {});
-                          },
+                          divisions: _presenter
+                              .drawingStrokeUpdateDeltaThresholdRatioDivisions,
+                          onChanged: (value) async => _presenter
+                              .onDrawingStrokeUpdateDeltaThresholdRatioChange(
+                                  value),
                         ),
                       ),
                     ],
@@ -323,8 +291,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.mapEnableClusterMarkers,
                             onChanged: (value) =>
-                                _toggleMapEnableClusterMarkers()),
-                        onTap: () => _toggleMapEnableClusterMarkers(),
+                                _presenter.toggleMapEnableClusterMarkers()),
+                        onTap: () => _presenter.toggleMapEnableClusterMarkers(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -332,8 +300,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.mapEnableMarkerBadges,
                             onChanged: (value) =>
-                                _toggleMapEnableMarkerBadges()),
-                        onTap: () => _toggleMapEnableMarkerBadges(),
+                                _presenter.toggleMapEnableMarkerBadges()),
+                        onTap: () => _presenter.toggleMapEnableMarkerBadges(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -341,8 +309,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.mapEnableCurrentLocation,
                             onChanged: (value) =>
-                                _toggleMapEnableCurrentLocation()),
-                        onTap: () => _toggleMapEnableCurrentLocation(),
+                                _presenter.toggleMapEnableCurrentLocation()),
+                        onTap: () =>
+                            _presenter.toggleMapEnableCurrentLocation(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -350,16 +319,18 @@ class _SettingsPageState extends State<SettingsPage> {
                         trailing: Switch(
                             value: settings.mapFollowCurrentLocation,
                             onChanged: (value) =>
-                                _toggleMapFollowCurrentLocation()),
-                        onTap: () => _toggleMapFollowCurrentLocation(),
+                                _presenter.toggleMapFollowCurrentLocation()),
+                        onTap: () =>
+                            _presenter.toggleMapFollowCurrentLocation(),
                       ),
                       _buildDivider(),
                       ListTile(
                         title: Text('Full screen'),
                         trailing: Switch(
                             value: settings.mapFullScreen,
-                            onChanged: (value) => _toggleMapFullScreen()),
-                        onTap: () => _toggleMapFullScreen(),
+                            onChanged: (value) =>
+                                _presenter.toggleMapFullScreen()),
+                        onTap: () => _presenter.toggleMapFullScreen(),
                       ),
                     ],
                   ),
@@ -372,8 +343,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: Text('Use authentication token'),
                         trailing: Switch(
                             value: settings.autoUseAuthToken,
-                            onChanged: (value) => _toggleAutoUseAuthToken()),
-                        onTap: () => _toggleAutoUseAuthToken(),
+                            onChanged: (value) =>
+                                _presenter.toggleAutoUseAuthToken()),
+                        onTap: () => _presenter.toggleAutoUseAuthToken(),
                       ),
                       _buildDivider(),
                       ListTile(
@@ -406,7 +378,10 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
-      onWillPop: _submit,
+      onWillPop: () async {
+        await _presenter.submit();
+        return true;
+      },
     );
   }
 
@@ -451,75 +426,6 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: EdgeInsets.zero,
       );
 
-  Future<void> _toggleTabsInActionList() async {
-    await settings.setTabsInActionList(!settings.tabsInActionList);
-    setState(() {});
-  }
-
-  Future<void> _toggleActionCallOnTap() async {
-    await settings.setActionCallOnTap(!settings.actionCallOnTap);
-    setState(() {});
-  }
-
-  Future<void> _toggleActionSwipeToClose() async {
-    await settings.setActionSwipeToClose(!settings.actionSwipeToClose);
-    setState(() {});
-  }
-
-  Future<void> _toggleUseInternalViewers() async {
-    await settings.setUseInternalViewers(!settings.useInternalViewers);
-    setState(() {});
-  }
-
-  Future<void> _toggleUseScrollableIndexedList() async {
-    await settings
-        .setUseScrollableIndexedList(!settings.useScrollableIndexedList);
-    setState(() {});
-  }
-
-  Future<void> _toggleAutoUseAuthToken() async {
-    await settings.setAutoUseAuthToken(!settings.autoUseAuthToken);
-    setState(() {});
-  }
-
-  Future<void> _toggleShowNewEventNotification() async {
-    await settings
-        .setShowNewEventNotification(!settings.showNewEventNotification);
-    setState(() {});
-  }
-
-  Future<void> _toggleMapEnableClusterMarkers() async {
-    await settings
-        .setMapEnableClusterMarkers(!settings.mapEnableClusterMarkers);
-    setState(() {});
-  }
-
-  Future<void> _toggleMapEnableMarkerBadges() async {
-    await settings.setMapEnableMarkerBadges(!settings.mapEnableMarkerBadges);
-    setState(() {});
-  }
-
-  Future<void> _toggleMapEnableCurrentLocation() async {
-    await settings
-        .setMapEnableCurrentLocation(!settings.mapEnableCurrentLocation);
-    setState(() {});
-  }
-
-  Future<void> _toggleMapFollowCurrentLocation() async {
-    await settings
-        .setMapFollowCurrentLocation(!settings.mapFollowCurrentLocation);
-    setState(() {});
-  }
-
-  Future<void> _toggleMapFullScreen() async {
-    await settings.setMapFullScreen(!settings.mapFullScreen);
-    setState(() {});
-  }
-
-  Future<void> _toggleTheme(BuildContext context) async {
-    await settings.setIsDarkMode(!settings.isDarkMode);
-  }
-
   Future<void> _resetToDefaults(BuildContext context) async {
     try {
       bool cleared = await _clearSettings(context);
@@ -544,17 +450,13 @@ class _SettingsPageState extends State<SettingsPage> {
       return false;
     }
 
-    await ApplicationProvider.of(context).service.clearSettings();
-
-    setState(() {});
+    await _presenter.clearSettings();
 
     return true;
   }
 
-  Future<bool> _submit() async {
-    ApplicationProvider.of(context).service.spongeService?.maxEventCount =
-        _maxEventCountSliderValue * MAX_EVENT_COUNT_RATIO;
-
-    return true;
+  @override
+  void refresh() {
+    setState(() {});
   }
 }
