@@ -146,7 +146,7 @@ class _ActionCallPageState extends State<ActionCallPage>
                   ),
                 );
               } else {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
             },
           )
@@ -160,7 +160,7 @@ class _ActionCallPageState extends State<ActionCallPage>
             builder: (BuildContext context, ProvideActionArgsState state) {
               _presenter.error = null;
               if (state is ProvideActionArgsStateInitialize) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (state is ProvideActionArgsStateError) {
                 _presenter.error = state.error;
                 return Center(
@@ -189,7 +189,7 @@ class _ActionCallPageState extends State<ActionCallPage>
 
     if (hasRootRecordSingleLeadingField) {
       child = editorContext.isAnyValueLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _buildActionArgumentsWidget(editorContext);
     } else {
       var children = [
@@ -200,9 +200,9 @@ class _ActionCallPageState extends State<ActionCallPage>
                 widget.header,
                 textAlign: TextAlign.left,
               ),
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
             ),
-            shape: BeveledRectangleBorder(),
+            shape: const BeveledRectangleBorder(),
           ),
         _buildActionArgumentsWidget(editorContext),
         _buildButtonBar(context),

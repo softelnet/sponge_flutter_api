@@ -80,7 +80,7 @@ class ErrorCircleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkResponse(
       child: CircleAvatar(
-        child: Icon(Icons.error_outline),
+        child: const Icon(Icons.error_outline),
         foregroundColor: Colors.white,
         backgroundColor: Colors.red,
       ),
@@ -104,7 +104,7 @@ class ConnectionNotInitializedWidget extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         alignment: Alignment.center,
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: Text(
           hasConnections
               ? 'Please tap here to activate\na Sponge connection'
@@ -133,7 +133,7 @@ class LoginRequiredWidget extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         alignment: Alignment.center,
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: Text(
           'Please tap here to login to\n$connectionName',
           key: Key('tapToLogin'),

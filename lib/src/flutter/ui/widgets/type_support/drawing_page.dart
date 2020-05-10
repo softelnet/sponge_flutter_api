@@ -52,7 +52,7 @@ class _DrawingPageState extends State<DrawingPage> {
                         message: widget.name,
                         child: Text('Draw: ${widget.name}'),
                       )
-                    : Text('Drawing'),
+                    : const Text('Drawing'),
               )
             : null,
         body: SafeArea(
@@ -60,10 +60,10 @@ class _DrawingPageState extends State<DrawingPage> {
             child: AspectRatio(
               aspectRatio: widget.drawingBinary.aspectRatio,
               child: ConstrainedBox(
-                constraints: BoxConstraints.expand(),
+                constraints: const BoxConstraints.expand(),
                 child: Card(
                   elevation: 10.0,
-                  margin: EdgeInsets.all(10.0),
+                  margin: const EdgeInsets.all(10.0),
                   child: PainterPanel(
                     drawingBinary: widget.drawingBinary,
                     controller: _controller,

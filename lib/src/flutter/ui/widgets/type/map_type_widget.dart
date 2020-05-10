@@ -70,7 +70,7 @@ class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
               label,
               style: getArgLabelTextStyle(context),
             ),
-            padding: EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10),
           ),
         Table(
           border: TableBorder.all(

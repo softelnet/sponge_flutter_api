@@ -42,8 +42,11 @@ class ApplicationProviderState extends State<ApplicationProvider> {
   PageStorageKey _storageKey;
   PageStorageKey get storageKey => _storageKey;
 
-  bool updateConnection(SpongeConnection connection,
-      {bool refresh = true, bool force = false}) {
+  bool updateConnection(
+    SpongeConnection connection, {
+    bool refresh = true,
+    bool force = false,
+  }) {
     if (_connection == null || !_connection.isSame(connection) || force) {
       // Recreate PageStorage after connection change.
       _createPageStorage();
@@ -104,5 +107,3 @@ class _InheritedStateContainer extends InheritedWidget {
   @override
   bool updateShouldNotify(_InheritedStateContainer old) => true;
 }
-
-

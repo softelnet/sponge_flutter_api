@@ -238,7 +238,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
                 _presenter.label ?? '',
                 style: getArgLabelTextStyle(context),
               ),
-              padding: EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10),
             ),
             Expanded(
               child: ButtonBar(
@@ -384,7 +384,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
             ? () => _onElementTap(subUiContext, element, index)
                 .catchError((e) => handleError(context, e))
             : null,
-        contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       ),
       verticalMargin:
           widget.showBorders ? (verticalMargin ?? 0) + 5 : verticalMargin,

@@ -97,7 +97,7 @@ class _TextViewWidgetState extends State<TextViewWidget> {
             ),
           if (showLabel)
             Container(
-              margin: EdgeInsets.all(2.0),
+              margin: const EdgeInsets.all(2.0),
             ),
           FractionallySizedBox(
             widthFactor: 1,

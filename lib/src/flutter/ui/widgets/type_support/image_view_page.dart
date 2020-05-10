@@ -56,7 +56,7 @@ class ImageViewPage extends StatelessWidget {
                         }
                       },
                       itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
+                        const PopupMenuItem<String>(
                             key: Key('save'),
                             value: 'save',
                             child: Text('Save to a file...')),
@@ -68,7 +68,7 @@ class ImageViewPage extends StatelessWidget {
           body: Container(
             child: PhotoView(
               imageProvider: MemoryImage(imageData),
-              backgroundDecoration: BoxDecoration(),
+              backgroundDecoration: const BoxDecoration(),
             ),
           ),
         ),

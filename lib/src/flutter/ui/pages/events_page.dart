@@ -108,7 +108,7 @@ class _EventsPageState extends State<EventsPage>
                     color: Theme.of(context).primaryColor,
                   ),
               trailing: InkResponse(
-                child: Icon(Icons.delete_sweep),
+                child: const Icon(Icons.delete_sweep),
                 onTap: () => _removeEvent(context, eventData.event.id),
               ),
               title: Text(_presenter.getEventLabel(eventData)),
@@ -139,7 +139,7 @@ class _EventsPageState extends State<EventsPage>
   }
 
   List<Widget> _buildActionsWidget(BuildContext context) {
-    var icon = Icon(Icons.explore);
+    var icon = const Icon(Icons.explore);
 
     return <Widget>[
       _presenter.subscriptionBloc != null

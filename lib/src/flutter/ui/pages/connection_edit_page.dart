@@ -127,7 +127,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       key: Key('name'),
                       keyboardType: TextInputType.text,
                       labelText: 'Connection name *',
-                      icon: Icon(Icons.bookmark),
+                      icon: const Icon(Icons.bookmark),
                       onSaved: (String value) {
                         setState(() => _presenter.name = value);
                       },
@@ -139,7 +139,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       key: Key('address'),
                       keyboardType: TextInputType.text,
                       labelText: 'Sponge address *',
-                      icon: Icon(Icons.computer),
+                      icon: const Icon(Icons.computer),
                       onSaved: (String value) {
                         setState(() => _presenter.url = value);
                       },
@@ -150,7 +150,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       key: Key('network'),
                       keyboardType: TextInputType.text,
                       labelText: 'Network',
-                      icon: Icon(Icons.wifi),
+                      icon: const Icon(Icons.wifi),
                       onSaved: (String value) {
                         setState(() => _presenter.network = value);
                       },
@@ -160,7 +160,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       padding: const EdgeInsets.only(left: PADDING),
                       child: Row(
                         children: <Widget>[
-                          Text('Anonymous'),
+                          const Text('Anonymous'),
                           Checkbox(
                             key: Key('anonymous'),
                             value: _presenter.anonymous,
@@ -177,7 +177,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       key: Key('username'),
                       keyboardType: TextInputType.text,
                       labelText: 'Username',
-                      icon: Icon(Icons.person),
+                      icon: const Icon(Icons.person),
                       onSaved: (String value) {
                         setState(() => _presenter.username = value);
                       },
@@ -189,7 +189,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       key: Key('password'),
                       keyboardType: TextInputType.text,
                       labelText: 'Password',
-                      icon: Icon(Icons.verified_user),
+                      icon: const Icon(Icons.verified_user),
                       onSaved: (String value) => _presenter.password = value,
                       controller: _passwordController,
                       obscureText: true,
@@ -200,7 +200,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       padding: const EdgeInsets.only(left: PADDING),
                       child: Row(
                         children: <Widget>[
-                          Text('Save password'),
+                          const Text('Save password'),
                           Checkbox(
                             key: Key('save-password'),
                             value: _presenter.savePassword,
@@ -281,9 +281,12 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      var snackController = Scaffold.of(context).showSnackBar(SnackBar(
+      var snackController = Scaffold.of(context).showSnackBar(
+        const SnackBar(
           content: Text('Verifying the connection...'),
-          duration: Duration(hours: 1)));
+          duration: Duration(hours: 1),
+        ),
+      );
 
       try {
         var version = await _presenter.verifyConnection();

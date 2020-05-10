@@ -51,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Settings'),
+          title: const Text('Settings'),
           actions: [
             Builder(
               builder: (BuildContext context) => _buildMenu(context),
@@ -71,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     initiallyExpanded: true,
                     children: [
                       ListTile(
-                        title: Text('Dark theme'),
+                        title: const Text('Dark theme'),
                         trailing: Switch(
                           value: settings.isDarkMode,
                           onChanged: (value) => _presenter.toggleTheme(),
@@ -86,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     initiallyExpanded: false,
                     children: [
                       ListTile(
-                        title: Text(
+                        title: const Text(
                             'Show tabs for action categories and knowledge bases'),
                         trailing: Switch(
                             value: settings.tabsInActionList,
@@ -96,8 +96,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title:
-                            Text('Action call simplified by a tap on an item'),
+                        title: const Text(
+                            'Action call simplified by a tap on an item'),
                         trailing: Switch(
                             value: settings.actionCallOnTap,
                             onChanged: (value) =>
@@ -106,8 +106,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title:
-                            Text('Action argument list element tap behavior'),
+                        title: const Text(
+                            'Action argument list element tap behavior'),
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             value: settings.argumentListElementTapBehavior,
@@ -126,7 +126,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Action icons view'),
+                        title: const Text('Action icons view'),
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             value: settings.actionIconsView,
@@ -144,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Actions order'),
+                        title: const Text('Actions order'),
                         trailing: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             value: settings.actionsOrder,
@@ -162,8 +162,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title:
-                            Text('Swipe to close action (from left to right)'),
+                        title: const Text(
+                            'Swipe to close action (from left to right)'),
                         trailing: Switch(
                             value: settings.actionSwipeToClose,
                             onChanged: (value) =>
@@ -191,8 +191,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       Divider(),
                       ListTile(
-                        title:
-                            Text('Subscription watchdog interval (in seconds)'),
+                        title: const Text(
+                            'Subscription watchdog interval (in seconds)'),
                         subtitle: TextField(
                           // The key is required here, see https://github.com/flutter/flutter/issues/36539.
                           key: PageStorageKey(
@@ -215,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       Divider(),
                       ListTile(
-                        title: Text('Show new event notification'),
+                        title: const Text('Show new event notification'),
                         trailing: Switch(
                             value: settings.showNewEventNotification,
                             onChanged: (value) =>
@@ -231,7 +231,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     initiallyExpanded: false,
                     children: [
                       ListTile(
-                        title: Text('Use internal viewers if possible'),
+                        title: const Text('Use internal viewers if possible'),
                         trailing: Switch(
                             value: settings.useInternalViewers,
                             onChanged: (value) =>
@@ -253,8 +253,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title:
-                            Text('Use scrollable indexed list (experimental)'),
+                        title: const Text(
+                            'Use scrollable indexed list (experimental)'),
                         trailing: Switch(
                             value: settings.useScrollableIndexedList,
                             onChanged: (value) =>
@@ -287,7 +287,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     initiallyExpanded: false,
                     children: [
                       ListTile(
-                        title: Text('Cluster data markers'),
+                        title: const Text('Cluster data markers'),
                         trailing: Switch(
                             value: settings.mapEnableClusterMarkers,
                             onChanged: (value) =>
@@ -296,7 +296,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Show marker badges'),
+                        title: const Text('Show marker badges'),
                         trailing: Switch(
                             value: settings.mapEnableMarkerBadges,
                             onChanged: (value) =>
@@ -305,7 +305,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Show current location (experimental)'),
+                        title:
+                            const Text('Show current location (experimental)'),
                         trailing: Switch(
                             value: settings.mapEnableCurrentLocation,
                             onChanged: (value) =>
@@ -315,7 +316,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Follow current location'),
+                        title: const Text('Follow current location'),
                         trailing: Switch(
                             value: settings.mapFollowCurrentLocation,
                             onChanged: (value) =>
@@ -325,7 +326,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Full screen'),
+                        title: const Text('Full screen'),
                         trailing: Switch(
                             value: settings.mapFullScreen,
                             onChanged: (value) =>
@@ -340,7 +341,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     initiallyExpanded: false,
                     children: [
                       ListTile(
-                        title: Text('Use authentication token'),
+                        title: const Text('Use authentication token'),
                         trailing: Switch(
                             value: settings.autoUseAuthToken,
                             onChanged: (value) =>
@@ -349,7 +350,8 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ),
                       _buildDivider(),
                       ListTile(
-                        title: Text('Service discovery timeot (in seconds)'),
+                        title:
+                            const Text('Service discovery timeot (in seconds)'),
                         subtitle: TextField(
                           // The key is required here, see https://github.com/flutter/flutter/issues/36539.
                           key:
@@ -400,7 +402,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
   }
 
   Widget _buildDivider() {
-    return Divider(
+    return const Divider(
       indent: 10,
       endIndent: 10,
     );
@@ -414,7 +416,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
           }
         },
         itemBuilder: (BuildContext context) => [
-          PopupMenuItem<String>(
+          const PopupMenuItem<String>(
             key: Key('settings-menu-reset'),
             value: 'reset',
             child: IconTextPopupMenuItemWidget(

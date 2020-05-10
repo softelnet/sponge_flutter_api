@@ -85,9 +85,9 @@ class _ActionResultWidgetState extends State<ActionResultWidget>
           child: Container(
             child: Text(
               'Error: $exception',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
-            margin: EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
           ),
           color: Colors.red,
         ),

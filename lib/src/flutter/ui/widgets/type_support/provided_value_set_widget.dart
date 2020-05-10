@@ -92,7 +92,7 @@ class _ProvidedValueSetEditorWidgetState
                   style: getArgLabelTextStyle(context),
                 ),
                 Container(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                 ),
                 Expanded(
                   child: dropdown,

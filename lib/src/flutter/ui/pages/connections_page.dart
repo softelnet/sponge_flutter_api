@@ -58,7 +58,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Connections'),
+        title: const Text('Connections'),
         actions: _buildMenu(context),
       ),
       body: SafeArea(
@@ -71,7 +71,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
         onPressed: () =>
             _addConnection().catchError((e) => handleError(context, e)),
         tooltip: 'Add',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

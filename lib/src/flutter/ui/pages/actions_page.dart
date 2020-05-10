@@ -167,7 +167,7 @@ class _ActionsPageState extends State<ActionsPage>
           context,
           child: _presenter.connected
               ? (_busyNoConnection
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : _buildActionGroupWidget(context, snapshot))
               : ConnectionNotInitializedWidget(
                   hasConnections: _presenter.hasConnections),
@@ -319,7 +319,7 @@ class _ActionsPageState extends State<ActionsPage>
                 key: Key('filterByNetwork'),
                 value: 'filterByNetwork',
                 checked: service.settings.filterConnectionsByNetwork,
-                child: Text('Filter by network'),
+                child: const Text('Filter by network'),
               ),
             if (widget.onGetNetworkStatus != null && connections.isNotEmpty)
               PopupMenuDivider(),
@@ -346,7 +346,7 @@ class _ActionsPageState extends State<ActionsPage>
             .then((_) => setState(() {}))
             .catchError((e) => handleError(context, e)),
         tooltip: 'Refresh actions',
-        child: Icon(Icons.refresh),
+        child: const Icon(Icons.refresh),
       );
 
   Future<void> _refreshActions(BuildContext context) async {
@@ -366,8 +366,8 @@ class _ActionsPageState extends State<ActionsPage>
         return ListView.builder(
           key: PageStorageKey<String>(
               '${_presenter.connectionName}-actions-$tabName'),
-          padding: const EdgeInsets.only(
-              left: 4.0, right: 4.0, top: 4.0, bottom: 100.0),
+          padding:
+              const EdgeInsets.only(left: 4.0, right: 4.0, top: 4.0, bottom: 100.0),
           itemBuilder: (context, i) {
             var actionData = actions[i];
             return ActionListItem(

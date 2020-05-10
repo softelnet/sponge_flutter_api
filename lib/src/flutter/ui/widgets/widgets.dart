@@ -57,8 +57,10 @@ class DefaultDrawerHeader extends StatelessWidget {
         color: isDarkTheme(context)
             ? Theme.of(context).dialogBackgroundColor
             : Theme.of(context).accentColor,
-        image: DecorationImage(
-            image: AssetImage('assets/images/banner.png'), fit: BoxFit.cover),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/banner.png'),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

@@ -74,7 +74,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
                             ? Image.memory(snapshot.data)
                             : snapshot.hasError
                                 ? Text('Error: ${snapshot.error}')
-                                : CircularProgressIndicator(),
+                                : const CircularProgressIndicator(),
                   )
                 : null;
             return Container(
@@ -160,7 +160,7 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
         if (viewerContext.typeLabel != null) Text(viewerContext.typeLabel),
         if (viewerContext.typeLabel != null)
           Container(
-            margin: EdgeInsets.all(2.0),
+            margin: const EdgeInsets.all(2.0),
           ),
         Center(child: _createCompactViewerDataWidget(viewerContext)),
       ],
@@ -812,7 +812,7 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
       if (image != null) {
         return Container(
           child: image,
-          padding: EdgeInsets.symmetric(vertical: 5),
+          padding: const EdgeInsets.symmetric(vertical: 5),
         );
       }
     }

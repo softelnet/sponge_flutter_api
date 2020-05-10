@@ -54,7 +54,7 @@ Future<bool> showConfirmationDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation'),
+          title: const Text('Confirmation'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -64,13 +64,13 @@ Future<bool> showConfirmationDialog(
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('YES'),
+              child: const Text('YES'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(true);
               },
             ),
             FlatButton(
-              child: Text('NO'),
+              child: const Text('NO'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(false);
               },

@@ -60,7 +60,7 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
     Color choosenColor = await showDialog<Color>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text('Pick a color'),
+        title: const Text('Pick a color'),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: suggestedColor,
@@ -72,13 +72,13 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text('OK'),
+            child: const Text('OK'),
             onPressed: () {
               Navigator.of(context).pop(_currentPickerColor);
             },
           ),
           FlatButton(
-            child: Text('CANCEL'),
+            child: const Text('CANCEL'),
             onPressed: () {
               Navigator.of(context).pop(null);
             },

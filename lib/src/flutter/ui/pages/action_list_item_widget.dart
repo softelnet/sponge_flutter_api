@@ -177,7 +177,7 @@ class _ActionListItemState extends State<ActionListItem>
         Container(
           child: resultWidget,
           alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(top: 5.0),
+          padding: const EdgeInsets.only(top: 5.0),
         ),
       _buildButtonBar(context),
     ]);

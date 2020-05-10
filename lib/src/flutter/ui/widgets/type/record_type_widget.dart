@@ -73,7 +73,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
     var label = _presenter.label;
     bool isExpanded = _presenter.isExpanded();
 
-    var margin = EdgeInsets.only(bottom: 5);
+    var margin = const EdgeInsets.only(bottom: 5);
 
     // Return widget for a null record in the read only mode.
     if (_presenter.shouldShowNullValue) {
@@ -163,7 +163,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
               shape: BoxShape.circle,
               color: Theme.of(context).dividerColor,
             ),
-            margin: EdgeInsets.only(bottom: 5, right: 5),
+            margin: const EdgeInsets.only(bottom: 5, right: 5),
           ),
           alignment: Alignment.centerRight,
         ));
@@ -181,7 +181,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
       widgets.add(_buildFieldGroupWidget(context, group));
 
       if (i < groups.length - 1) {
-        widgets.add(Divider(height: 10));
+        widgets.add(const Divider(height: 10));
       }
     });
 
@@ -279,7 +279,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
           isFieldReadOnly ||
           !_presenter.isRecordEnabled) {
         return Padding(
-          padding: EdgeInsets.only(left: 0, right: 0, top: 5, bottom: 5),
+          padding: const EdgeInsets.only(left: 0, right: 0, top: 5, bottom: 5),
           child: _presenter.typeGuiProviders[qFieldType.type.name]
               .createViewer(editorContext.cloneAsViewer()),
         );
