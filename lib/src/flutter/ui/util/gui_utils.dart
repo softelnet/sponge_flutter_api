@@ -198,6 +198,18 @@ typedef GetProvidedArgCallback = ProvidedValue Function(
 
 Widget createClearableTextFieldSuffixIcon(
     BuildContext context, TextEditingController controller) {
+  return createClearableFieldSuffixIcon(
+    context,
+    onClear: () => WidgetsBinding.instance.addPostFrameCallback(
+      (_) => controller.clear(),
+    ),
+  );
+}
+
+Widget createClearableFieldSuffixIcon(
+  BuildContext context, {
+  @required Function() onClear,
+}) {
   return InkResponse(
     key: Key('text-clear'),
     child: Icon(
@@ -205,7 +217,6 @@ Widget createClearableTextFieldSuffixIcon(
       color: Colors.grey,
       size: getArgLabelTextStyle(context).fontSize * 1.5,
     ),
-    onTap: () =>
-        WidgetsBinding.instance.addPostFrameCallback((_) => controller.clear()),
+    onTap: () => onClear?.call(),
   );
 }

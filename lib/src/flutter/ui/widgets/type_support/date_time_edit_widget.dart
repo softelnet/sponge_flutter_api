@@ -15,24 +15,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
 class DateTimeEditWidget extends StatefulWidget {
   DateTimeEditWidget({
     Key key,
     @required this.name,
+    @required this.type,
     @required this.initialValue,
     @required this.onValueChanged,
     this.enabled = true,
+    this.nullable = false,
     this.firstDate,
     this.lastDate,
     this.yearsRange = 200,
   }) : super(key: key);
 
   final String name;
+  final DateTimeType type;
   final DateTime initialValue;
   final ValueChanged<DateTime> onValueChanged;
   final bool enabled;
+  final bool nullable;
   final DateTime firstDate;
   final DateTime lastDate;
   final int yearsRange;
@@ -41,28 +46,50 @@ class DateTimeEditWidget extends StatefulWidget {
   _DateTimeEditWidgetState createState() => _DateTimeEditWidgetState();
 }
 
-// TODO DateTime editor support for different dateTimeKind.
+// TODO DateTime editor support for DATE_TIME_ZONE and INSTANT.
 class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
+  bool get hasDate =>
+      widget.type.dateTimeKind == DateTimeKind.DATE ||
+      widget.type.dateTimeKind == DateTimeKind.DATE_TIME;
+
+  bool get hasTime =>
+      widget.type.dateTimeKind == DateTimeKind.TIME ||
+      widget.type.dateTimeKind == DateTimeKind.DATE_TIME;
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (widget.name != null) Text(widget.name),
-        FlatButton(
-          child: Text(widget.initialValue != null
-              ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
-              : 'DATE'),
-          onPressed: () =>
-              _showDatePicker().catchError((e) => handleError(context, e)),
-        ),
-        FlatButton(
-          child: Text(widget.initialValue != null
-              ? DateFormat('HH:mm').format(widget.initialValue)
-              : 'TIME'),
-          onPressed: () =>
-              _showTimePicker().catchError((e) => handleError(context, e)),
-        ),
+        if (hasDate)
+          FlatButton(
+            child: Text(widget.initialValue != null
+                ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
+                : 'DATE'),
+            onPressed: () =>
+                _showDatePicker().catchError((e) => handleError(context, e)),
+          ),
+        if (hasTime)
+          FlatButton(
+            child: Text(widget.initialValue != null
+                ? DateFormat('HH:mm').format(widget.initialValue)
+                : 'TIME'),
+            onPressed: () =>
+                _showTimePicker().catchError((e) => handleError(context, e)),
+          ),
+        if (widget.nullable && widget.enabled)
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: createClearableFieldSuffixIcon(
+                context,
+                onClear: () {
+                  widget.onValueChanged(null);
+                },
+              ),
+            ),
+          )
       ],
     );
   }
@@ -109,6 +136,12 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
     TimeOfDay picked = await showTimePicker(
       context: context,
       initialTime: initialTime,
+      builder: (BuildContext context, Widget child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child,
+        );
+      },
     );
     if (picked != null) {
       var newValue = widget.initialValue ?? DateTime.now();

@@ -67,6 +67,7 @@ class FlutterApplicationService<S extends FlutterSpongeService,
   factory FlutterApplicationService.of(ApplicationService service) =>
       service as FlutterApplicationService;
 
+  @mustCallSuper
   Future<void> init() async {
     if (_initialized) {
       return;

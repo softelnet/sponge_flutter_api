@@ -183,6 +183,22 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
 class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
   BooleanTypeGuiProvider(DataType type) : super(type);
 
+  Widget _wrap(UiContext uiContext, Widget widget) {
+    var label = uiContext.getDecorationLabel();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (label != null)
+          Text(
+            label,
+            style: getArgLabelTextStyle(uiContext.context),
+          ),
+        widget,
+      ],
+    );
+  }
+
   @override
   Widget createEditor(TypeEditorContext editorContext) {
     String widgetType = Features.getOptional(
@@ -193,27 +209,16 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         ? null
         : (bool value) => editorContext.onSave(value);
 
-    var label = editorContext.getDecorationLabel();
-
-    var wrap = (Widget widget) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (label != null)
-              Text(
-                label,
-                style: getArgLabelTextStyle(editorContext.context),
-              ),
-            widget,
-          ],
-        );
-
     if (widgetType == Features.WIDGET_SWITCH &&
         !editorContext.qualifiedType.type.nullable) {
-      return wrap(Switch(
-        key: createDataTypeKey(editorContext.qualifiedType),
-        value: editorContext.value ?? (type.nullable ? null : false),
-        onChanged: onChanged,
-      ));
+      return _wrap(
+        editorContext,
+        Switch(
+          key: createDataTypeKey(editorContext.qualifiedType),
+          value: editorContext.value ?? (type.nullable ? null : false),
+          onChanged: onChanged,
+        ),
+      );
     } else if (iconInfo?.name != null &&
         !editorContext.qualifiedType.type.nullable) {
       return IconButton(
@@ -224,12 +229,15 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
             : null,
       );
     } else {
-      return wrap(Checkbox(
-        key: createDataTypeKey(editorContext.qualifiedType),
-        value: editorContext.value ?? (type.nullable ? null : false),
-        onChanged: onChanged,
-        tristate: type.nullable,
-      ));
+      return _wrap(
+        editorContext,
+        Checkbox(
+          key: createDataTypeKey(editorContext.qualifiedType),
+          value: editorContext.value ?? (type.nullable ? null : false),
+          onChanged: onChanged,
+          tristate: type.nullable,
+        ),
+      );
     }
   }
 
@@ -239,23 +247,15 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
 
   @override
   Widget createViewer(TypeViewerContext viewerContext) {
-    var boolValue = viewerContext.value as bool;
-
-    var label = viewerContext.getDecorationLabel();
-
-    return boolValue != null
-        ? CheckboxListTile(
-            title: label != null
-                ? Text(
-                    label,
-                    style: getArgLabelTextStyle(viewerContext.context),
-                  )
-                : null,
-            value: boolValue,
-            onChanged: null,
-            dense: true,
-          )
-        : null;
+    return _wrap(
+      viewerContext,
+      Checkbox(
+        key: createDataTypeKey(viewerContext.qualifiedType),
+        value: viewerContext.value,
+        onChanged: null,
+        tristate: type.nullable || viewerContext.value == null,
+      ),
+    );
   }
 }
 
@@ -270,9 +270,11 @@ class DateTimeTypeGuiProvider extends BaseUnitTypeGuiProvider<DateTimeType> {
       return DateTimeEditWidget(
         key: createDataTypeKey(editorContext.qualifiedType),
         name: editorContext.getDecorationLabel(),
+        type: editorContext.qualifiedType.type,
         initialValue: editorContext.value,
         onValueChanged: editorContext.onSave,
         enabled: editorContext.enabled && !editorContext.readOnly,
+        nullable: editorContext.qualifiedType.type.nullable,
         firstDate: type.minValue,
         lastDate: type.maxValue,
       );
