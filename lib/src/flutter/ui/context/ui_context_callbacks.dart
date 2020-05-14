@@ -21,6 +21,7 @@ abstract class UiContextCallbacks {
   void onUpdate(QualifiedDataType qType, dynamic value);
   void onActivate(QualifiedDataType qType, dynamic value);
   ProvidedValue onGetProvidedArg(QualifiedDataType qType);
+  Future<void> onRefresh();
   Future<void> onRefreshArgs();
   Future<bool> onSaveForm();
   Future<void> onBeforeSubActionCall();
@@ -58,6 +59,9 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
 
   @override
   bool shouldBeEnabled(QualifiedDataType qType) => true;
+
+  @override
+  Future<void> onRefresh() async {}
 
   @override
   Future<void> onRefreshArgs() async {}

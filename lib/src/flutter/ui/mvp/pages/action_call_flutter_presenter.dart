@@ -54,6 +54,11 @@ class FlutterActionCallPresenter extends ActionCallPresenter
       session.shouldBeEnabled(qType);
 
   @override
+  Future<void> onRefresh() async {
+    await view.refresh();
+  }
+
+  @override
   Future<void> onRefreshArgs() async {
     await view.refreshArgs();
   }

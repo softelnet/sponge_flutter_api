@@ -336,6 +336,11 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   @override
+  Future<void> refresh() async {
+    setState(() {});
+  }
+
+  @override
   Future<void> refreshArgs() async {
     if (!mounted) {
       return;

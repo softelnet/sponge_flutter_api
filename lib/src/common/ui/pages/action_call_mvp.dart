@@ -29,6 +29,7 @@ class ActionCallViewModel extends BaseViewModel {
 }
 
 abstract class ActionCallView extends BaseView {
+  Future<void> refresh();
   Future<void> refreshArgs();
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
