@@ -313,7 +313,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
   }
 
   Future<void> verifyServerVersion(BuildContext context, String version) async {
-    if (SpongeUtils.isServerVersionCompatible(version)) {
+    if (SpongeClientUtils.isServerVersionCompatible(version)) {
       await showModalDialog(
           context, 'Information', Text('The connection is OK.'));
     } else {
