@@ -40,8 +40,8 @@ class SpongeService<AD extends ActionData> {
   TypeConverter typeConverter;
   FeatureConverter featureConverter;
 
-  SpongeRestClient _client;
-  SpongeRestClient get client => _client;
+  SpongeClient _client;
+  SpongeClient get client => _client;
   SpongeGrpcClient _grpcClient;
   SpongeGrpcClient get grpcClient => _grpcClient;
 
@@ -409,7 +409,7 @@ class SpongeService<AD extends ActionData> {
   static Future<String> verifyConnection(SpongeConnection connection) async =>
       await _createSpongeClient(connection).getVersion();
 
-  static SpongeRestClient _createSpongeClient(
+  static SpongeClient _createSpongeClient(
     SpongeConnection connection, {
     TypeConverter typeConverter,
     FeatureConverter featureConverter,
@@ -420,8 +420,8 @@ class SpongeService<AD extends ActionData> {
       throw UsernamePasswordNotSetException(connection.name);
     }
 
-    return SpongeRestClient(
-      SpongeRestClientConfiguration(
+    return SpongeClient(
+      SpongeClientConfiguration(
         connection.url,
         username: connection.anonymous ? null : connection.username,
         password: connection.anonymous ? null : connection.password,
@@ -433,7 +433,7 @@ class SpongeService<AD extends ActionData> {
   }
 
   SpongeGrpcClient createSpongeGrpcClient(
-      SpongeRestClient client, SpongeConnection connection) {
+      SpongeClient client, SpongeConnection connection) {
     return DefaultSpongeGrpcClient(
       client,
       channelOptions: ChannelOptions(
