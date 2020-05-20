@@ -82,9 +82,10 @@ class SpongeService<AD extends ActionData> {
     );
 
     serviceFeatures = await _client.getFeatures();
-    String version =
-        serviceFeatures[SpongeClientConstants.REMOTE_API_FEATURE_VERSION];
-    if (version == null || !SpongeClientUtils.isServerVersionCompatible(version)) {
+    String version = serviceFeatures[
+        SpongeClientConstants.REMOTE_API_FEATURE_SPONGE_VERSION];
+    if (version == null ||
+        !SpongeClientUtils.isServerVersionCompatible(version)) {
       throw SpongeException(
           'The Sponge server version $version is incompatible '
           'with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*');
