@@ -154,7 +154,7 @@ class SpongeService<AD extends ActionData> {
 
     ActionCallResultInfo resultInfo;
     try {
-      var result = await _client.call(actionMeta.name, args, actionMeta);
+      var result = await _client.call(actionMeta.name, args: args, actionMeta: actionMeta);
       resultInfo = ActionCallResultInfo(result: result);
 
       // Handle action intent after call.
