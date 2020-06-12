@@ -179,9 +179,8 @@ IconData getPopupMenuIconData(BuildContext context) {
     case TargetPlatform.fuchsia:
       return Icons.more_vert;
     case TargetPlatform.iOS:
-      // TODO Uncomment after Flutter upgrade: case TargetPlatform.macOS:
+    case TargetPlatform.macOS:
       return Icons.more_horiz;
-      break;
     default:
       return Icons.more_vert;
   }
