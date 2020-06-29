@@ -253,6 +253,8 @@ class FlutterApplicationSettings extends ApplicationSettings {
   Future<bool> setMapFullScreen(bool value) async =>
       await _prefs.setBool(PREF_MAP_FULL_SCREEN, value);
 
+  bool get exitConfirmation => false;
+
   @override
   Future<void> clear() async {
     for (var key in _prefs

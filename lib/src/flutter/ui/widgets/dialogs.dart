@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 
 Future<void> showErrorDialog(BuildContext context, String message) async {
   await showModalDialog(context, 'Error', Text(message));
@@ -81,6 +82,11 @@ Future<bool> showConfirmationDialog(
   return result ?? false;
 }
 
-Future<bool> showAppExitConfirmationDialog(BuildContext context) async =>
-    await showConfirmationDialog(
+Future<bool> showAppExitConfirmationDialog(BuildContext context) async {
+  if (ApplicationProvider.of(context).service.settings.exitConfirmation) {
+    return await showConfirmationDialog(
         context, 'Are you sure you want to exit the app?');
+  }
+
+  return true;
+}
