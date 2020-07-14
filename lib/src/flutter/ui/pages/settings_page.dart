@@ -72,11 +72,20 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                     children: [
                       ListTile(
                         title: const Text('Dark theme'),
-                        trailing: Switch(
-                          value: settings.isDarkMode,
-                          onChanged: (value) => _presenter.toggleTheme(),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: settings.themeMode,
+                            items: settings.themeModeValueSet
+                                .map((annotatedValue) => DropdownMenuItem(
+                                      value: annotatedValue.value,
+                                      child: Text(annotatedValue.valueLabel),
+                                    ))
+                                .toList(),
+                            onChanged: (value) async =>
+                                _presenter.onThemeModeChange(value),
+                            isDense: true,
+                          ),
                         ),
-                        onTap: () => _presenter.toggleTheme(),
                       )
                     ],
                   ),

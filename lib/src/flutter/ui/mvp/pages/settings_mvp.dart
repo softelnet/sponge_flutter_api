@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:flutter/material.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_constants.dart';
@@ -174,8 +175,10 @@ class SettingsPresenter extends BasePresenter<SettingsViewModel, SettingsView> {
     view.refresh();
   }
 
-  Future<void> toggleTheme() async {
-    await settings.setIsDarkMode(!settings.isDarkMode);
+  Future<void> onThemeModeChange(ThemeMode value) async {
+    await settings.setThemeMode(value);
+
+    view.refresh();
   }
 
   Future<void> onArgumentListElementTapBehaviorChange(String value) async {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
@@ -23,7 +24,7 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   static const String _PREF_PREFIX = 'settings.';
 
-  static const String PREF_IS_DARK_MODE = '$_PREF_PREFIX.isDarkMode';
+  static const String PREF_THEME_MODE = '$_PREF_PREFIX.themeMode';
 
   static const String PREF_ACTION_LIST_TABS = '$_PREF_PREFIX.tabsInActionList';
 
@@ -85,10 +86,20 @@ class FlutterApplicationSettings extends ApplicationSettings {
 
   final ApplicationStateNotifier _stateNotifier;
 
-  bool get isDarkMode => _prefs.getBool(PREF_IS_DARK_MODE) ?? true;
+  List<AnnotatedValue> get themeModeValueSet => [
+        AnnotatedValue(ThemeMode.system, valueLabel: 'Default'),
+        AnnotatedValue(ThemeMode.dark, valueLabel: 'Dark'),
+        AnnotatedValue(ThemeMode.light, valueLabel: 'Light')
+      ];
 
-  Future<bool> setIsDarkMode(bool value) async {
-    var result = await _prefs.setBool(PREF_IS_DARK_MODE, value);
+  ThemeMode get themeMode =>
+      ThemeMode.values.firstWhere(
+          (e) => e.toString() == _prefs.getString(PREF_THEME_MODE),
+          orElse: () => null) ??
+      ThemeMode.system;
+
+  Future<bool> setThemeMode(ThemeMode value) async {
+    var result = await _prefs.setString(PREF_THEME_MODE, value.toString());
 
     _stateNotifier.notify();
 
