@@ -15,7 +15,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 
 Future<void> showDefaultAboutAppDialog(
   BuildContext context, {
@@ -23,11 +23,9 @@ Future<void> showDefaultAboutAppDialog(
   String imageAsset,
   String applicationLegalese,
 }) async {
-  var packageInfo = await PackageInfo.fromPlatform();
-
   showAboutDialog(
       context: context,
-      applicationVersion: packageInfo.version,
+      applicationVersion: await CommonUtils.getPackageVersion(),
       applicationIcon: Image.asset(
         imageAsset ?? 'assets/images/icon_small.png',
         fit: BoxFit.scaleDown,

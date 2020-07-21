@@ -16,7 +16,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,17 +37,17 @@ class DefaultDrawerHeader extends StatelessWidget {
           Image.asset('assets/images/logo.png', fit: BoxFit.scaleDown),
           Container(
             alignment: Alignment.centerRight,
-            child: FutureBuilder<PackageInfo>(
-              future: PackageInfo.fromPlatform(),
+            child: FutureBuilder<String>(
+              future: CommonUtils.getPackageVersion(),
               builder: (context, snapshot) {
                 return Text(
                     snapshot.hasData
-                        ? '$applicationName, ver. ${snapshot.data.version}'
+                        ? '$applicationName, ver. ${snapshot.data}'
                         : '',
                     style: DefaultTextStyle.of(context)
                         .style
                         .apply(color: Colors.white)
-                        .apply(fontSizeFactor: 1.2));
+                        .apply(fontSizeFactor: 1.1));
               },
             ),
           ),

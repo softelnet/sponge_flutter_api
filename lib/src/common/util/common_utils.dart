@@ -14,6 +14,8 @@
 
 import 'dart:async';
 
+import 'package:package_info/package_info.dart';
+
 typedef VoidFutureOrCallback = FutureOr<void> Function();
 
 class CommonUtils {
@@ -27,4 +29,10 @@ class CommonUtils {
       // It's important not to use the SocketException class directly because it will impact the supported platforms.
       // The https://pub.dev/packages/io doesn't support web.
       error?.runtimeType?.toString() == 'SocketException';
+
+  static Future<String> getPackageVersion() async {
+    var version = (await PackageInfo.fromPlatform()).version;
+
+    return '$version (alpha)';
+  }
 }
