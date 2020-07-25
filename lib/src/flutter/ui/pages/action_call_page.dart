@@ -99,10 +99,7 @@ class _ActionCallPageState extends State<ActionCallPage>
             _presenter.canSwipeToClose ? (context) => _onCancel(context) : null,
         child: Scaffold(
           appBar: AppBar(
-            title: Tooltip(
-              message: _presenter.title,
-              child: Text('${_presenter.title}'),
-            ),
+            title: _buildTitle(context),
             actions:
                 subActionsWidget != null ? <Widget>[subActionsWidget] : null,
           ),
@@ -118,6 +115,17 @@ class _ActionCallPageState extends State<ActionCallPage>
         _onClose();
         return true;
       },
+    );
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    return Tooltip(
+      child: Text(
+        _presenter.title,
+        softWrap: true,
+        overflow: TextOverflow.visible,
+      ),
+      message: _presenter.title,
     );
   }
 
