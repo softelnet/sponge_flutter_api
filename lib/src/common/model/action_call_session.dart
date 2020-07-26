@@ -105,6 +105,10 @@ class ActionCallSession {
 
   final VoidFutureOrCallback _onEventError;
 
+  bool _submittableBlocking = false;
+
+  bool get blocking => _submittableBlocking;
+
   void open() {
     if (_running) {
       return;
@@ -246,16 +250,20 @@ class ActionCallSession {
         _logger.finer(
             'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, argFeatures: $argFeatures, loading: $loading');
 
-        Map<String, ProvidedValue> newProvidedArgs =
-            await spongeService.client.provideActionArgs(
-          actionData.actionMeta.name,
-          provide: namesToProvide,
-          submit: List.of(actualArgsToSubmit.keys),
-          current: current,
-          dynamicTypes: dynamicTypes,
-          argFeatures: argFeatures,
-          initial: _initialProvideArgs,
-        );
+        Map<String, ProvidedValue> newProvidedArgs;
+        try {
+          newProvidedArgs = await spongeService.client.provideActionArgs(
+            actionData.actionMeta.name,
+            provide: namesToProvide,
+            submit: List.of(actualArgsToSubmit.keys),
+            current: current,
+            dynamicTypes: dynamicTypes,
+            argFeatures: argFeatures,
+            initial: _initialProvideArgs,
+          );
+        } finally {
+          _submittableBlocking = false;
+        }
 
         _initialProvideArgs = false;
 
@@ -396,6 +404,8 @@ class ActionCallSession {
 
       if ((qType.type.provided?.submittable != null) && qType.path != null) {
         _argsToSubmit[qType.path] = value;
+
+        _setupSubmittableToSubmit(qType);
       }
 
       return true;
@@ -407,12 +417,22 @@ class ActionCallSession {
   bool activate(QualifiedDataType qType, value) {
     if ((qType.type.provided?.submittable != null) && qType.path != null) {
       _argsToSubmit[qType.path] = value;
+      _setupSubmittableToSubmit(qType);
+
       _provideArgsBloc.provideArgs();
 
       return true;
     }
 
     return false;
+  }
+
+  void _setupSubmittableToSubmit(QualifiedDataType qType) {
+    if (!_submittableBlocking) {
+      _submittableBlocking = Features.getBool(
+          qType.type.features, Features.SUBMITTABLE_BLOCKING,
+          orElse: () => false);
+    }
   }
 
   ProvidedValue getProvidedArg(QualifiedDataType qType) =>

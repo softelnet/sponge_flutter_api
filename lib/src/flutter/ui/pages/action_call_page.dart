@@ -178,7 +178,10 @@ class _ActionCallPageState extends State<ActionCallPage>
                   ),
                 );
               } else {
-                return _buildActionCallWidget(context, state);
+                return ModalProgressHUD(
+                  child: _buildActionCallWidget(context, state),
+                  inAsyncCall: _presenter.busy,
+                );
               }
             },
           )
@@ -323,8 +326,8 @@ class _ActionCallPageState extends State<ActionCallPage>
           if (_presenter.callImmediately) {
             await callActionImmediately(
               context: context,
-              onBeforeCall: () => setState(() => _presenter.busy = true),
-              onAfterCall: () => setState(() => _presenter.busy = false),
+              onBeforeCall: () => setState(() => _presenter.calling = true),
+              onAfterCall: () => setState(() => _presenter.calling = false),
               actionData: _presenter.actionData,
               bloc: widget.bloc,
               showResultDialog: widget.showResultDialog,
@@ -358,14 +361,14 @@ class _ActionCallPageState extends State<ActionCallPage>
       context,
       () async {
         setState(() {
-          _presenter.busy = true;
+          _presenter.calling = true;
         });
         try {
           await _presenter.refreshAllowedProvidedArgsSilently();
         } finally {
           if (mounted) {
             setState(() {
-              _presenter.busy = false;
+              _presenter.calling = false;
             });
           }
         }
@@ -399,7 +402,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   @override
   Future<void> onBeforeSubActionCall() async {
     setState(() {
-      _presenter.busy = true;
+      _presenter.calling = true;
     });
   }
 
@@ -422,7 +425,7 @@ class _ActionCallPageState extends State<ActionCallPage>
       await _presenter.refreshAllowedProvidedArgsSilently();
     } finally {
       setState(() {
-        _presenter.busy = false;
+        _presenter.calling = false;
       });
     }
   }

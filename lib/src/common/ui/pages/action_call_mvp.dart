@@ -45,7 +45,8 @@ class ActionCallPresenter
     viewModel.actionData = viewModel.actionData.clone();
   }
 
-  bool busy = false;
+  bool get busy => calling || _session.blocking;
+  bool calling = false;
   bool get callable => actionMeta.callable ?? true;
 
   ActionCallSession _session;
