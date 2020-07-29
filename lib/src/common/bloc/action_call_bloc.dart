@@ -27,19 +27,15 @@ class ActionCallBloc extends Bloc<List, ActionCallState> {
     @required bool saveState,
   })  : _spongeService = spongeService,
         _actionName = actionName,
-        _initialState = initialState ?? ActionCallStateInitialize(),
-        _saveState = saveState;
+        _saveState = saveState,
+        super(initialState ?? ActionCallStateInitialize());
 
   final SpongeService _spongeService;
   final String _actionName;
-  final ActionCallState _initialState;
   final bool _saveState;
 
   // A non null event indicationg a `clear` event.
   static const _clearArgsEvent = [];
-
-  @override
-  ActionCallState get initialState => _initialState;
 
   @override
   Stream<ActionCallState> mapEventToState(List actionArgs) {

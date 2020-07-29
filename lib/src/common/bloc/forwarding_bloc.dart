@@ -16,12 +16,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
 class ForwardingBloc<T> extends Bloc<T, T> {
-  ForwardingBloc({@required this.initialValue});
-
-  T initialValue;
-
-  @override
-  T get initialState => initialValue;
+  ForwardingBloc({@required T initialValue}) : super(initialValue);
 
   @override
   Stream<T> mapEventToState(T event) async* {

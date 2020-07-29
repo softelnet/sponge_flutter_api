@@ -51,7 +51,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget>
     _presenter.updateModel(model);
 
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-      bloc: _presenter.bloc,
+      cubit: _presenter.bloc,
       builder: (BuildContext context, ActionCallState state) {
         return _buildResultWidget(context, state);
       },

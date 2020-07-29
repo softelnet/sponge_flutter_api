@@ -60,7 +60,7 @@ class _ActionListItemState extends State<ActionListItem>
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-        bloc: _presenter.bloc,
+        cubit: _presenter.bloc,
         builder: (BuildContext context, ActionCallState state) {
           _presenter.state = state;
 

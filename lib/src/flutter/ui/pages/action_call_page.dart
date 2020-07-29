@@ -164,7 +164,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   Widget _buildProvideArgsWidget(BuildContext context) {
     return _presenter.hasProvidedArgs
         ? BlocBuilder<ProvideActionArgsBloc, ProvideActionArgsState>(
-            bloc: _presenter.provideArgsBloc,
+            cubit: _presenter.provideArgsBloc,
             builder: (BuildContext context, ProvideActionArgsState state) {
               _presenter.error = null;
               if (state is ProvideActionArgsStateInitialize) {

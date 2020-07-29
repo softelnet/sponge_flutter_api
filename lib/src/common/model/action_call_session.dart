@@ -37,13 +37,9 @@ class ProvideActionArgsBloc
     @required ActionCallSession session,
     ProvideActionArgsState initialState,
   })  : _session = session,
-        _initialState = initialState ?? ProvideActionArgsStateInitialize();
+        super(initialState ?? ProvideActionArgsStateInitialize());
 
   final ActionCallSession _session;
-  final ProvideActionArgsState _initialState;
-
-  @override
-  ProvideActionArgsState get initialState => _initialState;
 
   @override
   Stream<ProvideActionArgsState> mapEventToState(

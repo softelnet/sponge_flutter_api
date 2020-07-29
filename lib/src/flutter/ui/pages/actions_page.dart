@@ -87,7 +87,7 @@ class _ActionsPageState extends State<ActionsPage>
     return WillPopScope(
       child: BlocBuilder<ForwardingBloc<SpongeConnectionState>,
               SpongeConnectionState>(
-          bloc: service.connectionBloc,
+          cubit: service.connectionBloc,
           builder: (BuildContext context, SpongeConnectionState state) {
             if (state is SpongeConnectionStateNotConnected) {
               return _buildScaffold(
