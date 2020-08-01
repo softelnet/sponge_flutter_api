@@ -59,6 +59,8 @@ typedef OnCreateRoutesCallback = Map<String, WidgetBuilder> Function();
 
 typedef OnCreateNetworkImageCallback = Widget Function(String src);
 
+typedef OnPopupMenuItemSelected<T> = void Function(BuildContext context, T value);
+
 class ConnectionsPageMenuItemConfiguration {
   ConnectionsPageMenuItemConfiguration({
     @required this.value,
@@ -68,5 +70,5 @@ class ConnectionsPageMenuItemConfiguration {
 
   final String value;
   final OnCreateConnectionsPageMenuItemCallback itemBuilder;
-  final PopupMenuItemSelected<ConnectionsPresenter> onSelected;
+  final OnPopupMenuItemSelected<ConnectionsPresenter> onSelected;
 }

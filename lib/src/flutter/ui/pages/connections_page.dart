@@ -161,7 +161,7 @@ class _ConnectionsPageState extends State<ConnectionsPage>
               .firstWhere((config) => config.value == value, orElse: () => null)
               ?.onSelected;
           if (customOnSelected != null) {
-            customOnSelected(_presenter);
+            customOnSelected(context, _presenter);
           } else {
             switch (value) {
               case 'filterByNetwork':
