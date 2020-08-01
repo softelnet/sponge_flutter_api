@@ -25,7 +25,8 @@ class EventsViewModel extends BaseViewModel {}
 abstract class EventsView extends BaseView {}
 
 class EventsPresenter extends BasePresenter<EventsViewModel, EventsView> {
-  EventsPresenter(ApplicationService service, EventsView view) : super(service, EventsViewModel(), view);
+  EventsPresenter(ApplicationService service, EventsView view)
+      : super(service, EventsViewModel(), view);
 
   static final Logger _logger = Logger('EventsPresenter');
 

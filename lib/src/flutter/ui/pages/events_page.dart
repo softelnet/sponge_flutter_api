@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/bloc/forwarding_bloc.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/events_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
 import 'package:sponge_flutter_api/src/flutter/gui_factory.dart';
@@ -143,11 +145,10 @@ class _EventsPageState extends State<EventsPage>
 
     return <Widget>[
       _presenter.subscriptionBloc != null
-          ? StreamBuilder<bool>(
-              stream: _presenter.subscriptionBloc,
-              initialData: false,
-              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                if (snapshot.data) {
+          ? BlocBuilder<ForwardingBloc<bool>, bool>(
+              cubit: _presenter.subscriptionBloc,
+              builder: (BuildContext context, bool state) {
+                if (state) {
                   _controller.repeat();
                 } else {
                   _controller.stop(canceled: false);
@@ -230,6 +231,9 @@ class _EventsPageState extends State<EventsPage>
       if (resultActionData != null) {
         setState(() {});
       }
+    } else {
+      await showWarningDialog(
+          context, 'An event subscription action not found.');
     }
   }
 }
