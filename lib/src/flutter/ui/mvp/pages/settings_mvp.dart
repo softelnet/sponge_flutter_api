@@ -222,6 +222,8 @@ class SettingsPresenter extends BasePresenter<SettingsViewModel, SettingsView> {
   Future<void> clearSettings() async {
     await service.clearSettings();
 
+    await settings.setThemeMode(settings.themeMode);
+
     view.refresh();
 
     return true;

@@ -87,7 +87,7 @@ class FlutterApplicationSettings extends ApplicationSettings {
   final ApplicationStateNotifier _stateNotifier;
 
   List<AnnotatedValue> get themeModeValueSet => [
-        AnnotatedValue(ThemeMode.system, valueLabel: 'Default'),
+        AnnotatedValue(ThemeMode.system, valueLabel: 'System'),
         AnnotatedValue(ThemeMode.dark, valueLabel: 'Dark'),
         AnnotatedValue(ThemeMode.light, valueLabel: 'Light')
       ];
@@ -96,7 +96,7 @@ class FlutterApplicationSettings extends ApplicationSettings {
       ThemeMode.values.firstWhere(
           (e) => e.toString() == _prefs.getString(PREF_THEME_MODE),
           orElse: () => null) ??
-      ThemeMode.system;
+      ThemeMode.dark;
 
   Future<bool> setThemeMode(ThemeMode value) async {
     var result = await _prefs.setString(PREF_THEME_MODE, value.toString());
