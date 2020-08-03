@@ -27,7 +27,10 @@ class ProvideActionArgsStateInitialize extends ProvideActionArgsState {}
 class ProvideActionArgsStateBeforeInvocation extends ProvideActionArgsState {
   ProvideActionArgsStateBeforeInvocation({
     @required List<String> loading,
+    this.initial = false,
   }) : super(loading: loading);
+
+  final bool initial;
 }
 
 class ProvideActionArgsStateAfterInvocation extends ProvideActionArgsState {}

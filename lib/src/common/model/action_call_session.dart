@@ -241,7 +241,8 @@ class ActionCallSession {
 
         var loading = namesToProvide + influencedBySummitted;
 
-        yield ProvideActionArgsStateBeforeInvocation(loading: loading);
+        yield ProvideActionArgsStateBeforeInvocation(
+            loading: loading, initial: _initialProvideArgs);
 
         _logger.finer(
             'Provide (${actionMeta.name}): $namesToProvide, submit: ${actualArgsToSubmit.keys}, current: $current, dynamicTypes: $dynamicTypes, argFeatures: $argFeatures, loading: $loading');

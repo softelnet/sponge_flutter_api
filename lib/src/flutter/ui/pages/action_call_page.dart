@@ -178,6 +178,11 @@ class _ActionCallPageState extends State<ActionCallPage>
                   ),
                 );
               } else {
+                if (state is ProvideActionArgsStateBeforeInvocation &&
+                    state.initial) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
                 return ModalProgressHUD(
                   child: _buildActionCallWidget(context, state),
                   inAsyncCall: _presenter.busy,
