@@ -214,6 +214,9 @@ class ActionCallSession {
         // Set pageable info if necessary.
         _setupPageableListsFeatures(namesToProvide, argFeatures);
 
+        // Save a copy of the original before the network call.
+        var actualArgsToSubmit = Map.of(_argsToSubmit);
+
         Set<String> currentNames = namesToProvide.expand((argName) {
           var arg = actionData.getArgType(argName);
 
@@ -221,11 +224,7 @@ class ActionCallSession {
               ? arg.provided.dependencies + [argName]
               : arg.provided.dependencies;
         }).toSet()
-          ..addAll(_getCurrentArgNamesForSubmit());
-
-        // Save a copy and clear the original before a network call.
-        var actualArgsToSubmit = Map.of(_argsToSubmit);
-        _argsToSubmit.clear();
+          ..addAll(_getCurrentArgNamesForSubmit(actualArgsToSubmit));
 
         // TODO The predefined doesn't support Dynamic values.
         var current =
@@ -260,6 +259,11 @@ class ActionCallSession {
           );
         } finally {
           _submittableBlocking = false;
+
+          // Remove from the global _argsToSubmit only those which values are the same as sent to the server.
+          _argsToSubmit.removeWhere((key, value) =>
+              actualArgsToSubmit.containsKey(key) &&
+              actualArgsToSubmit[key] == value);
         }
 
         _initialProvideArgs = false;
@@ -301,9 +305,9 @@ class ActionCallSession {
     }
   }
 
-  Set<String> _getCurrentArgNamesForSubmit() {
-    Set<String> currentNames = Set.from(_argsToSubmit.keys);
-    _argsToSubmit.keys.forEach((argName) {
+  Set<String> _getCurrentArgNamesForSubmit(Map<String, dynamic> argsToSubmit) {
+    Set<String> currentNames = Set.from(argsToSubmit.keys);
+    argsToSubmit.keys.forEach((argName) {
       var dependencies = actionData.getArgType(argName).provided?.dependencies;
       if (dependencies != null) {
         currentNames.addAll(dependencies);
