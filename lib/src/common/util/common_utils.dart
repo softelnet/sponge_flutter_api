@@ -35,4 +35,8 @@ class CommonUtils {
 
     return '$version (alpha)';
   }
+
+  static Future<String> getPackageBuildNumber() async {
+    return (await PackageInfo.fromPlatform()).buildNumber;
+  }
 }
