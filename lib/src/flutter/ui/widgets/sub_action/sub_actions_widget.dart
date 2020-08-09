@@ -110,12 +110,7 @@ class SubActionsWidget extends StatefulWidget {
 class _SubActionsWidgetState extends State<SubActionsWidget> {
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-          iconTheme: Theme.of(context)
-              .iconTheme
-              .copyWith(color: getButtonTextColor(context))),
-      child: AsyncPopupMenuButton<SubActionSpec>(
+    return AsyncPopupMenuButton<SubActionSpec>(
         padding: EdgeInsets.zero,
         itemBuilder: (BuildContext context) =>
             _buildSubActionsMenuItems(context),
@@ -129,7 +124,6 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
         icon: widget.menuIcon,
         child: widget.menuWidget,
         tooltip: widget.tooltip,
-      ),
     );
   }
 
