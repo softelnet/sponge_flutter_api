@@ -203,7 +203,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
     if (rawFieldWidgets.length > 1) {
       groupWidget = Wrap(
         spacing: 10,
-        runSpacing: 10,
         children: rawFieldWidgets,
         crossAxisAlignment: WrapCrossAlignment.center,
       );

@@ -225,7 +225,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         return Tooltip(
           message: editorContext.typeDescription ?? editorContext.typeLabel,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: ToggleButtons(
               children: [
                 getIcon(editorContext.context, editorContext.service, iconInfo)
