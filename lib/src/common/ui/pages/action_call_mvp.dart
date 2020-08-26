@@ -30,7 +30,7 @@ class ActionCallViewModel extends BaseViewModel {
 
 abstract class ActionCallView extends BaseView {
   Future<void> refresh();
-  Future<void> refreshArgs();
+  Future<void> refreshArgs({bool showDialogOnError});
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
   Future<void> onAfterSubActionCall(ActionCallState state);
@@ -77,8 +77,8 @@ class ActionCallPresenter
       defaultPageableListPageSize: service.settings.defaultPageableListPageSize,
       verifyIsActive: verifyIsActive,
       // Refresh args in the next build.
-      onEventError: () => WidgetsBinding.instance
-          .addPostFrameCallback((_) => view.refreshArgs()),
+      onEventError: () => WidgetsBinding.instance.addPostFrameCallback(
+          (_) => view.refreshArgs(showDialogOnError: false)),
     );
 
     _session.open();

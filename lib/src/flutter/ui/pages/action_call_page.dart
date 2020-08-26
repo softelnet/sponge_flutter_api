@@ -357,7 +357,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   @override
-  Future<void> refreshArgs() async {
+  Future<void> refreshArgs({bool showDialogOnError}) async {
     if (!mounted) {
       return;
     }
@@ -378,7 +378,7 @@ class _ActionCallPageState extends State<ActionCallPage>
           }
         }
       },
-      showDialogOnError: _presenter.error == null,
+      showDialogOnError: showDialogOnError ?? (_presenter.error == null),
       logStackTrace: _presenter.error == null,
       rethrowError: false,
     );

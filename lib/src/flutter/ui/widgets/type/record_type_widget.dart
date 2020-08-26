@@ -17,6 +17,7 @@ import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/error_widgets.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/sub_action/sub_actions_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/provided_value_set_widget.dart';
@@ -204,6 +205,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
         spacing: 10,
         runSpacing: 10,
         children: rawFieldWidgets,
+        crossAxisAlignment: WrapCrossAlignment.center,
       );
     } else if (rawFieldWidgets.length == 1) {
       groupWidget = rawFieldWidgets.first;
@@ -219,7 +221,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
                   : 0),
       child: Align(
         child: groupWidget,
-        alignment: Alignment.centerLeft,
+        alignment: fieldGroup.isNotEmpty
+            ? getAlignment(fieldGroup[0].features)
+            : Alignment.centerLeft,
       ),
     );
 

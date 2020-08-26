@@ -204,3 +204,14 @@ Future<void> navigateToExtendedViewer(
     );
   }
 }
+
+Alignment getAlignment(Map<String, Object> features) {
+  switch (features[Features.ALIGN]) {
+    case Features.ALIGN_CENTER:
+      return Alignment.center;
+    case Features.ALIGN_RIGHT:
+      return Alignment.centerRight;
+    default:
+      return Alignment.centerLeft;
+  }
+}

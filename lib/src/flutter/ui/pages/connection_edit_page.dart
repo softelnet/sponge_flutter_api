@@ -227,8 +227,12 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       child: Text('OK', style: getButtonTextStyle(context)),
                     ),
                     FlatButton(
-                      onPressed: () => _verifyConnection(context)
-                          .catchError((e) => handleConnectionError(context, e)),
+                      onPressed: () =>
+                          _verifyConnection(context).catchError((e) {
+                        if (mounted) {
+                          handleConnectionError(context, e);
+                        }
+                      }),
                       child: Text('VERIFY', style: getButtonTextStyle(context)),
                     ),
                     FlatButton(
