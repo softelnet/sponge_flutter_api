@@ -1,3 +1,7 @@
+## 0.16.5 (2020-08-27)
+
+* Minor bug fixes and improvements.
+  
 ## 0.16.4 (2020-08-21)
 
 * Minor bug fixes and improvements.
