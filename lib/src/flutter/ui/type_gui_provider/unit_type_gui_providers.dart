@@ -221,6 +221,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
       );
     } else if (iconInfo?.name != null &&
         !editorContext.qualifiedType.type.nullable) {
+      var value = (editorContext.value as bool) ?? false;
       if (widgetType == Features.WIDGET_TOGGLE_BUTTON) {
         return Tooltip(
           message: editorContext.typeDescription ?? editorContext.typeLabel,
@@ -230,10 +231,8 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
               children: [
                 getIcon(editorContext.context, editorContext.service, iconInfo)
               ],
-              onPressed: onChanged != null
-                  ? (_) => onChanged(!(editorContext.value as bool))
-                  : null,
-              isSelected: [editorContext.value],
+              onPressed: onChanged != null ? (_) => onChanged(!value) : null,
+              isSelected: [value],
               selectedBorderColor: getPrimaryColor(editorContext.context),
             ),
           ),
@@ -242,9 +241,7 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
         return IconButton(
           key: createDataTypeKey(editorContext.qualifiedType),
           icon: getIcon(editorContext.context, editorContext.service, iconInfo),
-          onPressed: onChanged != null
-              ? () => onChanged(!(editorContext.value as bool))
-              : null,
+          onPressed: onChanged != null ? () => onChanged(!value) : null,
           tooltip: editorContext.typeDescription ?? editorContext.typeLabel,
           iconSize: iconInfo.size ?? 24,
         );
