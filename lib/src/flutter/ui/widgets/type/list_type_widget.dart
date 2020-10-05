@@ -331,12 +331,19 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
   Widget _getIcon(UiContext subUiContext) {
     var elementIconInfo = Features.getIcon(subUiContext.features);
 
-    return getIcon(
+    var icon = getIcon(
       context,
       _presenter.service,
       elementIconInfo,
       imagePadding: const EdgeInsets.symmetric(vertical: 2),
     );
+
+    return icon != null
+        ? AspectRatio(
+            child: icon,
+            aspectRatio: 1,
+          )
+        : null;
   }
 
   Widget _createElementWidget(
