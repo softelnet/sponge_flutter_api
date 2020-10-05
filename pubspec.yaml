@@ -4,7 +4,7 @@ homepage: https://github.com/softelnet/sponge_flutter_api
 version: 0.16.5
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
   flutter:
