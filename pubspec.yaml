@@ -1,7 +1,7 @@
 name: sponge_flutter_api
 description: A Sponge Flutter API.
 homepage: https://github.com/softelnet/sponge_flutter_api
-version: 0.16.5
+version: 0.16.6
 
 environment:
   sdk: ">=2.8.0 <3.0.0"
