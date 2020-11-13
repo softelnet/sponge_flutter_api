@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -186,18 +187,22 @@ class _SwipeDetectorState extends State<SwipeDetector> {
   }
 }
 
-// This code is a copy from: https://github.com/flutter/flutter/blob/master/examples/flutter_gallery/lib/gallery/about.dart
 class LinkTextSpan extends TextSpan {
   LinkTextSpan({
     TextStyle style,
     String url,
     String text,
+    FutureOr<void> Function() onCantLaunch,
   }) : super(
           style: style,
           text: text ?? url,
           recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              launch(url, forceSafariVC: false);
+            ..onTap = () async {
+              if (await canLaunch(url)) {
+                await launch(url, forceSafariVC: false);
+              } else {
+                await onCantLaunch?.call();
+              }
             },
         );
 }

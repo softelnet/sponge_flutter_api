@@ -765,6 +765,11 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
           editor = _createImageCharacteristicViewer(editorContext);
         }
         break;
+      case Features.TYPE_CHARACTERISTIC_URL:
+        if (editorContext.readOnly) {
+          editor = _createUrlCharacteristicViewer(editorContext);
+        }
+        break;
       default:
         break;
     }
@@ -840,6 +845,52 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
     return null;
   }
 
+  Widget _createUrlCharacteristicViewer(UiContext uiContext) {
+    if (uiContext.value != null) {
+      final ThemeData themeData = Theme.of(uiContext.context);
+      final TextStyle linkStyle = themeData.textTheme.bodyText2.copyWith(
+        color: themeData.accentColor,
+        decoration: TextDecoration.underline,
+      );
+
+      var mainWidget = RichText(
+        textAlign: TextAlign.justify,
+        text: LinkTextSpan(
+          style: linkStyle,
+          url: uiContext.value,
+          text: uiContext.valueLabel ?? uiContext.value,
+          onCantLaunch: () =>
+              showErrorDialog(uiContext.context, 'Unable to launch the URL.'),
+        ),
+      );
+
+      var label = uiContext.showLabel ? uiContext.getDecorationLabel() : null;
+
+      // TODO Reuse the code from the TextViewWidget.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (label != null)
+            Text(
+              '$label',
+              key: Key('label'),
+              style: getArgLabelTextStyle(uiContext.context),
+            ),
+          if (label != null)
+            Container(
+              margin: const EdgeInsets.all(2.0),
+            ),
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: mainWidget,
+          ),
+        ],
+      );
+    }
+
+    return null;
+  }
+
   @override
   Widget createCompactViewer(TypeViewerContext viewerContext) {
     Widget viewer;
@@ -848,6 +899,9 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
       // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
       case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
         viewer = _createImageCharacteristicViewer(viewerContext);
+        break;
+      case Features.TYPE_CHARACTERISTIC_URL:
+        viewer = _createUrlCharacteristicViewer(viewerContext);
         break;
       default:
         break;
@@ -865,6 +919,9 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
       // TODO case Features.TYPE_CHARACTERISTIC_COLOR:
       case Features.TYPE_CHARACTERISTIC_NETWORK_IMAGE:
         viewer = _createImageCharacteristicViewer(viewerContext);
+        break;
+      case Features.TYPE_CHARACTERISTIC_URL:
+        viewer = _createUrlCharacteristicViewer(viewerContext);
         break;
       default:
         break;
