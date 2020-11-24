@@ -211,7 +211,10 @@ class _AsyncPopupMenuButton<T> extends State<AsyncPopupMenuButton<T>> {
       padding: widget.padding,
       tooltip:
           widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
-      onPressed: widget.enabled && !_fetchingData ? showButtonMenu : null,
+      onPressed: widget.enabled && !_fetchingData
+          ? () async => await showButtonMenu()
+              .catchError((e) async => await handleError(context, e))
+          : null,
     );
   }
 }

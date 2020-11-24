@@ -110,19 +110,18 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
   @override
   Widget build(BuildContext context) {
     return AsyncPopupMenuButton<SubActionSpec>(
-        padding: EdgeInsets.zero,
-        itemBuilder: (BuildContext context) =>
-            _buildSubActionsMenuItems(context),
-        onSelected: (subActionSpec) async => await _onSelectedSubAction(
-            context,
-            subActionSpec,
-            widget.value,
-            widget.index,
-            widget.parentType,
-            widget.parentValue),
-        icon: widget.menuIcon,
-        child: widget.menuWidget,
-        tooltip: widget.tooltip,
+      padding: EdgeInsets.zero,
+      itemBuilder: (BuildContext context) => _buildSubActionsMenuItems(context),
+      onSelected: (subActionSpec) async => await _onSelectedSubAction(
+          context,
+          subActionSpec,
+          widget.value,
+          widget.index,
+          widget.parentType,
+          widget.parentValue),
+      icon: widget.menuIcon,
+      child: widget.menuWidget,
+      tooltip: widget.tooltip,
     );
   }
 
