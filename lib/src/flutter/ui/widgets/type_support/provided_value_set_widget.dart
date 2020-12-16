@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/util/common_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/model_gui_utils.dart';
 
@@ -50,7 +51,7 @@ class _ProvidedValueSetEditorWidgetState
       // TODO Dispose controller when creating a new one.
       _controller = TextEditingController(text: widget.value?.toString() ?? '')
         ..addListener(() {
-          widget.onSaved(_controller.text);
+          widget.onSaved(CommonUtils.normalizeString(_controller.text));
         });
     }
 

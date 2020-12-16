@@ -44,6 +44,8 @@ Future<void> callActionImmediately({
 
     if (callState is ActionCallStateEnded) {
       resultInfo = callState.resultInfo;
+    } else if (callState is ActionCallStateError) {
+      throw callState.error;
     }
   } finally {
     if (onAfterCall != null) {
