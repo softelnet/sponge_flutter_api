@@ -118,6 +118,12 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   @override
   FlutterApplicationService get service => super.service;
 
+  @override
+  DataType get rootType => viewModel.actionData.argsAsRecordType;
+
+  @override
+  dynamic get rootValue => viewModel.actionData.argsAsRecord;
+
   bool get canSwipeToClose =>
       // TODO Is checking the record single leading field for swipe to close ok? Swipe should be disabled for maps.
       service.settings.actionSwipeToClose &&

@@ -37,6 +37,10 @@ abstract class UiContextCallbacks {
   dynamic getAdditionalData(QualifiedDataType qType, String additionalDataKey);
 
   FlutterApplicationService get service;
+
+  DataType get rootType;
+
+  dynamic get rootValue;
 }
 
 class NoOpUiContextCallbacks implements UiContextCallbacks {
@@ -44,6 +48,12 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
 
   @override
   final FlutterApplicationService service;
+
+  @override
+  DataType rootType;
+
+  @override
+  DataType rootValue;
 
   @override
   void onSave(QualifiedDataType qType, dynamic value) {}

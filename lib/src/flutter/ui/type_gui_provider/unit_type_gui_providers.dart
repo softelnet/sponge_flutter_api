@@ -22,6 +22,7 @@ import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/drawing_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/type_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/date_time_edit_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/list_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/map_type_widget.dart';
@@ -938,6 +939,16 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
 
 class TypeTypeGuiProvider extends BaseUnitTypeGuiProvider<TypeType> {
   TypeTypeGuiProvider(DataType type) : super(type);
+
+  // TODO TypeTypeWidget - Work in propgress.
+  // @override
+  // Widget createEditor(TypeEditorContext editorContext) {
+  //   return TypeTypeWidget(
+  //     key: createDataTypeKey(editorContext.qualifiedType),
+  //     editorContext: editorContext,
+  //     guiProvider: this,
+  //   );
+  // }
 }
 
 class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {

@@ -29,8 +29,7 @@ class SubActionsWidget extends StatefulWidget {
     @required this.controller,
     @required this.value,
     this.index,
-    this.parentType,
-    this.parentValue,
+    this.typeValueBundle,
     this.menuIcon,
     this.menuWidget,
     this.header,
@@ -40,8 +39,7 @@ class SubActionsWidget extends StatefulWidget {
   final SubActionsController controller;
   final dynamic value;
   final int index;
-  final DataType parentType;
-  final dynamic parentValue;
+  final RefTypeValueBundle typeValueBundle;
 
   final Widget menuIcon;
   final Widget menuWidget;
@@ -81,8 +79,7 @@ class SubActionsWidget extends StatefulWidget {
     @required SubActionsController controller,
     @required dynamic element,
     @required int index,
-    @required DataType parentType,
-    @required dynamic parentValue,
+    @required RefTypeValueBundle typeValueBundle,
     Widget menuIcon,
     Widget menuWidget,
     Widget header,
@@ -93,8 +90,7 @@ class SubActionsWidget extends StatefulWidget {
       controller: controller,
       value: element,
       index: index,
-      parentType: parentType,
-      parentValue: parentValue,
+      typeValueBundle: typeValueBundle,
       menuIcon: menuIcon,
       menuWidget: menuWidget,
       header: header,
@@ -113,12 +109,12 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       padding: EdgeInsets.zero,
       itemBuilder: (BuildContext context) => _buildSubActionsMenuItems(context),
       onSelected: (subActionSpec) async => await _onSelectedSubAction(
-          context,
-          subActionSpec,
-          widget.value,
-          widget.index,
-          widget.parentType,
-          widget.parentValue),
+        context,
+        subActionSpec,
+        widget.value,
+        widget.index,
+        widget.typeValueBundle,
+      ),
       icon: widget.menuIcon,
       child: widget.menuWidget,
       tooltip: widget.tooltip,
@@ -129,7 +125,7 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       BuildContext context) async {
     List<SubActionRuntimeSpec> runtimeSpecs = await widget.controller
         .getSubActionsRuntimeSpecs(
-            widget.value, widget.index, widget.parentType, widget.parentValue);
+            widget.value, widget.index, widget.typeValueBundle);
     return [
       if (widget.header != null)
         PopupMenuItem<SubActionSpec>(
@@ -170,33 +166,32 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
       SubActionSpec subActionSpec,
       dynamic element,
       int index,
-      DataType parentType,
-      dynamic parentValue) async {
+      RefTypeValueBundle typeValueBundle) async {
     switch (subActionSpec.type) {
       case SubActionType.create:
-        await widget.controller.onCreateElement(context,
-            parentType: parentType, parentValue: parentValue);
+        await widget.controller
+            .onCreateElement(context, typeValueBundle: typeValueBundle);
         break;
       case SubActionType.read:
         await widget.controller.onReadElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
+            index: index, typeValueBundle: typeValueBundle);
         break;
       case SubActionType.update:
         await widget.controller.onUpdateElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
+            index: index, typeValueBundle: typeValueBundle);
         break;
       case SubActionType.delete:
         await widget.controller.onDeleteElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
+            index: index, typeValueBundle: typeValueBundle);
         break;
       case SubActionType.activate:
         await widget.controller.onActivateElement(context, element,
-            index: index, parentType: parentType, parentValue: parentValue);
+            index: index, typeValueBundle: typeValueBundle);
         break;
       case SubActionType.context:
         await widget.controller.onElementContextAction(
             context, subActionSpec, element,
-            index: index, parentType: parentType, parentValue: parentValue);
+            index: index, typeValueBundle: typeValueBundle);
         break;
     }
   }

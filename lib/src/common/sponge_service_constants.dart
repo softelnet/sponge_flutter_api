@@ -20,6 +20,5 @@ class SpongeServiceConstants {
   static const DEMO_SERVICE_ADDRESS = 'https://spongedemoapi.openksavi.org';
   static const DEMO_SERVICE_NAME = 'Demo service';
 
-  static const SUPPORTED_SPONGE_VERSION_MAJOR_MINOR =
-      SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR;
+  static const PROTOCOL_VERSION = SpongeClientConstants.PROTOCOL_VERSION;
 }

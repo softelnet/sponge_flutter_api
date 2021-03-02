@@ -82,13 +82,13 @@ class SpongeService<AD extends ActionData> {
     );
 
     serviceFeatures = await _client.getFeatures();
-    String version = serviceFeatures[
-        SpongeClientConstants.REMOTE_API_FEATURE_SPONGE_VERSION];
-    if (version == null ||
-        !SpongeClientUtils.isServerVersionCompatible(version)) {
+    String protocolVersion = serviceFeatures[
+        SpongeClientConstants.REMOTE_API_FEATURE_PROTOCOL_VERSION];
+    if (protocolVersion != null &&
+        !SpongeClientUtils.isServerVersionCompatible(protocolVersion)) {
       throw SpongeException(
-          'The Sponge server version $version is incompatible '
-          'with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*');
+          'The Sponge server protocol version $protocolVersion is incompatible '
+          'with the supported version ${SpongeClientConstants.PROTOCOL_VERSION}');
     }
 
     _grpcClient = (serviceFeatures[
@@ -154,7 +154,8 @@ class SpongeService<AD extends ActionData> {
 
     ActionCallResultInfo resultInfo;
     try {
-      var result = await _client.call(actionMeta.name, args: args, actionMeta: actionMeta);
+      var result = await _client.call(actionMeta.name,
+          args: args, actionMeta: actionMeta);
       resultInfo = ActionCallResultInfo(result: result);
 
       // Handle action intent after call.
@@ -260,12 +261,13 @@ class SpongeService<AD extends ActionData> {
   void setupSubActionSpec(
     SubActionSpec subActionSpec,
     DataType sourceType, {
-    DataType sourceParentType,
+    RefTypeBundle sourceTypeBundle,
   }) {
     subActionSpec.setup(
-        getCachedAction(subActionSpec.actionName, required: true).actionMeta,
-        sourceType,
-        sourceParentType: sourceParentType);
+      getCachedAction(subActionSpec.actionName, required: true).actionMeta,
+      sourceType,
+      sourceTypeBundle: sourceTypeBundle,
+    );
   }
 
   Future<String> getVersion() => _client.getVersion();
@@ -408,7 +410,8 @@ class SpongeService<AD extends ActionData> {
   }
 
   static Future<String> verifyConnection(SpongeConnection connection) async =>
-      await _createSpongeClient(connection).getVersion();
+      (await _createSpongeClient(connection).getFeatures())[
+          SpongeClientConstants.REMOTE_API_FEATURE_PROTOCOL_VERSION];
 
   static SpongeClient _createSpongeClient(
     SpongeConnection connection, {

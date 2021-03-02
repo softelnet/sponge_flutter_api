@@ -293,10 +293,10 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
       );
 
       try {
-        var version = await _presenter.verifyConnection();
+        var protocolVersion = await _presenter.verifyConnection();
 
         if (_presenter.isBound) {
-          await verifyServerVersion(context, version);
+          await verifyServerVersion(context, protocolVersion);
         }
       } finally {
         try {
@@ -316,16 +316,18 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
     }
   }
 
-  Future<void> verifyServerVersion(BuildContext context, String version) async {
-    if (SpongeClientUtils.isServerVersionCompatible(version)) {
+  Future<void> verifyServerVersion(
+      BuildContext context, String protocolVersion) async {
+    if (SpongeClientUtils.isServerVersionCompatible(protocolVersion)) {
       await showModalDialog(
           context, 'Information', Text('The connection is OK.'));
     } else {
       await showModalDialog(
         context,
         'Warning',
-        Text('The Sponge server version $version is incompatible '
-            'with the supported versions ${SpongeClientConstants.SUPPORTED_SPONGE_VERSION_MAJOR_MINOR}.*'),
+        Text(
+            'The Sponge server version protocol $protocolVersion is incompatible '
+            'with the supported version SpongeClientConstants.PROTOCOL_VERSION'),
       );
     }
   }

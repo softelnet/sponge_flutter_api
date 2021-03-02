@@ -46,13 +46,13 @@ abstract class BaseActionsController {
     @required this.spongeService,
     @required this.parentFeatures,
     @required this.elementType,
-    @required this.parentType,
+    @required this.sourceTypeBundle,
   });
 
   final SpongeService spongeService;
   final Map<String, Object> parentFeatures;
   final DataType elementType;
-  final DataType parentType;
+  final RefTypeBundle sourceTypeBundle;
 
   Map<String, Object> getFeatures(dynamic element) => {}
     ..addAll(parentFeatures ?? {})
@@ -71,7 +71,7 @@ abstract class BaseActionsController {
       return null;
     }
     spongeService.setupSubActionSpec(subActionSpec, elementType,
-        sourceParentType: parentType);
+        sourceTypeBundle: sourceTypeBundle);
     return subActionSpec;
   }
 }
@@ -81,7 +81,7 @@ class SubActionsController extends BaseActionsController {
     @required SpongeService spongeService,
     @required Map<String, Object> parentFeatures,
     @required DataType elementType,
-    DataType parentType,
+    @required RefTypeBundle sourceTypeBundle,
     @required this.onBeforeSelectedSubAction,
     @required this.onBeforeInstantCall,
     @required this.onAfterCall,
@@ -90,7 +90,7 @@ class SubActionsController extends BaseActionsController {
           spongeService: spongeService,
           parentFeatures: parentFeatures,
           elementType: elementType,
-          parentType: parentType,
+          sourceTypeBundle: sourceTypeBundle,
         );
 
   final OnBeforeSelectedSubActionCallback onBeforeSelectedSubAction;
@@ -106,6 +106,8 @@ class SubActionsController extends BaseActionsController {
       spongeService: spongeService,
       parentFeatures: uiContext.features,
       elementType: recordType,
+      // TODO No parent type for a record.
+      sourceTypeBundle: RefTypeBundle(uiContext.callbacks.rootType, null),
       onBeforeSelectedSubAction: (ActionData subActionData,
           SubActionType subActionType, dynamic contextValue) async {
         if (subActionData.needsRunConfirmation) {
@@ -154,7 +156,8 @@ class SubActionsController extends BaseActionsController {
         spongeService: spongeService,
         parentFeatures: uiContext.features,
         elementType: elementType,
-        parentType: uiContext.qualifiedType.type,
+        sourceTypeBundle: RefTypeBundle(
+            uiContext.callbacks.rootType, uiContext.qualifiedType.type),
         onBeforeSelectedSubAction: (ActionData subActionData,
             SubActionType subActionType, dynamic contextValue) async {
           if (subActionData.needsRunConfirmation) {
@@ -237,8 +240,7 @@ class SubActionsController extends BaseActionsController {
     List<SubActionSpec> specs,
     dynamic element, {
     @required int index,
-    @required DataType parentType,
-    @required dynamic parentValue,
+    @required RefTypeValueBundle typeValueBundle,
   }) async {
     var entries = specs
         .map((spec) => IsActionActiveEntry(
@@ -246,8 +248,7 @@ class SubActionsController extends BaseActionsController {
             args: ModelUtils.substituteSubActionArgs(
                 spongeService, spec, elementType, element,
                 sourceIndex: index,
-                sourceParentType: parentType,
-                sourceParent: parentValue,
+                sourceTypeValueBundle: typeValueBundle,
                 propagateContextActions: propagateContextActions,
                 bestEffort: true),
             qualifiedVersion: spongeService
@@ -297,12 +298,12 @@ class SubActionsController extends BaseActionsController {
       ?.actionName;
 
   void setupSubAction(
-      ActionData actionData,
-      SubActionSpec subActionSpec,
-      dynamic sourceValue,
-      int sourceIndex,
-      DataType parentType,
-      dynamic parentValue) {
+    ActionData actionData,
+    SubActionSpec subActionSpec,
+    dynamic sourceValue,
+    int sourceIndex,
+    RefTypeValueBundle sourceTypeValueBundle,
+  ) {
     if (subActionSpec.hasArgSubstitutions) {
       if (!actionData.hasCacheableContextArgs) {
         actionData.clear();
@@ -311,16 +312,14 @@ class SubActionsController extends BaseActionsController {
       actionData.args = ModelUtils.substituteSubActionArgs(
           spongeService, subActionSpec, elementType, sourceValue,
           sourceIndex: sourceIndex,
-          sourceParentType: parentType,
-          sourceParent: parentValue,
+          sourceTypeValueBundle: sourceTypeValueBundle,
           propagateContextActions: propagateContextActions);
     }
   }
 
   Future<void> onCreateElement(
     BuildContext context, {
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     var createAction = getSubActionSpec(
         parentFeatures[Features.SUB_ACTION_CREATE_ACTION],
@@ -330,7 +329,7 @@ class SubActionsController extends BaseActionsController {
         context: context,
         subActionSpec: createAction,
         setupCallback: (actionData) => setupSubAction(
-            actionData, createAction, null, null, parentType, parentValue),
+            actionData, createAction, null, null, typeValueBundle),
       );
     }
   }
@@ -339,8 +338,7 @@ class SubActionsController extends BaseActionsController {
     BuildContext context,
     dynamic value, {
     int index,
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     var readAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_READ_ACTION],
@@ -350,7 +348,7 @@ class SubActionsController extends BaseActionsController {
         context: context,
         subActionSpec: readAction,
         setupCallback: (actionData) => setupSubAction(
-            actionData, readAction, value, index, parentType, parentValue),
+            actionData, readAction, value, index, typeValueBundle),
         value: value,
         index: index,
         readOnly: true,
@@ -362,8 +360,7 @@ class SubActionsController extends BaseActionsController {
     BuildContext context,
     dynamic value, {
     int index,
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     var updateAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_UPDATE_ACTION],
@@ -373,7 +370,7 @@ class SubActionsController extends BaseActionsController {
         context: context,
         subActionSpec: updateAction,
         setupCallback: (actionData) => setupSubAction(
-            actionData, updateAction, value, index, parentType, parentValue),
+            actionData, updateAction, value, index, typeValueBundle),
         value: value,
         index: index,
       );
@@ -384,8 +381,7 @@ class SubActionsController extends BaseActionsController {
     BuildContext context,
     dynamic value, {
     int index,
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     var deleteAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_DELETE_ACTION],
@@ -395,7 +391,7 @@ class SubActionsController extends BaseActionsController {
         context: context,
         subActionSpec: deleteAction,
         setupCallback: (actionData) => setupSubAction(
-            actionData, deleteAction, value, index, parentType, parentValue),
+            actionData, deleteAction, value, index, typeValueBundle),
         value: value,
         index: index,
       );
@@ -406,8 +402,7 @@ class SubActionsController extends BaseActionsController {
     BuildContext context,
     dynamic value, {
     int index,
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     var activateAction = getSubActionSpec(
         getFeatures(value)[Features.SUB_ACTION_ACTIVATE_ACTION],
@@ -418,7 +413,7 @@ class SubActionsController extends BaseActionsController {
         context: context,
         subActionSpec: activateAction,
         setupCallback: (actionData) => setupSubAction(
-            actionData, activateAction, value, index, parentType, parentValue),
+            actionData, activateAction, value, index, typeValueBundle),
         value: value,
         index: index,
       );
@@ -430,14 +425,13 @@ class SubActionsController extends BaseActionsController {
     SubActionSpec subActionSpec,
     dynamic value, {
     int index,
-    DataType parentType,
-    dynamic parentValue,
+    RefTypeValueBundle typeValueBundle,
   }) async {
     await _onElementSubAction(
       context: context,
       subActionSpec: subActionSpec,
       setupCallback: (actionData) => setupSubAction(
-          actionData, subActionSpec, value, index, parentType, parentValue),
+          actionData, subActionSpec, value, index, typeValueBundle),
       value: value,
       index: index,
       header: value is AnnotatedValue ? value.valueLabel : null,
@@ -577,8 +571,8 @@ class SubActionsController extends BaseActionsController {
     return crudActionSpecs;
   }
 
-  Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(dynamic value,
-      int index, DataType parentType, dynamic parentValue) async {
+  Future<List<SubActionRuntimeSpec>> getSubActionsRuntimeSpecs(
+      dynamic value, int index, RefTypeValueBundle typeValueBundle) async {
     List<SubActionSpec> crudActionSpecs = _getRudActions(value);
     List<SubActionSpec> contextActionSpecs = _getContextActions(value);
 
@@ -587,8 +581,7 @@ class SubActionsController extends BaseActionsController {
       crudActionSpecs + contextActionSpecs,
       value,
       index: index,
-      parentType: parentType,
-      parentValue: parentValue,
+      typeValueBundle: typeValueBundle,
     );
 
     if (crudActionSpecs.isNotEmpty && contextActionSpecs.isNotEmpty) {

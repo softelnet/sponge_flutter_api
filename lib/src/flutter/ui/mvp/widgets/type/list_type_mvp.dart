@@ -101,4 +101,10 @@ class ListTypePresenter extends BasePresenter<ListTypeViewModel, ListTypeView> {
   Future<void> onRefresh() async {
     await uiContext?.callbacks?.onRefreshArgs();
   }
+
+  RefTypeValueBundle get typeValueBundle => RefTypeValueBundle(
+      uiContext.callbacks.rootType,
+      uiContext.callbacks.rootValue,
+      listType,
+      rawListValue);
 }

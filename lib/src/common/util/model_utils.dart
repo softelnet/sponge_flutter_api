@@ -50,8 +50,7 @@ class ModelUtils {
     DataType sourceType,
     dynamic sourceValue, {
     @required int sourceIndex,
-    @required DataType sourceParentType,
-    @required dynamic sourceParent,
+    @required RefTypeValueBundle sourceTypeValueBundle,
     @required bool propagateContextActions,
     bool bestEffort = false,
   }) {
@@ -69,20 +68,19 @@ class ModelUtils {
         try {
           dynamic value;
 
-          switch (substitution.source) {
-            case DataTypeConstants.PATH_INDEX:
-              value = Validate.notNull(
-                  sourceIndex, 'The list element index is unknown');
-              break;
-            case DataTypeConstants.PATH_PARENT:
-              value =
-                  Validate.notNull(sourceParent, 'The parent list is unknown');
-              break;
-            default:
-              value = DataTypeUtils.getSubValue(
-                  sourceValue, substitution.source,
-                  unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
-              break;
+          if (substitution.source == DataTypeConstants.PATH_INDEX) {
+            value = Validate.notNull(
+                sourceIndex, 'The list element index is unknown');
+          } else if (substitution.source == DataTypeConstants.PATH_PARENT) {
+            value = Validate.notNull(sourceTypeValueBundle.parentValue,
+                'The parent list is unknown');
+          } else if (DataTypeUtils.isPathRelativeToRoot(substitution.source)) {
+            value = DataTypeUtils.getSubValue(sourceTypeValueBundle.rootValue,
+                DataTypeUtils.getRootRelativePath(substitution.source),
+                unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
+          } else {
+            value = DataTypeUtils.getSubValue(sourceValue, substitution.source,
+                unwrapAnnotatedTarget: false, unwrapDynamicTarget: false);
           }
 
           // Do not propagate annotated value sub-actions to a sub-action.
@@ -118,20 +116,24 @@ class ModelUtils {
           bool predicate =
               visibleArg && showActionCallWidget || subArgType.nullable;
 
-          switch (substitution.source) {
-            case DataTypeConstants.PATH_INDEX:
-            case DataTypeConstants.PATH_PARENT:
-              Validate.isTrue(predicate || subActionData.args[i] != null,
-                  'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
-              break;
-            default:
-              Validate.isTrue(
-                  predicate ||
-                      DataTypeUtils.hasAllNotNullValuesSet(
-                          subArgType, subActionData.args[i]),
-                  // TODO Support context actions in dynamic types.
-                  'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceType, substitution.source, null))}\' is not set properly');
-              break;
+          if (substitution.source == DataTypeConstants.PATH_INDEX ||
+              substitution.source == DataTypeConstants.PATH_PARENT) {
+            Validate.isTrue(predicate || subActionData.args[i] != null,
+                'The sub-action argument \'${getSafeTypeDisplayLabel(subArgType)}\' is not set properly');
+          } else if (DataTypeUtils.isPathRelativeToRoot(substitution.source)) {
+            Validate.isTrue(
+                predicate ||
+                    DataTypeUtils.hasAllNotNullValuesSet(
+                        subArgType, subActionData.args[i]),
+                // TODO Support context actions in dynamic types.
+                'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceTypeValueBundle.rootType, DataTypeUtils.getRootRelativePath(substitution.source), null))}\' is not set properly');
+          } else {
+            Validate.isTrue(
+                predicate ||
+                    DataTypeUtils.hasAllNotNullValuesSet(
+                        subArgType, subActionData.args[i]),
+                // TODO Support context actions in dynamic types.
+                'The argument \'${getSafeTypeDisplayLabel(DataTypeUtils.getSubType(sourceType, substitution.source, null))}\' is not set properly');
           }
         }
       }
