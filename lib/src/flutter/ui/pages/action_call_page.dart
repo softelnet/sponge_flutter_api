@@ -428,6 +428,9 @@ class _ActionCallPageState extends State<ActionCallPage>
       }
 
       await _presenter.refreshAllowedProvidedArgsSilently();
+
+      // Restart the main Form to read current values of arguments to text fields!
+      _formKey = GlobalKey<FormState>();
     } finally {
       setState(() {
         _presenter.calling = false;

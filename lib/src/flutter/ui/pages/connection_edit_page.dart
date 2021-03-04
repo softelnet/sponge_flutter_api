@@ -318,7 +318,13 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
 
   Future<void> verifyServerVersion(
       BuildContext context, String protocolVersion) async {
-    if (SpongeClientUtils.isServerVersionCompatible(protocolVersion)) {
+    if (protocolVersion == null) {
+      await showModalDialog(
+        context,
+        'Warning',
+        Text('The Sponge server version protocol version is not specified.'),
+      );
+    } else if (SpongeClientUtils.isServerVersionCompatible(protocolVersion)) {
       await showModalDialog(
           context, 'Information', Text('The connection is OK.'));
     } else {

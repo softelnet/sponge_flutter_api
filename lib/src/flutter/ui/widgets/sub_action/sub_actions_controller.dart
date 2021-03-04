@@ -130,11 +130,8 @@ class SubActionsController extends BaseActionsController {
             state is ActionCallStateEnded &&
             state.resultInfo != null &&
             state.resultInfo.isSuccess) {
-          var targetType =
-              resultSubstitutionTarget == DataTypeConstants.PATH_THIS
-                  ? uiContext.qualifiedType
-                  : uiContext.qualifiedType.createChild(
-                      recordType.getFieldType(resultSubstitutionTarget));
+          var targetType = getResultSubstitutionTargetType(
+              uiContext, resultSubstitutionTarget);
 
           var value = state.resultInfo.result;
           if (resultSubstitutionTarget != DataTypeConstants.PATH_THIS ||
@@ -146,6 +143,20 @@ class SubActionsController extends BaseActionsController {
         await uiContext.callbacks.onAfterSubActionCall(state);
       },
     );
+  }
+
+  static QualifiedDataType getResultSubstitutionTargetType(
+      UiContext uiContext, String resultSubstitutionTarget) {
+    if (resultSubstitutionTarget == DataTypeConstants.PATH_THIS) {
+      return uiContext.qualifiedType;
+    } else if (DataTypeUtils.isPathRelativeToRoot(resultSubstitutionTarget)) {
+      return QualifiedDataType(uiContext.callbacks.rootType,
+          path: DataTypeUtils.getRootRelativePath(resultSubstitutionTarget));
+    } else {
+      return uiContext.qualifiedType.createChild(
+          (uiContext.qualifiedType.type as RecordType)
+              .getFieldType(resultSubstitutionTarget));
+    }
   }
 
   factory SubActionsController.forList(
@@ -189,30 +200,36 @@ class SubActionsController extends BaseActionsController {
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
-            switch (resultSubstitutionTarget) {
-              case DataTypeConstants.PATH_THIS:
-                Validate.notNull(
-                    index, 'The list element index cannot be null');
+            if (resultSubstitutionTarget == DataTypeConstants.PATH_THIS) {
+              Validate.notNull(index, 'The list element index cannot be null');
 
-                var value = state.resultInfo.result;
-                if (!DataTypeUtils.isNull(value)) {
-                  (uiContext.value as List)[index] = value;
-                  // Save the whole list.
-                  uiContext.callbacks
-                      .onSave(uiContext.qualifiedType, uiContext.value);
-                }
-                break;
-              case DataTypeConstants.PATH_PARENT:
-                var value = state.resultInfo.result;
-                if (!DataTypeUtils.isNull(value)) {
-                  // Save the whole list.
-                  uiContext.callbacks.onSave(uiContext.qualifiedType, value);
-                }
-                break;
-              default:
-                throw Exception(
-                    'The result substitution target $resultSubstitutionTarget is not supported for a list');
-                break;
+              var value = state.resultInfo.result;
+              if (!DataTypeUtils.isNull(value)) {
+                (uiContext.value as List)[index] = value;
+                // Save the whole list.
+                uiContext.callbacks
+                    .onSave(uiContext.qualifiedType, uiContext.value);
+              }
+            } else if (resultSubstitutionTarget ==
+                DataTypeConstants.PATH_PARENT) {
+              var value = state.resultInfo.result;
+              if (!DataTypeUtils.isNull(value)) {
+                // Save the whole list.
+                uiContext.callbacks.onSave(uiContext.qualifiedType, value);
+              }
+            } else if (DataTypeUtils.isPathRelativeToRoot(
+                resultSubstitutionTarget)) {
+              var value = state.resultInfo.result;
+              if (!DataTypeUtils.isNull(value)) {
+                // Save relative to the root.
+                uiContext.callbacks.onSave(
+                    getResultSubstitutionTargetType(
+                        uiContext, resultSubstitutionTarget),
+                    value);
+              }
+            } else {
+              throw Exception(
+                  'The result substitution target $resultSubstitutionTarget is not supported for a list');
             }
           }
 
