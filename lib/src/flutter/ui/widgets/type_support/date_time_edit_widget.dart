@@ -63,7 +63,7 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
       children: <Widget>[
         if (widget.name != null) Text(widget.name),
         if (hasDate)
-          FlatButton(
+          TextButton(
             child: Text(widget.initialValue != null
                 ? DateFormat('yyyy-MM-dd').format(widget.initialValue)
                 : 'DATE'),
@@ -71,7 +71,7 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
                 _showDatePicker().catchError((e) => handleError(context, e)),
           ),
         if (hasTime)
-          FlatButton(
+          TextButton(
             child: Text(widget.initialValue != null
                 ? DateFormat('HH:mm').format(widget.initialValue)
                 : 'TIME'),

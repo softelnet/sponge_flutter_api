@@ -175,7 +175,6 @@ class _AsyncPopupMenuButton<T> extends State<AsyncPopupMenuButton<T>> {
           position: position,
           shape: widget.shape ?? popupMenuTheme.shape,
           color: widget.color ?? popupMenuTheme.color,
-          captureInheritedThemes: widget.captureInheritedThemes,
         );
 
         if (!mounted) return null;

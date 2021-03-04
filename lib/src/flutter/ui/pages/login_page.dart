@@ -161,11 +161,11 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
               ),
               ButtonBar(
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: () async => await _logIn(context),
                     child: Text('LOG IN', style: getButtonTextStyle(context)),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () {
                       _onClose();
                       Navigator.pop(context, null);

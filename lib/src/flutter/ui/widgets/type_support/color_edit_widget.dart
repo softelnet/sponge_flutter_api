@@ -43,12 +43,14 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
   @override
   Widget build(BuildContext context) {
     var suggestedColor = widget.initialColor ?? widget.defaultColor;
-    return FlatButton(
+    return TextButton(
       child: Text(
         '${widget.name ?? 'Color'}${widget.initialColor != null ? " (" + color2string(widget.initialColor) + ")" : ""}',
         style: TextStyle(color: getContrastColor(suggestedColor)),
       ),
-      color: suggestedColor,
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(suggestedColor),
+      ),
       onPressed: widget.enabled
           ? () => showColorPicker(context, suggestedColor)
           : null,
@@ -71,13 +73,13 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
           ),
         ),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: const Text('OK'),
             onPressed: () {
               Navigator.of(context).pop(_currentPickerColor);
             },
           ),
-          FlatButton(
+          TextButton(
             child: const Text('CANCEL'),
             onPressed: () {
               Navigator.of(context).pop(null);

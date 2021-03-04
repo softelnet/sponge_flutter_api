@@ -188,7 +188,7 @@ class _ActionListItemState extends State<ActionListItem>
       buttonPadding: EdgeInsets.zero,
       alignment: MainAxisAlignment.end,
       children: <Widget>[
-        FlatButton(
+        TextButton(
           onPressed: () =>
               _onActionCall(context).catchError((e) => handleError(context, e)),
           child: Text('RUN'),

@@ -254,26 +254,26 @@ class _ActionCallPageState extends State<ActionCallPage>
           if (_presenter.callable &&
               _presenter.showCall &&
               _presenter.callLabel != null)
-            FlatButton(
+            TextButton(
               onPressed: () => _submit(context),
               child: Text(_presenter.callLabel.toUpperCase(), style: textStyle),
             ),
           if (_presenter.showRefresh &&
               _presenter.refreshLabel != null &&
               _presenter.hasRefreshableArgs)
-            FlatButton(
+            TextButton(
               onPressed: refreshArgs,
               child:
                   Text(_presenter.refreshLabel.toUpperCase(), style: textStyle),
             ),
           if (_presenter.showClear && _presenter.clearLabel != null)
-            FlatButton(
+            TextButton(
               onPressed: _clearArgs,
               child:
                   Text(_presenter.clearLabel.toUpperCase(), style: textStyle),
             ),
           if (_presenter.showCancel && _presenter.cancelLabel != null)
-            FlatButton(
+            TextButton(
               onPressed: () => _onCancel(context),
               child:
                   Text(_presenter.cancelLabel.toUpperCase(), style: textStyle),
@@ -343,10 +343,10 @@ class _ActionCallPageState extends State<ActionCallPage>
           Navigator.pop(context, _presenter.actionData);
         }
       } catch (e) {
-        Scaffold.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar((SnackBar(
           content: Text(e.toString()),
           backgroundColor: Colors.red,
-        ));
+        )));
       }
     });
   }

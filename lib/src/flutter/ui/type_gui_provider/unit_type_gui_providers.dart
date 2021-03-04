@@ -22,12 +22,11 @@ import 'package:sponge_flutter_api/sponge_flutter_api.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/drawing_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/type_type_widget.dart';
-import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/date_time_edit_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/list_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/map_type_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/multi_choice_list_edit_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type/record_type_widget.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/date_time_edit_widget.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/widgets/type_support/slider.dart';
 
 abstract class BaseUnitTypeGuiProvider<T extends DataType>
@@ -79,9 +78,13 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
                   )
                 : null;
             return Container(
-              child: FlatButton(
-                color: Theme.of(editorContext.context).primaryColor,
-                textColor: Colors.white,
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Theme.of(editorContext.context).primaryColor),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
                 onPressed: editorContext.enabled
                     ? () async {
                         DrawingBinaryValue oldValue =

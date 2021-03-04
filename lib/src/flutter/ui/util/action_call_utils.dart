@@ -110,7 +110,7 @@ Future<void> showActionResultDialog({
           ),
         ),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: const Text('CLOSE'),
             onPressed: () {
               bloc.clear();

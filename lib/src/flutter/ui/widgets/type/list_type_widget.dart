@@ -167,7 +167,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
 
     if (_subActionsController.isCreateEnabled()) {
       // TODO Support active/inactive verification to enable/disable the button.
-      buttons.add(FlatButton(
+      buttons.add(TextButton(
         key: Key('list-create'),
         child: getActionIconByActionName(
               context,
@@ -178,7 +178,9 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
               Icons.add,
               color: getIconColor(context),
             ),
-        padding: EdgeInsets.zero,
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+        ),
         onPressed: () => _subActionsController
             .onCreateElement(context,
                 typeValueBundle: _presenter.typeValueBundle)
@@ -187,26 +189,30 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
     }
 
     if (_presenter.isRefreshEnabled) {
-      buttons.add(FlatButton(
+      buttons.add(TextButton(
         key: Key('list-refresh'),
         child: Icon(
           Icons.refresh,
           color: getIconColor(context),
         ),
-        padding: EdgeInsets.zero,
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+        ),
         onPressed: () =>
             _presenter.onRefresh().catchError((e) => handleError(context, e)),
       ));
     }
 
     if (_isIndicatedIndexEnabled) {
-      buttons.add(FlatButton(
+      buttons.add(TextButton(
         key: Key('list-goToIndicatedIndex'),
         child: Icon(
           MdiIcons.target,
           color: getIconColor(context),
         ),
-        padding: EdgeInsets.zero,
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+        ),
         onPressed: () =>
             _goToIndicatedItem().catchError((e) => handleError(context, e)),
       ));

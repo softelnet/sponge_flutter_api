@@ -221,12 +221,12 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                 padding: EdgeInsets.zero,
                 child: ButtonBar(
                   children: [
-                    FlatButton(
+                    TextButton(
                       onPressed: () => _saveConnection(context)
                           .catchError((e) => handleConnectionError(context, e)),
                       child: Text('OK', style: getButtonTextStyle(context)),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: () =>
                           _verifyConnection(context).catchError((e) {
                         if (mounted) {
@@ -235,7 +235,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
                       }),
                       child: Text('VERIFY', style: getButtonTextStyle(context)),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: () => Navigator.pop(context, null),
                       child: Text('CANCEL', style: getButtonTextStyle(context)),
                     ),
@@ -285,7 +285,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      var snackController = Scaffold.of(context).showSnackBar(
+      var snackController = ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Verifying the connection...'),
           duration: Duration(hours: 1),

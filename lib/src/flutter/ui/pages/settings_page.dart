@@ -442,7 +442,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
       bool cleared = await _clearSettings(context);
       if (cleared) {
         var backgroudColor = getPrimaryColor(context);
-        Scaffold.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
             'Settings have been reset to the default values',
             style: TextStyle(color: getContrastColor(backgroudColor)),

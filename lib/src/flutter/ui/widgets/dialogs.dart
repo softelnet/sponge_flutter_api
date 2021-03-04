@@ -38,7 +38,7 @@ Future<void> showModalDialog(BuildContext context, String title, Widget child,
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(closeButtonLabel),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -64,13 +64,13 @@ Future<bool> showConfirmationDialog(
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: const Text('YES'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(true);
               },
             ),
-            FlatButton(
+            TextButton(
               child: const Text('NO'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(false);
