@@ -84,7 +84,7 @@ class SpongeService<AD extends ActionData> {
     serviceFeatures = await _client.getFeatures();
     String protocolVersion = serviceFeatures[
         SpongeClientConstants.REMOTE_API_FEATURE_PROTOCOL_VERSION];
-    if (protocolVersion != null &&
+    if (protocolVersion == null ||
         !SpongeClientUtils.isServerVersionCompatible(protocolVersion)) {
       throw SpongeException(
           'The Sponge server protocol version $protocolVersion is incompatible '
@@ -118,11 +118,15 @@ class SpongeService<AD extends ActionData> {
     }
   }
 
+  bool _hasActionDataType(ActionMeta actionMeta, DataTypeKind typeKind) {
+    return DataTypeUtils.hasSubType(actionMeta.result, typeKind) ||
+        actionMeta.args.any((arg) => DataTypeUtils.hasSubType(arg, typeKind));
+  }
+
   bool isActionSupported(ActionMeta actionMeta) {
-    bool hasStream = DataTypeUtils.hasSubType(
-            actionMeta.result, DataTypeKind.STREAM) ||
-        actionMeta.args
-            .any((arg) => DataTypeUtils.hasSubType(arg, DataTypeKind.STREAM));
+    bool hasStream =
+        _hasActionDataType(actionMeta, DataTypeKind.OUTPUT_STREAM) ||
+            _hasActionDataType(actionMeta, DataTypeKind.INPUT_STREAM);
     if (hasStream) {
       return false;
     }

@@ -333,7 +333,7 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
         'Warning',
         Text(
             'The Sponge server version protocol $protocolVersion is incompatible '
-            'with the supported version SpongeClientConstants.PROTOCOL_VERSION'),
+            'with the supported version ${SpongeClientConstants.PROTOCOL_VERSION}'),
       );
     }
   }

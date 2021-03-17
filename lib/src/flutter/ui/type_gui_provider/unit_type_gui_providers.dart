@@ -731,8 +731,12 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   }
 }
 
-class StreamTypeGuiProvider extends BaseUnitTypeGuiProvider<StreamType> {
-  StreamTypeGuiProvider(DataType type) : super(type);
+class OutputStreamTypeGuiProvider extends BaseUnitTypeGuiProvider<OutputStreamType> {
+  OutputStreamTypeGuiProvider(DataType type) : super(type);
+}
+
+class InputStreamTypeGuiProvider extends BaseUnitTypeGuiProvider<InputStreamType> {
+  InputStreamTypeGuiProvider(DataType type) : super(type);
 }
 
 class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
