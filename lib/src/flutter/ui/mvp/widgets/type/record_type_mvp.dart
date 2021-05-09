@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
@@ -133,7 +134,7 @@ class RecordTypePresenter extends BasePresenter<RecordTypeViewModel, RecordTypeV
       uiContext.value = null;
     }
 
-    onSave(uiContext.qualifiedType, uiContext.value);
+    onSave(SaveValueEvent(uiContext.qualifiedType, uiContext.value));
   }
 
   List<List<DataType>> createFieldGroups() {
@@ -164,11 +165,11 @@ class RecordTypePresenter extends BasePresenter<RecordTypeViewModel, RecordTypeV
   bool hasAnyFieldInGroupScroll(List<DataType> fieldGroup) => fieldGroup
       .any((fieldType) => DataTypeGuiUtils.hasListTypeScroll(fieldType));
 
-  void onSave(QualifiedDataType qType, dynamic value) {
-    uiContext.callbacks.onSave(qType, value);
+  void onSave(SaveValueEvent event) {
+    uiContext.callbacks.onSave(event);
   }
 
-  void onUpdate(QualifiedDataType qType, dynamic value) {
-    uiContext.callbacks.onUpdate(qType, value);
+  void onUpdate(UpdateValueEvent event) {
+    uiContext.callbacks.onUpdate(event);
   }
 }

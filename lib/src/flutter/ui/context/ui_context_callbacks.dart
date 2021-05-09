@@ -13,19 +13,19 @@
 // limitations under the License.
 
 import 'package:sponge_client_dart/sponge_client_dart.dart';
-import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 
 abstract class UiContextCallbacks {
-  void onSave(QualifiedDataType qType, dynamic value);
-  void onUpdate(QualifiedDataType qType, dynamic value);
-  void onActivate(QualifiedDataType qType, dynamic value);
+  void onSave(SaveValueEvent event);
+  void onUpdate(UpdateValueEvent event);
+  void onActivate(ActivateValueEvent event);
   ProvidedValue onGetProvidedArg(QualifiedDataType qType);
   Future<void> onRefresh();
   Future<void> onRefreshArgs();
   Future<bool> onSaveForm();
   Future<void> onBeforeSubActionCall();
-  Future<void> onAfterSubActionCall(ActionCallState state);
+  Future<void> onAfterSubActionCall(AfterSubActionCallEvent event);
   bool shouldBeEnabled(QualifiedDataType qType);
   PageableList getPageableList(QualifiedDataType qType);
   Future<void> fetchPageableListPage(QualifiedDataType qType);
@@ -56,13 +56,13 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
   DataType rootValue;
 
   @override
-  void onSave(QualifiedDataType qType, dynamic value) {}
+  void onSave(SaveValueEvent event) {}
 
   @override
-  void onUpdate(QualifiedDataType qType, dynamic value) {}
+  void onUpdate(UpdateValueEvent event) {}
 
   @override
-  void onActivate(QualifiedDataType qType, value) {}
+  void onActivate(ActivateValueEvent event) {}
 
   @override
   ProvidedValue onGetProvidedArg(QualifiedDataType qType) => null;
@@ -80,7 +80,7 @@ class NoOpUiContextCallbacks implements UiContextCallbacks {
   Future<bool> onSaveForm() async => true;
 
   @override
-  Future<void> onAfterSubActionCall(ActionCallState state) async {}
+  Future<void> onAfterSubActionCall(AfterSubActionCallEvent event) async {}
 
   @override
   Future<void> onBeforeSubActionCall() async {}

@@ -15,9 +15,9 @@
 import 'package:logging/logging.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/sponge_flutter_api.dart';
-import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/service/flutter_application_service.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 
 class FlutterActionCallPresenter extends ActionCallPresenter
     implements UiContextCallbacks {
@@ -28,21 +28,21 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   static final Logger _logger = Logger('FlutterActionCallPresenter');
 
   @override
-  void onSave(QualifiedDataType qType, dynamic value) {
-    onSaveOrUpdate(qType, value, true);
+  void onSave(SaveValueEvent event) {
+    onSaveOrUpdate(event.qType, event.value, true);
   }
 
   @override
-  void onUpdate(QualifiedDataType qType, dynamic value) {
+  void onUpdate(UpdateValueEvent event) {
     bool responsive = DataTypeUtils.getFeatureOrProperty(
-        qType.type, value, Features.RESPONSIVE, () => false);
+        event.qType.type, event.value, Features.RESPONSIVE, () => false);
 
-    onSaveOrUpdate(qType, value, responsive);
+    onSaveOrUpdate(event.qType, event.value, responsive);
   }
 
   @override
-  void onActivate(QualifiedDataType qType, value) {
-    session.activate(qType, value);
+  void onActivate(ActivateValueEvent event) {
+    session.activate(event.qType, event.value);
   }
 
   @override
@@ -72,8 +72,8 @@ class FlutterActionCallPresenter extends ActionCallPresenter
   }
 
   @override
-  Future<void> onAfterSubActionCall(ActionCallState state) async {
-    await view.onAfterSubActionCall(state);
+  Future<void> onAfterSubActionCall(AfterSubActionCallEvent event) async {
+    await view.onAfterSubActionCall(event);
   }
 
   @override

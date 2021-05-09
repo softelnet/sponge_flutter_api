@@ -20,6 +20,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/bloc/provide_action_args_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 import 'package:sponge_flutter_api/src/common/ui/pages/action_call_mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
@@ -412,8 +413,9 @@ class _ActionCallPageState extends State<ActionCallPage>
   }
 
   @override
-  Future<void> onAfterSubActionCall(ActionCallState state) async {
+  Future<void> onAfterSubActionCall(AfterSubActionCallEvent event) async {
     String error;
+    var state = event.state;
 
     try {
       if (state is ActionCallStateEnded &&
@@ -423,7 +425,7 @@ class _ActionCallPageState extends State<ActionCallPage>
         error = state.error?.toString();
       }
 
-      if (error != null) {
+      if (error != null && !event.errorAlreadyHandled) {
         await showErrorDialog(context, error);
       }
 

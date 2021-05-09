@@ -20,6 +20,7 @@ import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/service/sponge_service.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/pages/action_call_page.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/action_call_utils.dart';
@@ -32,7 +33,7 @@ typedef OnBeforeSelectedSubActionCallback = Future<bool> Function(
     dynamic contextValue);
 
 typedef OnAfterSubActionCallCallback = Future<void> Function(
-    SubActionSpec subActionSpec, ActionCallState actionCallState, int index);
+    AfterSubActionCallEvent event);
 
 class SubActionRuntimeSpec {
   SubActionRuntimeSpec(this.spec, {this.active = true});
@@ -122,8 +123,11 @@ class SubActionsController extends BaseActionsController {
       onBeforeInstantCall: () async {
         await uiContext.callbacks.onBeforeSubActionCall();
       },
-      onAfterCall: (subActionSpec, state, index) async {
-        var resultSubstitutionTarget = subActionSpec.subAction.result?.target;
+      onAfterCall: (event) async {
+        var resultSubstitutionTarget =
+            event.subActionSpec.subAction.result?.target;
+
+        var state = event.state;
 
         // Handle sub-action result substitution.
         if (resultSubstitutionTarget != null &&
@@ -136,11 +140,11 @@ class SubActionsController extends BaseActionsController {
           var value = state.resultInfo.result;
           if (resultSubstitutionTarget != DataTypeConstants.PATH_THIS ||
               !DataTypeUtils.isNull(value)) {
-            uiContext.callbacks.onSave(targetType, value);
+            uiContext.callbacks.onSave(SaveValueEvent(targetType, value));
           }
         }
 
-        await uiContext.callbacks.onAfterSubActionCall(state);
+        await uiContext.callbacks.onAfterSubActionCall(event);
       },
     );
   }
@@ -193,39 +197,44 @@ class SubActionsController extends BaseActionsController {
         onBeforeInstantCall: () async {
           await uiContext.callbacks.onBeforeSubActionCall();
         },
-        onAfterCall: (subActionSpec, state, index) async {
-          var resultSubstitutionTarget = subActionSpec.subAction.result?.target;
+        onAfterCall: (event) async {
+          var resultSubstitutionTarget =
+              event.subActionSpec.subAction.result?.target;
+          var state = event.state;
 
           if (resultSubstitutionTarget != null &&
               state is ActionCallStateEnded &&
               state.resultInfo != null &&
               state.resultInfo.isSuccess) {
             if (resultSubstitutionTarget == DataTypeConstants.PATH_THIS) {
-              Validate.notNull(index, 'The list element index cannot be null');
+              Validate.notNull(
+                  event.index, 'The list element index cannot be null');
 
               var value = state.resultInfo.result;
               if (!DataTypeUtils.isNull(value)) {
-                (uiContext.value as List)[index] = value;
+                (uiContext.value as List)[event.index] = value;
                 // Save the whole list.
-                uiContext.callbacks
-                    .onSave(uiContext.qualifiedType, uiContext.value);
+                uiContext.callbacks.onSave(
+                    SaveValueEvent(uiContext.qualifiedType, uiContext.value));
               }
             } else if (resultSubstitutionTarget ==
                 DataTypeConstants.PATH_PARENT) {
               var value = state.resultInfo.result;
               if (!DataTypeUtils.isNull(value)) {
                 // Save the whole list.
-                uiContext.callbacks.onSave(uiContext.qualifiedType, value);
+                uiContext.callbacks
+                    .onSave(SaveValueEvent(uiContext.qualifiedType, value));
               }
             } else if (DataTypeUtils.isPathRelativeToRoot(
                 resultSubstitutionTarget)) {
               var value = state.resultInfo.result;
               if (!DataTypeUtils.isNull(value)) {
                 // Save relative to the root.
-                uiContext.callbacks.onSave(
-                    getResultSubstitutionTargetType(
-                        uiContext, resultSubstitutionTarget),
-                    value);
+                uiContext.callbacks.onSave(SaveValueEvent(
+                  getResultSubstitutionTargetType(
+                      uiContext, resultSubstitutionTarget),
+                  value,
+                ));
               }
             } else {
               throw Exception(
@@ -233,7 +242,7 @@ class SubActionsController extends BaseActionsController {
             }
           }
 
-          await uiContext.callbacks.onAfterSubActionCall(state);
+          await uiContext.callbacks.onAfterSubActionCall(event);
         });
   }
 
@@ -502,6 +511,8 @@ class SubActionsController extends BaseActionsController {
 
       var showActionCallWidget = actionData.hasVisibleArgs;
 
+      bool subActionResultShown = false;
+
       try {
         if (showActionCallWidget) {
           // Call the sub-action in the ActionCall screen.
@@ -523,6 +534,8 @@ class SubActionsController extends BaseActionsController {
           callState = newActionData != null
               ? ActionCallStateEnded(newActionData.resultInfo)
               : null;
+
+          subActionResultShown = true;
         } else {
           bool autoClosing = !showResultDialogIfNoResult &&
               actionData.actionMeta.result is VoidType &&
@@ -542,6 +555,8 @@ class SubActionsController extends BaseActionsController {
                 bloc: bloc,
                 autoClosing: autoClosing,
               );
+
+              subActionResultShown = true;
             }
           }
 
@@ -551,7 +566,12 @@ class SubActionsController extends BaseActionsController {
                   orElse: () => null);
         }
       } finally {
-        await onAfterCall?.call(subActionSpec, callState, index);
+        await onAfterCall?.call(AfterSubActionCallEvent(
+          subActionSpec,
+          callState,
+          index: index,
+          errorAlreadyHandled: subActionResultShown,
+        ));
 
         await bloc.close();
       }

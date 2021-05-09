@@ -1,3 +1,10 @@
+## 0.17.0 (2021-03-19)
+
+* Migration to Flutter 2.
+* Changed user_location to flutter_map_location.
+* Added support for `/` sub-action substitutions.
+* Added new Remote API feature protocolVersion.
+  
 ## 0.16.9 (2020-12-21)
 
 * Minor bug fixes and improvements.

@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/record_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
@@ -243,9 +244,9 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
       qFieldType,
       _presenter.getFieldValue(qFieldType),
       hintText: qFieldType.type.description,
-      onSave: (value) => setState(() => _presenter.onSave(qFieldType, value)),
+      onSave: (value) => setState(() => _presenter.onSave(SaveValueEvent(qFieldType, value))),
       onUpdate: (value) =>
-          setState(() => _presenter.onUpdate(qFieldType, value)),
+          setState(() => _presenter.onUpdate(UpdateValueEvent(qFieldType, value))),
       readOnly: _presenter.isRecordReadOnly ||
           !shouldFieldBeEnabled ||
           !_presenter.isRecordEnabled,

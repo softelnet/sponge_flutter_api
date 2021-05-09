@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/context/ui_context.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/mvp/widgets/type/list_type_mvp.dart';
 import 'package:sponge_flutter_api/src/flutter/ui/type_gui_provider/unit_type_gui_providers.dart';
@@ -419,7 +420,7 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
   Future<void> _onElementTap(
       TypeViewerContext subUiContext, dynamic rawElement, int index) async {
     if (_isOnActivateSubmit(rawElement)) {
-      subUiContext.callbacks.onActivate(subUiContext.qualifiedType, rawElement);
+      subUiContext.callbacks.onActivate(ActivateValueEvent(subUiContext.qualifiedType, rawElement));
     } else if (_subActionsController.isActivateEnabled(rawElement)) {
       await _subActionsController.onActivateElement(context, rawElement,
           index: index, typeValueBundle: _presenter.typeValueBundle);

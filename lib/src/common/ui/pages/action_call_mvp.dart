@@ -15,12 +15,12 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/bloc/action_call_bloc.dart';
-import 'package:sponge_flutter_api/src/common/bloc/action_call_state.dart';
 import 'package:sponge_flutter_api/src/common/model/action_call_session.dart';
 import 'package:sponge_flutter_api/src/common/service/application_service.dart';
 import 'package:sponge_flutter_api/src/common/ui/mvp/mvp.dart';
 import 'package:sponge_flutter_api/src/common/util/model_utils.dart';
 import 'package:sponge_flutter_api/src/common/util/type_gui_utils.dart';
+import 'package:sponge_flutter_api/src/common/model/events.dart';
 
 class ActionCallViewModel extends BaseViewModel {
   ActionCallViewModel(this.actionData);
@@ -33,7 +33,7 @@ abstract class ActionCallView extends BaseView {
   Future<void> refreshArgs({bool showDialogOnError});
   Future<bool> saveForm();
   Future<void> onBeforeSubActionCall();
-  Future<void> onAfterSubActionCall(ActionCallState state);
+  Future<void> onAfterSubActionCall(AfterSubActionCallEvent event);
 }
 
 class ActionCallPresenter

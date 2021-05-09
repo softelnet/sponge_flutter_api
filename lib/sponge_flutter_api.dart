@@ -19,6 +19,7 @@ export 'src/common/bloc/event_received_bloc.dart';
 export 'src/common/bloc/forwarding_bloc.dart';
 export 'src/common/configuration/connections_configuration.dart';
 export 'src/common/model/action_call_session.dart';
+export 'src/common/model/events.dart';
 export 'src/common/model/sponge_model.dart';
 export 'src/common/model/type/generic_type.dart';
 export 'src/common/model/type/type_value.dart';
