@@ -127,10 +127,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
                 : Card(
                     margin: margin,
                     elevation: 0,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: _buildFieldsWidgets(context),
-                    ),
                     color: Theme.of(widget.uiContext.context)
                         .scaffoldBackgroundColor,
                     shape: widget.showBorder
@@ -141,6 +137,10 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
                             ),
                           )
                         : null,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _buildFieldsWidgets(context),
+                    ),
                   ),
           ),
       ],
@@ -159,15 +159,15 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
 
       if (subActionsWidget != null) {
         widgets.add(Align(
+          alignment: Alignment.centerRight,
           child: Container(
-            child: subActionsWidget,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).dividerColor,
             ),
             margin: const EdgeInsets.only(bottom: 5, right: 5),
+            child: subActionsWidget,
           ),
-          alignment: Alignment.centerRight,
         ));
       }
     }
@@ -204,8 +204,8 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
     if (rawFieldWidgets.length > 1) {
       groupWidget = Wrap(
         spacing: 10,
-        children: rawFieldWidgets,
         crossAxisAlignment: WrapCrossAlignment.center,
+        children: rawFieldWidgets,
       );
     } else if (rawFieldWidgets.length == 1) {
       groupWidget = rawFieldWidgets.first;
@@ -220,10 +220,10 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
                   ? 10
                   : 0),
       child: Align(
-        child: groupWidget,
         alignment: fieldGroup.isNotEmpty
             ? getAlignment(fieldGroup[0].features)
             : Alignment.centerLeft,
+        child: groupWidget,
       ),
     );
 
@@ -264,6 +264,7 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
 
       if (qFieldType.type.provided?.hasValueSet ?? false) {
         return AbsorbPointer(
+          absorbing: qFieldType.type.readOnly || !_presenter.isRecordEnabled,
           child: ProvidedValueSetEditorWidget(
             editorContext.getDecorationLabel(),
             qFieldType,
@@ -272,7 +273,6 @@ class _RecordTypeWidgetState extends State<RecordTypeWidget>
             widget.uiContext.callbacks.onGetProvidedArg,
             editorContext.onSave,
           ),
-          absorbing: qFieldType.type.readOnly || !_presenter.isRecordEnabled,
         );
       }
 

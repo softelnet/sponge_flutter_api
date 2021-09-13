@@ -93,7 +93,7 @@ class _ActionsPageState extends State<ActionsPage>
     return WillPopScope(
       child: BlocBuilder<ForwardingBloc<SpongeConnectionState>,
               SpongeConnectionState>(
-          cubit: service.connectionBloc,
+          bloc: service.connectionBloc,
           builder: (BuildContext context, SpongeConnectionState state) {
             if (state is SpongeConnectionStateNotConnected) {
               return _buildScaffold(
@@ -158,8 +158,8 @@ class _ActionsPageState extends State<ActionsPage>
                       (group) => Tab(
                         key: Key('group-${group.name}'),
                         child: Tooltip(
-                          child: Text(group.name.toUpperCase()),
                           message: group.name,
+                          child: Text(group.name.toUpperCase()),
                         ),
                       ),
                     )
@@ -184,8 +184,8 @@ class _ActionsPageState extends State<ActionsPage>
         return _useTabs
             ? DefaultTabController(
                 length: snapshot.data.length,
-                child: scaffold,
                 initialIndex: _initialTabIndex,
+                child: scaffold,
               )
             : scaffold;
       },
@@ -208,8 +208,8 @@ class _ActionsPageState extends State<ActionsPage>
       drawer: Provider.of<SpongeGuiFactory>(context).createDrawer(context),
       body: SafeArea(
         child: ModalProgressHUD(
-          child: child,
           inAsyncCall: _presenter.busy,
+          child: child,
         ),
       ),
       floatingActionButton: _presenter.service.connectionBloc.state
@@ -253,6 +253,9 @@ class _ActionsPageState extends State<ActionsPage>
 
   Widget _buildTitle(BuildContext context) {
     return Tooltip(
+      message: _presenter.connectionName != null
+          ? '${_presenter.connectionName} actions'
+          : 'Actions',
       child: Text(
         _presenter.connectionName != null
             ? '${_presenter.connectionName}'
@@ -260,9 +263,6 @@ class _ActionsPageState extends State<ActionsPage>
         softWrap: true,
         overflow: TextOverflow.visible,
       ),
-      message: _presenter.connectionName != null
-          ? '${_presenter.connectionName} actions'
-          : 'Actions',
     );
   }
 

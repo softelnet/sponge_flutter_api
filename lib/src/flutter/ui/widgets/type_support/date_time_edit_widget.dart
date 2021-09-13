@@ -101,7 +101,7 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
       firstDate = Jiffy(initialDate).subtract(years: widget.yearsRange);
     }
 
-    return firstDate;
+    return firstDate.dateTime;
   }
 
   DateTime _getDefaultLastDate(DateTime initialDate, DateTime now) {
@@ -111,7 +111,7 @@ class _DateTimeEditWidgetState extends State<DateTimeEditWidget> {
       lastDate = Jiffy(initialDate).add(years: widget.yearsRange);
     }
 
-    return lastDate;
+    return lastDate.dateTime;
   }
 
   Future<void> _showDatePicker() async {

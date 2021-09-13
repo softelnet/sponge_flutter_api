@@ -127,6 +127,9 @@ class _EventsPageState extends State<EventsPage>
 
   Widget _buildTitle(BuildContext context) {
     return Tooltip(
+      message: _presenter.connectionName != null
+          ? '${_presenter.connectionName} events'
+          : 'Events',
       child: Text(
         _presenter.connectionName != null
             ? '${_presenter.connectionName} (Events)'
@@ -134,9 +137,6 @@ class _EventsPageState extends State<EventsPage>
         softWrap: true,
         overflow: TextOverflow.visible,
       ),
-      message: _presenter.connectionName != null
-          ? '${_presenter.connectionName} events'
-          : 'Events',
     );
   }
 
@@ -146,7 +146,7 @@ class _EventsPageState extends State<EventsPage>
     return <Widget>[
       _presenter.subscriptionBloc != null
           ? BlocBuilder<ForwardingBloc<bool>, bool>(
-              cubit: _presenter.subscriptionBloc,
+              bloc: _presenter.subscriptionBloc,
               builder: (BuildContext context, bool state) {
                 if (state) {
                   _controller.repeat();

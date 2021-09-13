@@ -74,9 +74,9 @@ class _DrawingPageState extends State<DrawingPage> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.clear),
           onPressed: () => setState(() => _controller.clear()),
           tooltip: 'Clear drawing',
+          child: Icon(Icons.clear),
         ),
       ),
       onWillPop: () async {

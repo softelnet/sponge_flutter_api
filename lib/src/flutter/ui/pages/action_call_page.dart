@@ -106,8 +106,8 @@ class _ActionCallPageState extends State<ActionCallPage>
           ),
           body: SafeArea(
             child: ModalProgressHUD(
-              child: _buildIsActiveWidget(context),
               inAsyncCall: _presenter.busy,
+              child: _buildIsActiveWidget(context),
             ),
           ),
         ),
@@ -121,12 +121,12 @@ class _ActionCallPageState extends State<ActionCallPage>
 
   Widget _buildTitle(BuildContext context) {
     return Tooltip(
+      message: _presenter.title,
       child: Text(
         _presenter.title,
         softWrap: true,
         overflow: TextOverflow.visible,
       ),
-      message: _presenter.title,
     );
   }
 
@@ -165,7 +165,7 @@ class _ActionCallPageState extends State<ActionCallPage>
   Widget _buildProvideArgsWidget(BuildContext context) {
     return _presenter.hasProvidedArgs
         ? BlocBuilder<ProvideActionArgsBloc, ProvideActionArgsState>(
-            cubit: _presenter.provideArgsBloc,
+            bloc: _presenter.provideArgsBloc,
             builder: (BuildContext context, ProvideActionArgsState state) {
               _presenter.error = null;
               if (state is ProvideActionArgsStateInitialize) {
@@ -185,8 +185,8 @@ class _ActionCallPageState extends State<ActionCallPage>
                 }
 
                 return ModalProgressHUD(
-                  child: _buildActionCallWidget(context, state),
                   inAsyncCall: _presenter.busy,
+                  child: _buildActionCallWidget(context, state),
                 );
               }
             },
@@ -212,14 +212,14 @@ class _ActionCallPageState extends State<ActionCallPage>
       var children = [
         if (widget.header != null)
           Card(
+            shape: const BeveledRectangleBorder(),
             child: Padding(
+              padding: const EdgeInsets.all(10),
               child: Text(
                 widget.header,
                 textAlign: TextAlign.left,
               ),
-              padding: const EdgeInsets.all(10),
             ),
-            shape: const BeveledRectangleBorder(),
           ),
         _buildActionArgumentsWidget(editorContext),
         _buildButtonBar(context),
@@ -288,8 +288,8 @@ class _ActionCallPageState extends State<ActionCallPage>
     var editor = _mainArgsGuiProvider.createEditor(editorContext);
 
     var argWidget = OptionalScrollContainer(
-      child: editor,
       scrollable: _presenter.isScrollable(),
+      child: editor,
     );
 
     return _presenter.isScrollable() ||

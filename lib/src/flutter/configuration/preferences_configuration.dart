@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/configuration/connections_configuration.dart';
 import 'package:sponge_flutter_api/src/common/model/sponge_model.dart';
+import 'package:sponge_flutter_api/src/flutter/ui/util/gui_utils.dart';
 
 class SharedPreferencesConnectionsConfiguration
     extends ConnectionsConfiguration {
@@ -104,18 +105,23 @@ class SharedPreferencesConnectionsConfiguration
       password = null;
     }
 
-    await _prefs.setString('$_KEY_PREFIX${connection.name}.username', username);
-    await _prefs.setString('$_KEY_PREFIX${connection.name}.password',
+    await setPreferenceStringNullable(
+        _prefs, '$_KEY_PREFIX${connection.name}.username', username);
+    await setPreferenceStringNullable(
+        _prefs,
+        '$_KEY_PREFIX${connection.name}.password',
         _baseConfiguration.encode(password));
-    await _prefs.setBool(
+    await setPreferenceBoolNullable(_prefs,
         '$_KEY_PREFIX${connection.name}.anonymous', connection.anonymous);
-    await _prefs.setBool(
+    await setPreferenceBoolNullable(_prefs,
         '$_KEY_PREFIX${connection.name}.savePassword', connection.savePassword);
-    await _prefs.setString(
-        '$_KEY_PREFIX${connection.name}.network', connection.network);
-    await _prefs.setBool(
+    await setPreferenceStringNullable(
+        _prefs, '$_KEY_PREFIX${connection.name}.network', connection.network);
+    await setPreferenceBoolNullable(_prefs,
         '$_KEY_PREFIX${connection.name}.subscribe', connection.subscribe);
-    await _prefs.setStringList('$_KEY_PREFIX${connection.name}.subscription',
+    await setPreferenceStringListNullable(
+        _prefs,
+        '$_KEY_PREFIX${connection.name}.subscription',
         connection.subscriptionEventNames);
   }
 

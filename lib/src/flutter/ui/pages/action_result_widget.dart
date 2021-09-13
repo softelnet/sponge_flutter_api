@@ -51,7 +51,7 @@ class _ActionResultWidgetState extends State<ActionResultWidget>
     _presenter.updateModel(model);
 
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-      cubit: _presenter.bloc,
+      bloc: _presenter.bloc,
       builder: (BuildContext context, ActionCallState state) {
         return _buildResultWidget(context, state);
       },
@@ -82,14 +82,14 @@ class _ActionResultWidgetState extends State<ActionResultWidget>
 
   Widget _buildErrorWidget(dynamic exception) => SingleChildScrollView(
         child: Container(
+          color: Colors.red,
           child: Container(
+            margin: const EdgeInsets.all(5),
             child: Text(
               'Error: $exception',
               style: const TextStyle(color: Colors.white),
             ),
-            margin: const EdgeInsets.all(5),
           ),
-          color: Colors.red,
         ),
       );
 

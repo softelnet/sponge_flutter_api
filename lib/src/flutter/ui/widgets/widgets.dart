@@ -33,6 +33,15 @@ class DefaultDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DrawerHeader(
+      decoration: BoxDecoration(
+        color: isDarkTheme(context)
+            ? Theme.of(context).dialogBackgroundColor
+            : Theme.of(context).accentColor,
+        image: const DecorationImage(
+          image: AssetImage('assets/images/banner.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Column(
         children: [
           Image.asset('assets/images/logo.png', fit: BoxFit.scaleDown),
@@ -53,15 +62,6 @@ class DefaultDrawerHeader extends StatelessWidget {
             ),
           ),
         ],
-      ),
-      decoration: BoxDecoration(
-        color: isDarkTheme(context)
-            ? Theme.of(context).dialogBackgroundColor
-            : Theme.of(context).accentColor,
-        image: const DecorationImage(
-          image: AssetImage('assets/images/banner.png'),
-          fit: BoxFit.cover,
-        ),
       ),
     );
   }

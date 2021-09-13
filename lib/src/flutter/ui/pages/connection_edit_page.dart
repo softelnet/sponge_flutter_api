@@ -102,8 +102,8 @@ class _ConnectionEditPageState extends State<ConnectionEditPage>
       ),
       body: SafeArea(
         child: ModalProgressHUD(
-          child: _buildMainWidget(),
           inAsyncCall: _presenter.busy,
+          child: _buildMainWidget(),
         ),
       ),
     );

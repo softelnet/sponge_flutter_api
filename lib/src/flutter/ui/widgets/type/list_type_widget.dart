@@ -170,6 +170,13 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
       // TODO Support active/inactive verification to enable/disable the button.
       buttons.add(TextButton(
         key: Key('list-create'),
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+        ),
+        onPressed: () => _subActionsController
+            .onCreateElement(context,
+                typeValueBundle: _presenter.typeValueBundle)
+            .catchError((e) => handleError(context, e)),
         child: getActionIconByActionName(
               context,
               _presenter.service,
@@ -179,43 +186,36 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
               Icons.add,
               color: getIconColor(context),
             ),
-        style: ButtonStyle(
-          padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-        ),
-        onPressed: () => _subActionsController
-            .onCreateElement(context,
-                typeValueBundle: _presenter.typeValueBundle)
-            .catchError((e) => handleError(context, e)),
       ));
     }
 
     if (_presenter.isRefreshEnabled) {
       buttons.add(TextButton(
         key: Key('list-refresh'),
-        child: Icon(
-          Icons.refresh,
-          color: getIconColor(context),
-        ),
         style: ButtonStyle(
           padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
         ),
         onPressed: () =>
             _presenter.onRefresh().catchError((e) => handleError(context, e)),
+        child: Icon(
+          Icons.refresh,
+          color: getIconColor(context),
+        ),
       ));
     }
 
     if (_isIndicatedIndexEnabled) {
       buttons.add(TextButton(
         key: Key('list-goToIndicatedIndex'),
-        child: Icon(
-          MdiIcons.target,
-          color: getIconColor(context),
-        ),
         style: ButtonStyle(
           padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
         ),
         onPressed: () =>
             _goToIndicatedItem().catchError((e) => handleError(context, e)),
+        child: Icon(
+          MdiIcons.target,
+          color: getIconColor(context),
+        ),
       ));
     }
 
@@ -241,17 +241,17 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
         Row(
           children: <Widget>[
             Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
                 _presenter.label ?? '',
                 style: getArgLabelTextStyle(context),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 10),
             ),
             Expanded(
               child: ButtonBar(
-                children: buttons,
                 buttonPadding: EdgeInsets.zero,
                 alignment: MainAxisAlignment.end,
+                children: buttons,
               ),
             ),
           ],
@@ -329,8 +329,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
               side: BorderSide(
                   style: BorderStyle.solid, color: getBorderColor(context)))
           : BeveledRectangleBorder(),
-      child: child,
       color: widget.showBorders ? getThemedBackgroundColor(context) : null,
+      child: child,
     );
   }
 
@@ -346,8 +346,8 @@ class _ListTypeWidgetState extends State<ListTypeWidget>
 
     return icon != null
         ? AspectRatio(
-            child: icon,
             aspectRatio: 1,
+            child: icon,
           )
         : null;
   }

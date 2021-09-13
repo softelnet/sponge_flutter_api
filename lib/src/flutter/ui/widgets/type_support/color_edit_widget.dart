@@ -44,16 +44,16 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
   Widget build(BuildContext context) {
     var suggestedColor = widget.initialColor ?? widget.defaultColor;
     return TextButton(
-      child: Text(
-        '${widget.name ?? 'Color'}${widget.initialColor != null ? " (" + color2string(widget.initialColor) + ")" : ""}',
-        style: TextStyle(color: getContrastColor(suggestedColor)),
-      ),
       style: ButtonStyle(
         foregroundColor: MaterialStateProperty.all<Color>(suggestedColor),
       ),
       onPressed: widget.enabled
           ? () => showColorPicker(context, suggestedColor)
           : null,
+      child: Text(
+        '${widget.name ?? 'Color'}${widget.initialColor != null ? " (" + color2string(widget.initialColor) + ")" : ""}',
+        style: TextStyle(color: getContrastColor(suggestedColor)),
+      ),
     );
   }
 

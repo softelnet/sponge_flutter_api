@@ -40,6 +40,11 @@ class SpongeService<AD extends ActionData> {
   TypeConverter typeConverter;
   FeatureConverter featureConverter;
 
+  SpongeClientConfiguration _additionalClientConfiguration;
+  set additionalClientConfiguration(SpongeClientConfiguration value) {
+    _additionalClientConfiguration = value;
+  }
+
   SpongeClient _client;
   SpongeClient get client => _client;
   SpongeGrpcClient _grpcClient;
@@ -79,6 +84,7 @@ class SpongeService<AD extends ActionData> {
       typeConverter: typeConverter,
       featureConverter: featureConverter,
       autoUseAuthToken: autoUseAuthToken,
+      additionalClientConfiguration: _additionalClientConfiguration,
     );
 
     serviceFeatures = await _client.getFeatures();
@@ -421,20 +427,26 @@ class SpongeService<AD extends ActionData> {
     SpongeConnection connection, {
     TypeConverter typeConverter,
     FeatureConverter featureConverter,
-    bool autoUseAuthToken = true,
+    bool autoUseAuthToken,
+    SpongeClientConfiguration additionalClientConfiguration,
   }) {
+    // TODO [Entrypoint] Anonymous/Username check.
     if (!connection.anonymous &&
         (connection.username == null || connection.password == null)) {
       throw UsernamePasswordNotSetException(connection.name);
     }
 
+    var clientConfiguration = SpongeClientConfiguration(
+      connection.url,
+      username: connection.anonymous ? null : connection.username,
+      password: connection.anonymous ? null : connection.password,
+      autoUseAuthToken: autoUseAuthToken ?? true,
+      // TODO [Entrypoint] Other additional configuration parameters.
+      httpHeaders: additionalClientConfiguration?.httpHeaders,
+    );
+
     return SpongeClient(
-      SpongeClientConfiguration(
-        connection.url,
-        username: connection.anonymous ? null : connection.username,
-        password: connection.anonymous ? null : connection.password,
-        autoUseAuthToken: autoUseAuthToken,
-      ),
+      clientConfiguration,
       typeConverter: typeConverter,
       featureConverter: featureConverter,
     );

@@ -40,7 +40,7 @@ Future<void> callActionImmediately({
 
     // Wait for the server response.
     var callState =
-        await bloc.firstWhere((state) => state.isFinal, orElse: () => null);
+        await bloc.stream.firstWhere((state) => state.isFinal, orElse: () => null);
 
     if (callState is ActionCallStateEnded) {
       resultInfo = callState.resultInfo;
@@ -85,7 +85,7 @@ Future<void> showActionResultDialog({
   BuildContext dialogContext;
 
   if (autoClosing) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => bloc.listen((state) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => bloc.stream.listen((state) {
           if (state is ActionCallStateEnded && dialogContext != null) {
             Navigator.of(dialogContext).pop(null);
           }

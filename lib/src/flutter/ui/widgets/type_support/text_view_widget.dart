@@ -146,8 +146,8 @@ class _ExtendedTextViewWidgetState extends State<ExtendedTextViewWidget> {
           ? SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                child: child,
                 width: textViewerWidth.roundToDouble(),
+                child: child,
               ),
             )
           : child,

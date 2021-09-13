@@ -60,7 +60,7 @@ class _ActionListItemState extends State<ActionListItem>
     callTapOnlyOnCallIcon = !service.settings.actionCallOnTap;
 
     return BlocBuilder<ActionCallBloc, ActionCallState>(
-        cubit: _presenter.bloc,
+        bloc: _presenter.bloc,
         builder: (BuildContext context, ActionCallState state) {
           _presenter.state = state;
 
@@ -175,9 +175,9 @@ class _ActionListItemState extends State<ActionListItem>
     return Column(children: [
       if (resultWidget != null)
         Container(
-          child: resultWidget,
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(top: 5.0),
+          child: resultWidget,
         ),
       _buildButtonBar(context),
     ]);

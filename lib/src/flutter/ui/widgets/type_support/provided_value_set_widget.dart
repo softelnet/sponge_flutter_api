@@ -120,6 +120,7 @@ class _ProvidedValueSetEditorWidgetState
             ),
           ),
           Visibility(
+            visible: !(items?.isEmpty ?? true),
             child: PopupMenuButton(
               key: Key('popup-${createDataTypeKeyValue(widget.qType)}'),
               itemBuilder: (BuildContext context) => items,
@@ -127,7 +128,6 @@ class _ProvidedValueSetEditorWidgetState
                 _controller.text = value?.toString();
               },
             ),
-            visible: !(items?.isEmpty ?? true),
           ),
         ],
       );
@@ -148,9 +148,7 @@ class _ProvidedValueSetEditorWidgetState
     // If the type is nullable and has value set that contains no null values, insert a first element that has a null value.
     if (widget.qType.type.nullable &&
         valueSetValues.every((valueSetValue) => valueSetValue?.value != null)) {
-      valueSetValues = []
-        ..add(AnnotatedValue(null))
-        ..addAll(valueSetValues);
+      valueSetValues = [AnnotatedValue(null), ...valueSetValues];
     }
 
     return valueSetValues

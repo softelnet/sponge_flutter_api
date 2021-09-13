@@ -75,8 +75,8 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
           title: Text(_presenter.title),
         ),
         body: ModalProgressHUD(
-          child: _buildMainWidget(),
           inAsyncCall: _busy,
+          child: _buildMainWidget(),
         ),
       ),
       onWillPop: () async {

@@ -98,13 +98,13 @@ Widget getIcon(
         Provider.of<SpongeGuiFactory>(context).createNetworkImage(iconInfo.url);
 
     var box = forcedSize != null
-        ? SizedBox(child: image, width: forcedSize, height: forcedSize)
+        ? SizedBox(width: forcedSize, height: forcedSize, child: image)
         : image;
 
     return imagePadding != null
         ? Padding(
-            child: box,
             padding: imagePadding,
+            child: box,
           )
         : box;
   }

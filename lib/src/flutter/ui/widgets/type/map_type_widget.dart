@@ -66,11 +66,11 @@ class _MapTypeWidgetState extends State<MapTypeWidget> implements MapTypeView {
       children: <Widget>[
         if (label != null)
           Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               label,
               style: getArgLabelTextStyle(context),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 10),
           ),
         Table(
           border: TableBorder.all(

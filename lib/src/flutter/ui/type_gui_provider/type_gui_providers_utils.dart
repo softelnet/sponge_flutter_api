@@ -129,11 +129,11 @@ class TypeGuiProviderUtils {
     return Column(
       children: <Widget>[
         Align(
+          alignment: Alignment.centerLeft,
           child: Text(
             viewerContext.getDecorationLabel() ?? '',
             style: getArgLabelTextStyle(viewerContext.context),
           ),
-          alignment: Alignment.centerLeft,
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),

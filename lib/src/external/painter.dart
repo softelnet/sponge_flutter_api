@@ -97,10 +97,10 @@ class _PainterState extends State<Painter> {
       child = RepaintBoundary(
         key: _globalKey,
         child: GestureDetector(
-          child: child,
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
+          child: child,
         ),
       );
     } else {
@@ -112,19 +112,19 @@ class _PainterState extends State<Painter> {
           children: <Widget>[
             widget.painterController.backgroundImage,
             GestureDetector(
-              child: child,
               onPanStart: _onPanStart,
               onPanUpdate: _onPanUpdate,
               onPanEnd: _onPanEnd,
+              child: child,
             )
           ],
         ),
       );
     }
     return Container(
-      child: child,
       width: double.infinity,
       height: double.infinity,
+      child: child,
     );
   }
 
@@ -395,7 +395,7 @@ class PainterController extends ChangeNotifier {
       ..strokeCap = StrokeCap.round;
     _pathHistory.backgroundColor =
         _bgimage != null ? Color(0x00000000) : _backgroundColor;
-    _pathHistory..useSubpaths = usingSubpaths;
+    _pathHistory.useSubpaths = usingSubpaths;
 
     if (doNotifyListeners) {
       notifyListeners();

@@ -136,8 +136,8 @@ class TypeGuiProvider<T extends DataType> {
 
     return widget != null && isLoading
         ? AbsorbPointer(
-            child: widget,
             absorbing: true,
+            child: widget,
           )
         : widget;
   }

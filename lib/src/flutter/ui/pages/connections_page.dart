@@ -63,8 +63,8 @@ class _ConnectionsPageState extends State<ConnectionsPage>
       ),
       body: SafeArea(
         child: ModalProgressHUD(
-          child: _buildWidget(),
           inAsyncCall: _presenter.busy,
+          child: _buildWidget(),
         ),
       ),
       floatingActionButton: FloatingActionButton(

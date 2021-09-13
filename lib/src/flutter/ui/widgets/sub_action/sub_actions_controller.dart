@@ -562,7 +562,7 @@ class SubActionsController extends BaseActionsController {
 
           callState = bloc.state.isFinal
               ? bloc.state
-              : await bloc.firstWhere((state) => state.isFinal,
+              : await bloc.stream.firstWhere((state) => state.isFinal,
                   orElse: () => null);
         }
       } finally {

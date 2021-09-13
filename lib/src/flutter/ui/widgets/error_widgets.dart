@@ -80,9 +80,9 @@ class ErrorCircleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkResponse(
       child: CircleAvatar(
-        child: const Icon(Icons.error_outline),
         foregroundColor: Colors.white,
         backgroundColor: Colors.red,
+        child: const Icon(Icons.error_outline),
       ),
       onTap: () => showErrorDialog(context, error?.toString() ?? ''),
     );

@@ -232,12 +232,12 @@ class BooleanTypeGuiProvider extends BaseUnitTypeGuiProvider<BooleanType> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: ToggleButtons(
-              children: [
-                getIcon(editorContext.context, editorContext.service, iconInfo)
-              ],
               onPressed: onChanged != null ? (_) => onChanged(!value) : null,
               isSelected: [value],
               selectedBorderColor: getPrimaryColor(editorContext.context),
+              children: [
+                getIcon(editorContext.context, editorContext.service, iconInfo)
+              ],
             ),
           ),
         );
@@ -844,8 +844,8 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
 
       if (image != null) {
         return Container(
-          child: image,
           padding: const EdgeInsets.symmetric(vertical: 5),
+          child: image,
         );
       }
     }
@@ -981,10 +981,10 @@ class VoidTypeGuiProvider extends BaseUnitTypeGuiProvider<VoidType> {
       );
     }
     return InkResponse(
+      onTap: onTap,
       child: Chip(
         label: Text(editorContext.typeLabel ?? ''),
       ),
-      onTap: onTap,
     );
   }
 

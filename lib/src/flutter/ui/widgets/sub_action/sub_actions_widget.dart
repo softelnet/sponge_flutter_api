@@ -116,8 +116,8 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
         widget.typeValueBundle,
       ),
       icon: widget.menuIcon,
-      child: widget.menuWidget,
       tooltip: widget.tooltip,
+      child: widget.menuWidget,
     );
   }
 
@@ -129,8 +129,8 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
     return [
       if (widget.header != null)
         PopupMenuItem<SubActionSpec>(
-          child: widget.header,
           enabled: false,
+          child: widget.header,
         ),
       if (widget.header != null && runtimeSpecs.isNotEmpty)
         const PopupMenuDivider(),
@@ -151,13 +151,13 @@ class _SubActionsWidgetState extends State<SubActionsWidget> {
 
     return PopupMenuItem<SubActionSpec>(
       value: subActionRuntimeSpec.spec,
+      enabled: subActionRuntimeSpec.active,
       child: ListTile(
         leading: getActionIcon(context, service, actionMeta),
         title: Text(subActionRuntimeSpec.spec.subAction.label ??
             ModelUtils.getActionMetaDisplayLabel(actionMeta)),
         enabled: subActionRuntimeSpec.active,
       ),
-      enabled: subActionRuntimeSpec.active,
     );
   }
 

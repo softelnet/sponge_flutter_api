@@ -18,6 +18,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sponge_client_dart/sponge_client_dart.dart';
 import 'package:sponge_flutter_api/src/common/service/exceptions.dart';
 import 'package:sponge_flutter_api/src/flutter/application_provider.dart';
@@ -218,4 +219,31 @@ Widget createClearableFieldSuffixIcon(
     ),
     onTap: () => onClear?.call(),
   );
+}
+
+Future<bool> setPreferenceStringNullable(
+    SharedPreferences prefs, String key, String value) async {
+  if (value != null) {
+    return await prefs.setString(key, value);
+  } else {
+    return await prefs.remove(key);
+  }
+}
+
+Future<bool> setPreferenceBoolNullable(
+    SharedPreferences prefs, String key, bool value) async {
+  if (value != null) {
+    return await prefs.setBool(key, value);
+  } else {
+    return await prefs.remove(key);
+  }
+}
+
+Future<bool> setPreferenceStringListNullable(
+    SharedPreferences prefs, String key, List<String> value) async {
+  if (value != null) {
+    return await prefs.setStringList(key, value);
+  } else {
+    return await prefs.remove(key);
+  }
 }
