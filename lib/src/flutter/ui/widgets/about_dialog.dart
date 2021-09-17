@@ -30,7 +30,7 @@ Future<void> showDefaultAboutAppDialog(
         imageAsset ?? 'assets/images/icon_small.png',
         fit: BoxFit.scaleDown,
       ),
-      applicationLegalese: applicationLegalese ?? '© 2020 The Sponge Authors',
+      applicationLegalese: applicationLegalese ?? '© 2021 The Sponge Authors',
       children: <Widget>[
         contents,
       ]);

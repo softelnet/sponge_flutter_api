@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import 'dart:async';
+import 'dart:io';
 
-import 'package:package_info/package_info.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:package_info_plus/package_info_plus.dart';
 
 typedef VoidFutureOrCallback = FutureOr<void> Function();
 
@@ -25,10 +27,17 @@ class CommonUtils {
     return (value?.isEmpty ?? true) ? null : value;
   }
 
-  static bool isNetworkError(dynamic error) =>
-      // It's important not to use the SocketException class directly because it will impact the supported platforms.
-      // The https://pub.dev/packages/io doesn't support web.
-      error?.runtimeType?.toString() == 'SocketException';
+  static bool isNetworkError(dynamic error) {
+    var sourceError = error is dio.DioError ? error.error : error;
+
+    return sourceError is IOException;
+  }
+
+  static String getNetworkErrorMessage(dynamic error) {
+    var sourceError = error is dio.DioError ? error.error : error;
+
+    return sourceError?.toString();
+  }
 
   static Future<String> getPackageVersion() async {
     var version = (await PackageInfo.fromPlatform()).version;

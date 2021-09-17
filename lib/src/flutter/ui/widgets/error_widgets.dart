@@ -63,7 +63,7 @@ class NotificationPanelWidget extends StatelessWidget {
           title: Text(title),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 10),
-            child: Text('$_notification'),
+            child: Text(CommonUtils.getNetworkErrorMessage(_notification)),
           ),
         ),
       ),
