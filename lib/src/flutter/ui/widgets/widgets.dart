@@ -36,7 +36,7 @@ class DefaultDrawerHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDarkTheme(context)
             ? Theme.of(context).dialogBackgroundColor
-            : Theme.of(context).accentColor,
+            : Theme.of(context).colorScheme.secondary,
         image: const DecorationImage(
           image: AssetImage('assets/images/banner.png'),
           fit: BoxFit.cover,

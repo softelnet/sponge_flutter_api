@@ -130,13 +130,13 @@ PageRoute<T> createPageRoute<T>(
             maintainState: maintainState,
             fullscreenDialog: fullscreenDialog);
 
-Color getPrimaryColor(BuildContext context) => Theme.of(context).accentColor;
+Color getPrimaryColor(BuildContext context) => Theme.of(context).colorScheme.secondary;
 
 Color getPrimaryDarkerColor(BuildContext context) =>
     Theme.of(context).colorScheme.primary;
 
 Color getIconColor(BuildContext context) =>
-    Theme.of(context).accentColor.withAlpha(200);
+    Theme.of(context).colorScheme.secondary.withAlpha(200);
 
 Color getFloatingButtonBackgroudColor(BuildContext context) =>
     getSecondaryColor(context).withOpacity(0.80);
@@ -152,12 +152,12 @@ Color getBorderColor(BuildContext context) =>
     Theme.of(context).dividerColor.withAlpha(15);
 
 Color getCallIconColor(BuildContext context) =>
-    Theme.of(context).accentColor.withAlpha(120);
+    Theme.of(context).colorScheme.secondary.withAlpha(120);
 
 bool isDarkTheme(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark;
 
-Color getButtonTextColor(BuildContext context) => Theme.of(context).accentColor;
+Color getButtonTextColor(BuildContext context) => Theme.of(context).colorScheme.secondary;
 
 Color getContrastColor(Color color) {
   // Using YIQ color space.

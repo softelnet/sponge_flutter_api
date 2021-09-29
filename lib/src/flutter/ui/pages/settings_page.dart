@@ -189,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ListTile(
                         title: Text(_presenter.maxEventCountTitle),
                         subtitle: Slider(
-                          activeColor: Theme.of(context).accentColor,
+                          activeColor: Theme.of(context).colorScheme.secondary,
                           label: _presenter.maxEventCountValueLabel,
                           min: 0,
                           max: _presenter.maxEventCountMaxValue,
@@ -251,7 +251,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                       ListTile(
                         title: Text(_presenter.useInternalViewersTitle),
                         subtitle: Slider(
-                          activeColor: Theme.of(context).accentColor,
+                          activeColor: Theme.of(context).colorScheme.secondary,
                           label: _presenter.useInternalViewersValueLabel,
                           min: 0,
                           max: _presenter.useInternalViewersMaxValue,
@@ -276,7 +276,7 @@ class _SettingsPageState extends State<SettingsPage> implements SettingsView {
                         title: Text(_presenter
                             .drawingStrokeUpdateDeltaThresholdRatioTitle),
                         subtitle: Slider(
-                          activeColor: Theme.of(context).accentColor,
+                          activeColor: Theme.of(context).colorScheme.secondary,
                           label: _presenter
                               .drawingStrokeUpdateDeltaThresholdRatioValueLabel,
                           value:

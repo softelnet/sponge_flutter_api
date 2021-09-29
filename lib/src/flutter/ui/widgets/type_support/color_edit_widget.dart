@@ -44,8 +44,8 @@ class _ColorEditWidgetState extends State<ColorEditWidget> {
   Widget build(BuildContext context) {
     var suggestedColor = widget.initialColor ?? widget.defaultColor;
     return TextButton(
-      style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all<Color>(suggestedColor),
+      style: TextButton.styleFrom(
+        backgroundColor: suggestedColor,
       ),
       onPressed: widget.enabled
           ? () => showColorPicker(context, suggestedColor)

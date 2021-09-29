@@ -49,7 +49,7 @@ class _SliderWidgetState extends State<SliderWidget> {
     }
 
     return Slider(
-      activeColor: Theme.of(context).accentColor,
+      activeColor: Theme.of(context).colorScheme.secondary,
       label: widget.name,
       min: widget.minValue.roundToDouble(),
       max: widget.maxValue.roundToDouble(),

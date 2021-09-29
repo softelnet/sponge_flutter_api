@@ -79,11 +79,9 @@ class BinaryTypeGuiProvider extends BaseUnitTypeGuiProvider<BinaryType> {
                 : null;
             return Container(
               child: TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Theme.of(editorContext.context).primaryColor),
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
+                style: TextButton.styleFrom(
+                  primary: Colors.white,
+                  backgroundColor: Theme.of(editorContext.context).primaryColor,
                 ),
                 onPressed: editorContext.enabled
                     ? () async {
@@ -731,11 +729,13 @@ class RecordTypeGuiProvider extends BaseUnitTypeGuiProvider<RecordType> {
   }
 }
 
-class OutputStreamTypeGuiProvider extends BaseUnitTypeGuiProvider<OutputStreamType> {
+class OutputStreamTypeGuiProvider
+    extends BaseUnitTypeGuiProvider<OutputStreamType> {
   OutputStreamTypeGuiProvider(DataType type) : super(type);
 }
 
-class InputStreamTypeGuiProvider extends BaseUnitTypeGuiProvider<InputStreamType> {
+class InputStreamTypeGuiProvider
+    extends BaseUnitTypeGuiProvider<InputStreamType> {
   InputStreamTypeGuiProvider(DataType type) : super(type);
 }
 
@@ -857,7 +857,7 @@ class StringTypeGuiProvider extends BaseUnitTypeGuiProvider<StringType> {
     if (uiContext.value != null) {
       final ThemeData themeData = Theme.of(uiContext.context);
       final TextStyle linkStyle = themeData.textTheme.bodyText2.copyWith(
-        color: themeData.accentColor,
+        color: themeData.colorScheme.secondary,
         decoration: TextDecoration.underline,
       );
 
