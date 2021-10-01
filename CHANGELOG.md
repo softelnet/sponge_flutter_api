@@ -1,3 +1,8 @@
+## 0.18.0 (2021-10-01)
+
+* Flutter upgrade to v2.5.0.
+* Dependencies upgrade.
+
 ## 0.17.0 (2021-03-19)
 
 * Migration to Flutter 2.
